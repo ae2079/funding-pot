@@ -1,32 +1,63 @@
+import {
+  createPublicClient,
+  http,
+  getContract,
+  erc20Abi,
+} from 'viem';
 import { queries } from './queries.js';
+import { bondingCurveAbi } from './abis.js';
+import { AnkrProvider } from '@ankr.com/ankr.js';
 
 export class QueryService {
-  rpcUrl;
   indexerUrl;
   blockExplorerUrl;
+  publicClient;
+  bondingCurve;
+  issuanceToken;
+  ankrProvider;
+  networkIdString;
 
-  constructor({ rpcUrl, indexerUrl, blockExplorerUrl }) {
-    this.rpcUrl = rpcUrl;
+  constructor({
+    rpcUrl,
+    indexerUrl,
+    blockExplorerUrl,
+    chainId,
+    bondingCurveAddress,
+    issuanceTokenAddress,
+  }) {
     this.indexerUrl = indexerUrl;
     this.blockExplorerUrl = blockExplorerUrl;
+    this.publicClient = createPublicClient({
+      chain: chainId,
+      transport: http(rpcUrl),
+    });
+    this.bondingCurve = getContract({
+      address: bondingCurveAddress,
+      client: this.publicClient,
+      abi: bondingCurveAbi,
+    });
+    this.networkIdString = this.getNetworkIdString(rpcUrl);
+    this.ankrProvider = new AnkrProvider(
+      this.getAdvancedApiEndpoint(rpcUrl)
+    );
   }
 
   // QUERIES
 
   async getTimeframe({ startBlock, endBlock, address }) {
     if (!startBlock) {
-      startBlock = await this.getStartBlock(address);
+      startBlock = await this.getLastPurchaseBlock(address);
     }
     if (!endBlock) {
       endBlock = await this.getCurrentBlockNumber();
     }
     return {
-      startBlock: await this.getStartBlock(address),
+      startBlock: await this.getLastPurchaseBlock(address),
       endBlock: await this.getCurrentBlockNumber(),
     };
   }
 
-  async getStartBlock(address) {
+  async getLastPurchaseBlock(address) {
     const {
       Swap: [lastBuy],
     } = await this.indexerConnector(
@@ -36,44 +67,80 @@ export class QueryService {
   }
 
   async getCurrentBlockNumber() {
-    const blockInHex = await this.rpcConnector(
-      queries.rpc.currentBlockNumber()
-    );
+    return await this.publicClient.getBlockNumber();
+  }
 
-    return parseInt(blockInHex, 16);
+  async getAmountOut(collateralIn) {
+    return await this.bondingCurve.read.calculatePurchaseReturn([
+      collateralIn,
+    ]);
+  }
+
+  async getIssuanceSupply() {
+    return await this.bondingCurve.read.getVirtualIssuanceSupply();
   }
 
   async getInflows(token, recipient, startBlock, endBlock) {
-    const transactions = await this.blockExplorerConnector(
-      queries.blockExplorer.erc20Transactions(
-        token,
-        recipient,
-        startBlock,
-        endBlock
-      )
-    );
+    const transactions = await this.ankrProvider.getTokenTransfers({
+      address: recipient,
+      fromBlock: startBlock,
+      toBlock: endBlock,
+      blockchain: this.networkIdString,
+      pageSize: 10000,
+    });
 
-    return transactions
-      .filter((tx) => tx.to.toLowerCase() === recipient.toLowerCase())
+    return transactions.transfers
+      .filter(
+        (tx) => tx.toAddress.toLowerCase() === recipient.toLowerCase()
+      )
+      .filter(
+        (tx) =>
+          tx.contractAddress.toLowerCase() === token.toLowerCase()
+      )
       .reduce((acc, tx) => {
-        const { from, value } = tx;
-        if (!acc[from]) {
-          acc[from] = BigInt(value);
+        const { fromAddress, value } = tx;
+        if (!acc[fromAddress]) {
+          acc[fromAddress] = parseFloat(value);
         } else {
-          acc[from] += BigInt(value);
+          acc[fromAddress] += parseFloat(value);
         }
         return acc;
       }, {});
   }
 
-  async getNftHolders(token, endBlock) {
-    const transactions = await this.blockExplorerConnector(
-      queries.blockExplorer.erc721Mints(token, endBlock)
-    );
-    return Array.from(new Set(transactions.map((tx) => tx.to)));
+  async getNftHolders(token) {
+    const { holders } = await this.ankrProvider.getNFTHolders({
+      blockchain: this.networkIdString,
+      contractAddress: token,
+    });
+    return holders;
   }
 
-  // CONNECTORS
+  async getBalances(token, addresses) {
+    const { holders } = await this.ankrProvider.getTokenHolders({
+      blockchain: this.networkIdString,
+      contractAddress: token,
+    });
+
+    const filteredHolders = holders
+      .filter((holder) =>
+        addresses.includes(holder.holderAddress.toLowerCase())
+      )
+      .reduce((obj, holder) => {
+        obj[holder.holderAddress] = holder.balanceRawInteger;
+        return obj;
+      }, {});
+
+    return filteredHolders;
+  }
+
+  async getIssuanceToken() {
+    return await this.bondingCurve.read.getIssuanceToken();
+  }
+
+  /* 
+    CONNECTORS
+  */
 
   async indexerConnector(query) {
     const response = await fetch(this.indexerUrl, {
@@ -90,35 +157,19 @@ export class QueryService {
     return data;
   }
 
-  async rpcConnector(requestBody) {
-    const response = await fetch(this.rpcUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: requestBody,
-    });
-    const { result } = await response.json();
-    return result;
+  /*
+    UTILS
+  */
+
+  getNetworkIdString(rpcUrl) {
+    const [, , , networkIdString] = rpcUrl.split('/');
+    return networkIdString;
   }
 
-  async blockExplorerConnector(urlParams) {
-    let transactions = [];
-    let hasMoreTransactions = true;
-    let pageCounter = 1;
-    while (hasMoreTransactions) {
-      urlParams['page'] = pageCounter;
-      const url = `${this.blockExplorerUrl}?${new URLSearchParams(
-        urlParams
-      ).toString()}`;
-      const response = await fetch(url);
-      const x = await response.json();
-      const { result } = x;
-      transactions = [...transactions, ...result];
-      pageCounter++;
-      hasMoreTransactions = result.length === 2000;
-    }
-
-    return transactions;
+  getAdvancedApiEndpoint(rpcUrl) {
+    const dissembled = rpcUrl.split('/');
+    dissembled[3] = 'multichain';
+    const reassembled = dissembled.join('/');
+    return reassembled;
   }
 }

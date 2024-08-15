@@ -8,5 +8,10 @@
   },
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@ankr.com/ankr.js": "^0.5.1",
+    "dotenv": "^16.4.5",
+    "viem": "^2.19.4"
+  }
 }
