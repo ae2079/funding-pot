@@ -112,23 +112,20 @@ export class FundingPotService {
   }
 
   async checkBalanceLimit(inflows, qualifiedAddresses) {
-    // get current issuance supply
-    const currentSupply = await this.queryService.getIssuanceSupply();
-    // get purchase volume (`calculatePurchaseReturn`)
-    const amountIn = Object.values(inflows).reduce(
-      (a, b) => a + b,
-      0n
-    );
-
-    const supplyIncrease = await this.queryService.getAmountOut(
-      amountIn
-    );
-    // what would be the new issuance supply after batch purchase?
-    const prospectiveNewSupply = currentSupply + supplyIncrease;
-
-    // calcu
-
-    return { accepted: {}, reimburse: {} };
+    /*
+        WHAT I HAVE:
+        1. list of contributor addresses with how much each address has contributed (collateral tokens) 
+        2. for each address, the current balance of issuance tokens (before batch buy)
+        3. the current issuance supply (before batch buy)
+        4. how much would be issued through the batch buy 
+    */
+    /* 
+        WHAT I NEED:
+        - list of contributor addresses with how much of their contribution is eligible to be used for batch buy
+        e.g. if Alice contributed 200 tokens initially, but that would push here over the 2% threshold, how much can she contribute so that she doesn't have
+        more than 2% of the issuance supply?
+        - consider that this can be the case for multiple contributors at the same time
+    */
   }
 
   async enrichInflowData(inflows, prospectiveNewSupply) {
