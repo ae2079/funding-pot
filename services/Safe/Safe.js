@@ -9,7 +9,7 @@ import {
   TransactionType,
 } from 'ethers-multisend';
 import { counterAbi } from '../../abis.js';
-import Safe from '@safe-global/protocol-kit';
+import SafeGlobal from '@safe-global/protocol-kit';
 import { TransactionBuilder } from '../TransactionBuilder/TransactionBuilder.js';
 
 export class Safe {
@@ -70,7 +70,7 @@ export class Safe {
 
   async enqueueTx(txs) {
     if (!this.protocolKit) {
-      this.protocolKit = await Safe.default.init({
+      this.protocolKit = await SafeGlobal.default.init({
         signer: '0x' + process.env.DELEGATE,
         provider: this.rpcUrl,
         safeAddress: this.safeAddress,

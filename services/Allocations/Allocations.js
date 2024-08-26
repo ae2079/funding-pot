@@ -1,7 +1,7 @@
 import { formatUnits, parseUnits } from 'viem';
-import { Queries } from '../Queries.js';
+import { Queries } from '../Queries/Queries.js';
 
-export class FundingPot {
+export class Allocations {
   nftContractAddress;
   multisigAddress;
   bondingCurveAddress;

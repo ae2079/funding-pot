@@ -1,4 +1,4 @@
-export const queries = {
+export const queryBuilder = {
   indexer: {
     lastBuyBlocknumber: (address) => {
       return `

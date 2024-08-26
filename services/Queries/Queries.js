@@ -4,7 +4,7 @@ import {
   getContract,
   erc20Abi,
 } from 'viem';
-import { queries } from './queryBuilder.js';
+import { queryBuilder } from './queryBuilder.js';
 import { bondingCurveAbi } from '../../abis.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 
@@ -61,7 +61,7 @@ export class Queries {
     const {
       Swap: [lastBuy],
     } = await this.indexerConnector(
-      queries.indexer.lastBuyBlocknumber(address)
+      queryBuilder.indexer.lastBuyBlocknumber(address)
     );
     return lastBuy.blockTimestamp;
   }
