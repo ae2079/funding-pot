@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { Queries } from './Queries.js';
@@ -25,7 +28,7 @@ describe('Queries', () => {
   describe('#getCurrentBlockNumber', () => {
     const querySevice = new Queries({
       rpcUrl:
-        'https://rpc.ankr.com/optimism/83faca2c6ed984789a58e5dfbf9ba75d5b2b5d7c48646f6f51a004cb6cccca29',
+        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
     });
 
     it('should return the blocknumber of the BUY', async () => {
@@ -42,7 +45,7 @@ describe('Queries', () => {
 
     const querySevice = new Queries({
       rpcUrl:
-        'https://rpc.ankr.com/optimism/83faca2c6ed984789a58e5dfbf9ba75d5b2b5d7c48646f6f51a004cb6cccca29',
+        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
     });
 
     it('should return all inflows within the timeframe', async () => {
@@ -70,7 +73,7 @@ describe('Queries', () => {
 
     const querySevice = new Queries({
       rpcUrl:
-        'https://rpc.ankr.com/optimism/83faca2c6ed984789a58e5dfbf9ba75d5b2b5d7c48646f6f51a004cb6cccca29',
+        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
     });
 
     it('should return all NFT holders with their balances', async () => {
@@ -122,7 +125,7 @@ describe('Queries', () => {
 
     const querySevice = new Queries({
       rpcUrl:
-        'https://rpc.ankr.com/optimism/83faca2c6ed984789a58e5dfbf9ba75d5b2b5d7c48646f6f51a004cb6cccca29',
+        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
     });
 
     it('returns list of token holders that sent tokens to funding pot with balances', async () => {
