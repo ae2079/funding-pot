@@ -1,14 +1,15 @@
-import { queries } from './queries.js';
-import { QueryService } from './QueryService.js';
+import { formatUnits, parseUnits } from 'viem';
+import { Queries } from '../Queries.js';
 
-export class FundingPotService {
+export class FundingPot {
   nftContractAddress;
   multisigAddress;
   bondingCurveAddress;
-  queryService;
+  Queries;
   isPrivate;
   bondingCurve;
   issuanceToken;
+  issuanceTokenDecimals;
 
   constructor({
     rpcUrl,
@@ -23,7 +24,7 @@ export class FundingPotService {
     this.multisigAddress = multisigAddress;
     this.bondingCurveAddress = bondingCurveAddress;
     this.nftContractAddress = nftContractAddress;
-    this.queryService = new QueryService({
+    this.Queries = new Queries({
       rpcUrl,
       indexerUrl,
       blockExplorerUrl,
@@ -37,7 +38,7 @@ export class FundingPotService {
     const { startBlock, endBlock } = await this.getTimeframe();
 
     // get all token inflows that occured within timeframe
-    const inflows = await this.queryService.getInflows(
+    const inflows = await this.Queries.getInflows(
       startBlock,
       endBlock
     );
@@ -74,16 +75,14 @@ export class FundingPotService {
       timeframe['startBlock'] = this.customConfig.startBlock;
     } else {
       timeframe['startBlock'] =
-        await this.queryService.getLastPurchaseBlock(
-          this.multisigAddress
-        );
+        await this.Queries.getLastPurchaseBlock(this.multisigAddress);
     }
 
     if (this.customConfig.endBlock) {
       timeframe['endBlock'] = this.customConfig.endBlock;
     } else {
       timeframe['endBlock'] =
-        await this.queryService.getCurrentBlockNumber();
+        await this.Queries.getCurrentBlockNumber();
     }
 
     return timeframe;
@@ -93,7 +92,7 @@ export class FundingPotService {
     if (this.customConfig.qualifiedAddresses) {
       return this.customConfig.qualifiedAddresses;
     } else {
-      return await this.queryService.getQualifiedAddressesFromNft(
+      return await this.Queries.getQualifiedAddressesFromNft(
         nftContractAddress
       );
     }
@@ -129,9 +128,9 @@ export class FundingPotService {
   }
 
   async enrichInflowData(inflows, prospectiveNewSupply) {
-    this.issuanceToken = await this.queryService.getIssuanceToken();
+    this.issuanceToken = await this.Queries.getIssuanceToken();
 
-    const x = await this.queryService.getBatchBalances(
+    const x = await this.Queries.getBatchBalances(
       this.issuanceToken,
       inflows
     );
@@ -153,6 +152,41 @@ export class FundingPotService {
 
   async getAllocations(acceptedInflows) {
     const totalAmountIn = this.getAmountIn(acceptedInflows);
+    const amountOut = await this.Queries.getAmountOut(totalAmountIn);
+
+    const withAllocations = Object.fromEntries(
+      Object.entries(acceptedInflows).map(([address, amount]) => [
+        address,
+        {
+          contribution: amount,
+          allocation: this.calculateAlloc(
+            amount,
+            totalAmountIn,
+            amountOut
+          ),
+        },
+      ])
+    );
+
+    return withAllocations;
+  }
+
+  calculateAlloc(contribution, totalAmountIn, amountOut) {
+    const contributionFloat = parseFloat(
+      formatUnits(contribution, 18)
+    );
+    const totalAmountInFloat = parseFloat(
+      formatUnits(totalAmountIn, 18)
+    );
+    const amountOutFloat = parseFloat(formatUnits(amountOut, 18));
+
+    return parseUnits(
+      (
+        (contributionFloat / totalAmountInFloat) *
+        amountOutFloat
+      ).toString(),
+      18
+    );
   }
 
   getAmountIn(contributions) {

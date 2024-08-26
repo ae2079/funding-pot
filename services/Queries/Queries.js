@@ -4,11 +4,11 @@ import {
   getContract,
   erc20Abi,
 } from 'viem';
-import { queries } from './queries.js';
-import { bondingCurveAbi } from './abis.js';
+import { queries } from './queryBuilder.js';
+import { bondingCurveAbi } from '../../abis.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 
-export class QueryService {
+export class Queries {
   indexerUrl;
   blockExplorerUrl;
   publicClient;
