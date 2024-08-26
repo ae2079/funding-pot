@@ -1,4 +1,4 @@
-export const queries = {
+export const queryBuilder = {
   indexer: {
     lastBuyBlocknumber: (address) => {
       return `
@@ -43,13 +43,18 @@ export const queries = {
       };
     },
   },
-  rpc: {
-    currentBlockNumber: () => {
+  ankrAdvancedApi: {
+    getNftHolders: (token) => {
       return JSON.stringify({
-        method: 'eth_blockNumber',
-        params: [],
         id: 1,
         jsonrpc: '2.0',
+        method: 'ankr_getNFTHolders',
+        params: {
+          blockchain: 'optimism_testnet',
+          contractAddress: token,
+          pageSize: 1000,
+          pageToken: '0',
+        },
       });
     },
   },
