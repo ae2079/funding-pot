@@ -3,6 +3,8 @@ import {
   http,
   getContract,
   erc20Abi,
+  formatUnits,
+  parseUnits,
 } from 'viem';
 import { queryBuilder } from './queryBuilder.js';
 import { bondingCurveAbi } from '../../abis.js';
@@ -10,36 +12,26 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 
 export class Queries {
   indexerUrl;
-  blockExplorerUrl;
   publicClient;
-  bondingCurve;
-  issuanceToken;
   ankrProvider;
   networkIdString;
 
-  constructor({
-    rpcUrl,
-    indexerUrl,
-    blockExplorerUrl,
-    chainId,
-    bondingCurveAddress,
-    issuanceTokenAddress,
-  }) {
+  constructor({ rpcUrl, indexerUrl, chainId, bondingCurveAddress }) {
     this.indexerUrl = indexerUrl;
-    this.blockExplorerUrl = blockExplorerUrl;
     this.publicClient = createPublicClient({
       chain: chainId,
       transport: http(rpcUrl),
-    });
-    this.bondingCurve = getContract({
-      address: bondingCurveAddress,
-      client: this.publicClient,
-      abi: bondingCurveAbi,
     });
     this.networkIdString = this.getNetworkIdString(rpcUrl);
     this.ankrProvider = new AnkrProvider(
       this.getAdvancedApiEndpoint(rpcUrl)
     );
+
+    this.bondingCurve = getContract({
+      address: bondingCurveAddress,
+      client: this.publicClient,
+      abi: bondingCurveAbi,
+    });
   }
 
   // QUERIES
@@ -98,11 +90,11 @@ export class Queries {
           tx.contractAddress.toLowerCase() === token.toLowerCase()
       )
       .reduce((acc, tx) => {
-        const { fromAddress, value } = tx;
+        const { fromAddress, value, tokenDecimals } = tx;
         if (!acc[fromAddress]) {
-          acc[fromAddress] = parseFloat(value);
+          acc[fromAddress] = parseUnits(value, tokenDecimals);
         } else {
-          acc[fromAddress] += parseFloat(value);
+          acc[fromAddress] += parseUnits(value, tokenDecimals);
         }
         return acc;
       }, {});
