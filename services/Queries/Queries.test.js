@@ -138,12 +138,12 @@ describe('Queries', () => {
         token,
         addresses
       );
-
+      console.log(balances);
       assert.deepStrictEqual(balances, {
         '0x27905e39b5eb4ebfdfbc285f209f46d92b01f3a0':
-          '3067718287019563653',
+          3067718287019563653n,
         '0x2e26ff7bc1ba49c4a234858f6a75379c56a9c85b':
-          '152112944197275',
+          152112944197275n,
       });
     });
   });

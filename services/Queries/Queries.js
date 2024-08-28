@@ -126,7 +126,7 @@ export class Queries {
         addresses.includes(holder.holderAddress.toLowerCase())
       )
       .reduce((obj, holder) => {
-        obj[holder.holderAddress] = holder.balanceRawInteger;
+        obj[holder.holderAddress] = BigInt(holder.balanceRawInteger);
         return obj;
       }, {});
 
