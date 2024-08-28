@@ -1,113 +1,76 @@
 import { formatUnits, parseUnits } from 'viem';
-import { Queries } from '../Queries/Queries.js';
 
 export class Allocations {
-  nftContractAddress;
-  multisigAddress;
-  bondingCurveAddress;
-  Queries;
-  isPrivate;
-  bondingCurve;
-  issuanceToken;
-  issuanceTokenDecimals;
+  data;
 
-  constructor({
-    rpcUrl,
-    indexerUrl,
-    multisigAddress,
-    blockExplorerUrl,
-    nftContractAddress,
-    bondingCurveAddress,
-    isPrivate,
-    customConfig,
-  }) {
-    this.multisigAddress = multisigAddress;
-    this.bondingCurveAddress = bondingCurveAddress;
-    this.nftContractAddress = nftContractAddress;
-    this.Queries = new Queries({
-      rpcUrl,
-      indexerUrl,
-      blockExplorerUrl,
-      bondingCurveAddress,
-    });
-    this.isPrivate = isPrivate;
+  constructor(participants) {
+    this.data = { participants };
   }
 
-  async getAllocations() {
-    // get start and end block
-    const { startBlock, endBlock } = await this.getTimeframe();
+  checkEligibility(qualifiedAddresses) {
+    const { participants } = this.data;
+    for (const address of Object.keys(participants)) {
+      if (!qualifiedAddresses.includes(address)) {
+        this.data.participants[address] = {
+          ...participants[address],
+          permitted: false,
+        };
+      } else {
+        this.data.participants[address] = {
+          ...participants[address],
+          permitted: true,
+        };
+      }
+    }
+  }
 
-    // get all token inflows that occured within timeframe
-    const inflows = await this.Queries.getInflows(
-      startBlock,
-      endBlock
+  addContributionData() {
+    const { participants } = this.data;
+    const totalContributions = Object.entries(participants)
+      .filter(([address]) => participants[address].permitted)
+      .reduce((acc, [, data]) => {
+        return acc + data.contribution;
+      }, 0n);
+    const totalReimbursements = Object.entries(participants)
+      .filter(([address]) => !participants[address].permitted)
+      .reduce((acc, [, data]) => {
+        return acc + data.contribution;
+      }, 0n);
+    this.data = {
+      totalContributions,
+      totalReimbursements,
+      ...this.data,
+    };
+  }
+
+  addPurchaseVolume(totalIssuance) {
+    this.data.totalIssuance = totalIssuance;
+  }
+
+  calculateRawAllocations() {
+    const { totalContributions, totalIssuance, participants } =
+      this.data;
+
+    const totalCongtributionFloat = parseFloat(
+      formatUnits(totalContributions, 18)
+    );
+    const totalIssuanceFloat = parseFloat(
+      formatUnits(totalIssuance, 18)
     );
 
-    let permitted, rejected;
-    // filter addresses for eligibility if private round
-    // otherwise all inflows are eligible
-    if (this.isPrivate) {
-      // get list of qualified addresses
-      const qualifiedAddresses = this.getQualifiedAddresses();
-      // check permissions (if private round)
-      ({ permitted, rejected } = this.checkPermissions(
-        inflows,
-        qualifiedAddresses
-      ));
-    } else {
-      permitted = inflows;
-    }
-
-    // TODO
-    // check for balance limits
-    // const { accepted, reimburse } = this.checkBalanceLimit(
-    //   permitted,
-    //   rejected
-    // );
-
-    const allocations = await this.getAllocations(permitted);
-  }
-
-  async getTimeframe() {
-    const timeframe = {};
-
-    if (this.customConfig.startBlock) {
-      timeframe['startBlock'] = this.customConfig.startBlock;
-    } else {
-      timeframe['startBlock'] =
-        await this.Queries.getLastPurchaseBlock(this.multisigAddress);
-    }
-
-    if (this.customConfig.endBlock) {
-      timeframe['endBlock'] = this.customConfig.endBlock;
-    } else {
-      timeframe['endBlock'] =
-        await this.Queries.getCurrentBlockNumber();
-    }
-
-    return timeframe;
-  }
-
-  async getQualifiedAddresses() {
-    if (this.customConfig.qualifiedAddresses) {
-      return this.customConfig.qualifiedAddresses;
-    } else {
-      return await this.Queries.getQualifiedAddressesFromNft(
-        nftContractAddress
+    for (const address of Object.keys(participants)) {
+      const { contribution } = participants[address];
+      const contributionFloat = parseFloat(
+        formatUnits(contribution, 18)
       );
+      const contributionShare =
+        contributionFloat / totalCongtributionFloat;
+      const issuanceAllocation =
+        Math.floor(contributionShare * totalIssuanceFloat * 10000) /
+        10000;
+      this.data.participants[address].rawIssuanceAllocation =
+        parseUnits(issuanceAllocation.toString(), 18);
     }
-  }
-
-  checkPermissions(inflows, qualifiedAddresses) {
-    const permitted = { ...inflows };
-    const rejected = {};
-
-    if (this.isPrivate) {
-      // iterate over inflows, check if is in qualified addresses
-      // if yes do nothing, if no, remove from permitted and add to rejected
-    }
-
-    return { permitted, rejected };
   }
 
   async checkBalanceLimit(inflows, qualifiedAddresses) {

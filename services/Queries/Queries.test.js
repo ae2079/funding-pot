@@ -55,15 +55,20 @@ describe('Queries', () => {
         startBlock,
         endBlock
       );
+
       assert.deepStrictEqual(inflows, {
-        '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb':
-          15560000000000000000n,
-        '0x932285a2e33b89981d25eb586a3893e0f5a1a9da':
-          11000000000000000000n,
-        '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff':
-          6000000000000000000n,
-        '0xf7c3128a43446621430530d6267d0eb21061fab6':
-          6020000000000000000n,
+        '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb': {
+          contribution: 15560000000000000000n,
+        },
+        '0x932285a2e33b89981d25eb586a3893e0f5a1a9da': {
+          contribution: 11000000000000000000n,
+        },
+        '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff': {
+          contribution: 6000000000000000000n,
+        },
+        '0xf7c3128a43446621430530d6267d0eb21061fab6': {
+          contribution: 6020000000000000000n,
+        },
       });
     });
   });

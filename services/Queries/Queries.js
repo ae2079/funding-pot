@@ -37,15 +37,17 @@ export class Queries {
   // QUERIES
 
   async getTimeframe({ startBlock, endBlock, address }) {
-    if (!startBlock) {
+    console.log({ startBlock, endBlock, address });
+    if (!startBlock && startBlock !== 0) {
       startBlock = await this.getLastPurchaseBlock(address);
     }
     if (!endBlock) {
       endBlock = await this.getCurrentBlockNumber();
     }
+
     return {
-      startBlock: await this.getLastPurchaseBlock(address),
-      endBlock: await this.getCurrentBlockNumber(),
+      startBlock,
+      endBlock,
     };
   }
 
@@ -92,9 +94,14 @@ export class Queries {
       .reduce((acc, tx) => {
         const { fromAddress, value, tokenDecimals } = tx;
         if (!acc[fromAddress]) {
-          acc[fromAddress] = parseUnits(value, tokenDecimals);
+          acc[fromAddress] = {
+            contribution: parseUnits(value, tokenDecimals),
+          };
         } else {
-          acc[fromAddress] += parseUnits(value, tokenDecimals);
+          acc[fromAddress].contribution += parseUnits(
+            value,
+            tokenDecimals
+          );
         }
         return acc;
       }, {});
