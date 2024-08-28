@@ -44,29 +44,27 @@ export class Allocations {
   }
 
   calculateRawAllocations(amountOut) {
-    this.data.totalIssuance = amountOut;
+    this.data.newIssuance = amountOut;
 
-    const { totalContributions, totalIssuance, participants } =
+    const { totalContributions, newIssuance, participants } =
       this.data;
 
-    const totalCongtributionFloat = parseFloat(
+    const totalContributionFloat = parseFloat(
       formatUnits(totalContributions, 18)
     );
-    const totalIssuanceFloat = parseFloat(
-      formatUnits(totalIssuance, 18)
-    );
+    const newIssuanceFloat = parseFloat(formatUnits(newIssuance, 18));
 
     for (const address of Object.keys(participants)) {
-      const { contribution } = participants[address];
+      const { contribution, permitted } = participants[address];
+      if (!permitted) continue;
       const contributionFloat = parseFloat(
         formatUnits(contribution, 18)
       );
       const contributionShare =
-        contributionFloat / totalCongtributionFloat;
+        contributionFloat / totalContributionFloat;
       const issuanceAllocation =
-        Math.floor(contributionShare * totalIssuanceFloat * 10000) /
+        Math.floor(contributionShare * newIssuanceFloat * 10000) /
         10000;
-      console.log(issuanceAllocation);
       this.data.participants[address].rawIssuanceAllocation =
         parseUnits(issuanceAllocation.toString(), 18);
     }
@@ -78,21 +76,30 @@ export class Allocations {
     );
   }
 
-  async checkBalanceLimit(inflows, qualifiedAddresses) {
-    /*
-        WHAT I HAVE:
-        1. list of contributor addresses with how much each address has contributed (collateral tokens) 
-        2. for each address, the current balance of issuance tokens (before batch buy)
-        3. the current issuance supply (before batch buy)
-        4. how much would be issued through the batch buy 
-    */
-    /* 
-        WHAT I NEED:
-        - list of contributor addresses with how much of their contribution is eligible to be used for batch buy
-        e.g. if Alice contributed 200 tokens initially, but that would push here over the 2% threshold, how much can she contribute so that she doesn't have
-        more than 2% of the issuance supply?
-        - consider that this can be the case for multiple contributors at the same time
-    */
+  checkBalanceLimit(currentIssuanceSupply, currentBalances) {
+    const { newIssuance } = this.data;
+    const newIssuanceSupply = currentIssuanceSupply + newIssuance;
+    this.data.currentIssuanceSupply = currentIssuanceSupply;
+    this.data.newIssuanceSupply = newIssuanceSupply;
+    const balanceLimitFloat =
+      0.02 * parseFloat(formatUnits(newIssuanceSupply, 18));
+    const balanceLimitBigInt = parseUnits(
+      balanceLimitFloat.toFixed(18),
+      18
+    );
+    this.data.balanceLimit = balanceLimitBigInt;
+
+    for (const address of Object.keys(currentBalances)) {
+      const { rawIssuanceAllocation, permitted } =
+        this.data.participants[address];
+      if (!permitted) continue;
+      const currentBalance = currentBalances[address];
+      const newProspectiveBalance =
+        currentBalance + rawIssuanceAllocation;
+      const excess = newProspectiveBalance - balanceLimitBigInt;
+      if (excess <= 0n) continue;
+      this.data.participants[address].excess = excess;
+    }
   }
 
   async enrichInflowData(inflows, prospectiveNewSupply) {

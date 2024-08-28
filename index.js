@@ -92,14 +92,18 @@ async function main() {
   // add allocation per address
   allocationsService.calculateRawAllocations(purchaseVolume);
 
-  // get current balances of contributors
+  // get current balances of contributors to check max balance limit
   const contributors = allocationsService.getContributors();
   const currentBalances = await queryService.getBalances(
     ISSUANCE_TOKEN,
     contributors
   );
-
-  // check max balance limit
+  const currentIssuanceSupply =
+    await queryService.getIssuanceSupply();
+  allocationsService.checkBalanceLimit(
+    currentBalances,
+    currentIssuanceSupply
+  );
 }
 
 main();

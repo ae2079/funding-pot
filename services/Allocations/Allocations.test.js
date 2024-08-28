@@ -87,7 +87,7 @@ describe('Allocations', () => {
     const totalAmountIn = 12000000000000000000n;
     const data = {
       totalContributions: totalAmountIn,
-      totalIssuance: totalAmountOut,
+      newIssuance: totalAmountOut,
       participants: {
         [addr1]: {
           contribution: contr1,
@@ -110,14 +110,10 @@ describe('Allocations', () => {
       allocationsService.calculateRawAllocations(totalAmountOut);
 
       assert.deepStrictEqual(
-        Object.values(allocationsService.data.participants).map(
-          (p) => p.rawIssuanceAllocation
-        ),
-        [
-          308641900000000000000n,
-          411522500000000000000n,
-          514403200000000000000n,
-        ]
+        Object.values(allocationsService.data.participants)
+          .filter((p) => p.permitted)
+          .map((p) => p.rawIssuanceAllocation),
+        [308641900000000000000n, 411522500000000000000n]
       );
     });
   });
@@ -146,6 +142,56 @@ describe('Allocations', () => {
       const contributors = allocationsService.getContributors();
 
       assert.deepStrictEqual(contributors, [addr1, addr2]);
+    });
+  });
+
+  describe('#checkBalanceLimit', () => {
+    const currentSupply = 97000n;
+    const currentBalances = {
+      [addr1]: 1000n,
+      [addr2]: 1000n,
+      [addr3]: 1000n,
+    };
+
+    const data = {
+      newIssuance: 3000n,
+      participants: {
+        [addr1]: {
+          rawIssuanceAllocation: 1000n,
+          permitted: true,
+        },
+        [addr2]: {
+          rawIssuanceAllocation: 2000n,
+          permitted: true,
+        },
+        [addr3]: {
+          permitted: false,
+        },
+      },
+    };
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    it('adds an excess value to "over contributors', () => {
+      allocationsService.checkBalanceLimit(
+        currentSupply,
+        currentBalances
+      );
+
+      assert.deepStrictEqual(allocationsService.data.participants, {
+        [addr1]: {
+          rawIssuanceAllocation: 1000n,
+          permitted: true,
+        },
+        [addr2]: {
+          rawIssuanceAllocation: 2000n,
+          permitted: true,
+          excess: 1000n,
+        },
+        [addr3]: {
+          permitted: false,
+        },
+      });
     });
   });
 });
