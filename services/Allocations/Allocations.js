@@ -43,11 +43,9 @@ export class Allocations {
     };
   }
 
-  addPurchaseVolume(totalIssuance) {
-    this.data.totalIssuance = totalIssuance;
-  }
+  calculateRawAllocations(amountOut) {
+    this.data.totalIssuance = amountOut;
 
-  calculateRawAllocations() {
     const { totalContributions, totalIssuance, participants } =
       this.data;
 
@@ -68,9 +66,16 @@ export class Allocations {
       const issuanceAllocation =
         Math.floor(contributionShare * totalIssuanceFloat * 10000) /
         10000;
+      console.log(issuanceAllocation);
       this.data.participants[address].rawIssuanceAllocation =
         parseUnits(issuanceAllocation.toString(), 18);
     }
+  }
+
+  getContributors() {
+    return Object.keys(this.data.participants).filter(
+      (address) => this.data.participants[address].permitted
+    );
   }
 
   async checkBalanceLimit(inflows, qualifiedAddresses) {

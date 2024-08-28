@@ -31,9 +31,9 @@ describe('Allocations', () => {
         permitted: false,
       },
     };
+    const allocationsService = new Allocations(dataWithEligibility);
 
     it('adds aggregate contribution data', () => {
-      const allocationsService = new Allocations(dataWithEligibility);
       allocationsService.addContributionData(dataWithEligibility);
 
       assert.deepStrictEqual(allocationsService.data, {
@@ -58,12 +58,10 @@ describe('Allocations', () => {
         contribution: contr3,
       },
     };
+    const allocationsService = new Allocations(data);
 
     it('adds `permitted` flag per participant', () => {
-      const allocationsService = new Allocations(data);
       allocationsService.checkEligibility(eligibleAddresses);
-
-      console.log(allocationsService.data);
 
       assert.deepStrictEqual(allocationsService.data, {
         participants: {
@@ -105,11 +103,12 @@ describe('Allocations', () => {
         },
       },
     };
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
 
     it('calculates allocations', () => {
-      const allocationsService = new Allocations();
-      allocationsService.data = data;
-      allocationsService.calculateRawAllocations();
+      allocationsService.calculateRawAllocations(totalAmountOut);
+
       assert.deepStrictEqual(
         Object.values(allocationsService.data.participants).map(
           (p) => p.rawIssuanceAllocation
@@ -120,6 +119,33 @@ describe('Allocations', () => {
           514403200000000000000n,
         ]
       );
+    });
+  });
+
+  describe('#getContributors', () => {
+    const data = {
+      participants: {
+        [addr1]: {
+          contribution: contr1,
+          permitted: true,
+        },
+        [addr2]: {
+          contribution: contr2,
+          permitted: true,
+        },
+        [addr3]: {
+          contribution: contr3,
+          permitted: false,
+        },
+      },
+    };
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    it("returns a list of contributors' addresses (`eligible` = true)", () => {
+      const contributors = allocationsService.getContributors();
+
+      assert.deepStrictEqual(contributors, [addr1, addr2]);
     });
   });
 });

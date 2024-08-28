@@ -88,9 +88,11 @@ async function main() {
   const purchaseVolume = await queryService.getAmountOut(
     allocationsService.data.totalContributions
   );
-  allocationsService.addPurchaseVolume(purchaseVolume);
 
   // add allocation per address
+  allocationsService.calculateRawAllocations(purchaseVolume);
+
+  // get current balances of contributors
 }
 
 main();
