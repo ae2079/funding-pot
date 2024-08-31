@@ -1,12 +1,8 @@
 import { formatUnits, parseUnits } from 'viem';
+import { cap } from '../../config.js';
 
 export class Batch {
   data;
-  relativeCap;
-
-  constructor() {
-    this.relativeCap = 0.02;
-  }
 
   // STATE-MODIFYING METHODS
 
@@ -66,9 +62,7 @@ export class Batch {
 
     // calculate individual and store individual cap
     this.data.issuanceTokenCap = parseUnits(
-      (
-        this.relativeCap * parseFloat(formatUnits(exAnteSupply, 18))
-      ).toString(),
+      (cap * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
       18
     );
 

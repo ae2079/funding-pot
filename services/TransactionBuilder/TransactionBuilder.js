@@ -4,6 +4,7 @@ import {
   paymentRouterAbi,
   erc20Abi,
 } from '../../data/abis.js';
+import { batchSize } from '../../config.js';
 
 const PAYMENT_PUSHER_ROLE =
   '0x5041594d454e545f505553484552000000000000000000000000000000000000';
@@ -64,9 +65,7 @@ export class TransactionBuilder {
 
   createVestings(vestingSpecs) {
     for (const vestingSpec of vestingSpecs) {
-      console.log(vestingSpec);
       const { recipient, amount } = vestingSpec;
-
       this.transactions.push(
         this.getEncodedTx(
           this.paymentRouter,
@@ -106,5 +105,18 @@ export class TransactionBuilder {
       functionSignature,
       inputValues,
     });
+  }
+
+  getTxBatches() {
+    const { transactions } = this;
+    const txBatches = [];
+
+    const chunkSize = batchSize;
+    for (let i = 0; i < transactions.length; i += chunkSize) {
+      const chunk = transactions.slice(i, i + chunkSize);
+      txBatches.push(chunk);
+    }
+
+    return txBatches;
   }
 }
