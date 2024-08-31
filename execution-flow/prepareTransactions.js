@@ -1,7 +1,6 @@
 export const prepareTransactions = async ({
   batchService,
   transactionBuilderService,
-  batchConfig,
 }) => {
   const {
     totalValidContributions,
@@ -12,4 +11,13 @@ export const prepareTransactions = async ({
     bondingCurve,
   } = batchService.data;
   const allocations = batchService.getAllocations();
+
+  // add batch buy tx
+  transactionBuilderService.buy(totalValidContributions);
+
+  // add vesting txs
+  transactionBuilderService.createVestings(allocations);
+
+  // create tx batches
+  transactionBuilderService.batchTxs();
 };
