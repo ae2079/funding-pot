@@ -1,212 +1,183 @@
 import { formatUnits, parseUnits } from 'viem';
-import { Queries } from '../Queries/Queries.js';
 
 export class Allocations {
-  nftContractAddress;
-  multisigAddress;
-  bondingCurveAddress;
-  Queries;
-  isPrivate;
-  bondingCurve;
-  issuanceToken;
-  issuanceTokenDecimals;
+  data;
+  relativeCap;
 
-  constructor({
-    rpcUrl,
-    indexerUrl,
-    multisigAddress,
-    blockExplorerUrl,
-    nftContractAddress,
-    bondingCurveAddress,
-    isPrivate,
-    customConfig,
-  }) {
-    this.multisigAddress = multisigAddress;
-    this.bondingCurveAddress = bondingCurveAddress;
-    this.nftContractAddress = nftContractAddress;
-    this.Queries = new Queries({
-      rpcUrl,
-      indexerUrl,
-      blockExplorerUrl,
-      bondingCurveAddress,
-    });
-    this.isPrivate = isPrivate;
+  constructor(participants) {
+    this.data = { participants };
+    this.relativeCap = 0.02;
   }
 
-  async getAllocations() {
-    // get start and end block
-    const { startBlock, endBlock } = await this.getTimeframe();
+  // STATE-MODIFYING METHODS
 
-    // get all token inflows that occured within timeframe
-    const inflows = await this.Queries.getInflows(
-      startBlock,
-      endBlock
-    );
-
-    let permitted, rejected;
-    // filter addresses for eligibility if private round
-    // otherwise all inflows are eligible
-    if (this.isPrivate) {
-      // get list of qualified addresses
-      const qualifiedAddresses = this.getQualifiedAddresses();
-      // check permissions (if private round)
-      ({ permitted, rejected } = this.checkPermissions(
-        inflows,
-        qualifiedAddresses
-      ));
-    } else {
-      permitted = inflows;
-    }
-
-    // TODO
-    // check for balance limits
-    // const { accepted, reimburse } = this.checkBalanceLimit(
-    //   permitted,
-    //   rejected
-    // );
-
-    const allocations = await this.getAllocations(permitted);
-  }
-
-  async getTimeframe() {
-    const timeframe = {};
-
-    if (this.customConfig.startBlock) {
-      timeframe['startBlock'] = this.customConfig.startBlock;
-    } else {
-      timeframe['startBlock'] =
-        await this.Queries.getLastPurchaseBlock(this.multisigAddress);
-    }
-
-    if (this.customConfig.endBlock) {
-      timeframe['endBlock'] = this.customConfig.endBlock;
-    } else {
-      timeframe['endBlock'] =
-        await this.Queries.getCurrentBlockNumber();
-    }
-
-    return timeframe;
-  }
-
-  async getQualifiedAddresses() {
-    if (this.customConfig.qualifiedAddresses) {
-      return this.customConfig.qualifiedAddresses;
-    } else {
-      return await this.Queries.getQualifiedAddressesFromNft(
-        nftContractAddress
-      );
+  checkEligibility(qualifiedAddresses) {
+    const { participants } = this.data;
+    for (const address of Object.keys(participants)) {
+      if (!qualifiedAddresses.includes(address)) {
+        this.data.participants[address] = {
+          ...participants[address],
+          permitted: false,
+        };
+      } else {
+        this.data.participants[address] = {
+          ...participants[address],
+          permitted: true,
+        };
+      }
     }
   }
 
-  checkPermissions(inflows, qualifiedAddresses) {
-    const permitted = { ...inflows };
-    const rejected = {};
+  calculateAggregateContributions() {
+    const { participants } = this.data;
 
-    if (this.isPrivate) {
-      // iterate over inflows, check if is in qualified addresses
-      // if yes do nothing, if no, remove from permitted and add to rejected
-    }
-
-    return { permitted, rejected };
+    const totalValidContributions = Object.entries(
+      participants
+    ).reduce((acc, [, data]) => {
+      return data.validContribution
+        ? acc + data.validContribution
+        : acc;
+    }, 0n);
+    const totalExcessContributions = Object.entries(
+      participants
+    ).reduce((acc, [, data]) => {
+      return data.excessContribution
+        ? acc + data.excessContribution
+        : acc;
+    }, 0n);
+    this.data = {
+      totalValidContributions,
+      totalExcessContributions,
+      ...this.data,
+    };
   }
 
-  async checkBalanceLimit(inflows, qualifiedAddresses) {
-    /*
-        WHAT I HAVE:
-        1. list of contributor addresses with how much each address has contributed (collateral tokens) 
-        2. for each address, the current balance of issuance tokens (before batch buy)
-        3. the current issuance supply (before batch buy)
-        4. how much would be issued through the batch buy 
-    */
-    /* 
-        WHAT I NEED:
-        - list of contributor addresses with how much of their contribution is eligible to be used for batch buy
-        e.g. if Alice contributed 200 tokens initially, but that would push here over the 2% threshold, how much can she contribute so that she doesn't have
-        more than 2% of the issuance supply?
-        - consider that this can be the case for multiple contributors at the same time
-    */
-  }
+  calculateValidContributions(
+    exAnteSupply,
+    exAnteSpotPrice,
+    exAnteBalances
+  ) {
+    // store exAnteSupply and exAnteSpotPrice
+    this.data.exAnteSupply = exAnteSupply;
+    this.data.exAnteSpotPrice = exAnteSpotPrice;
 
-  async enrichInflowData(inflows, prospectiveNewSupply) {
-    this.issuanceToken = await this.Queries.getIssuanceToken();
-
-    const x = await this.Queries.getBatchBalances(
-      this.issuanceToken,
-      inflows
-    );
-
-    const enrichedData = Object.entries(inflows)
-      .map(([address, amount]) => [address, { contribution: amount }])
-      .map(([address, data]) => [
-        address,
-        {
-          ...data,
-          relBalance:
-            parseFloat(data.contribution) /
-            parseFloat(prospectiveNewSupply),
-        },
-      ]);
-
-    return enrichedData;
-  }
-
-  async getAllocations(acceptedInflows) {
-    const totalAmountIn = this.getAmountIn(acceptedInflows);
-    const amountOut = await this.Queries.getAmountOut(totalAmountIn);
-
-    const withAllocations = Object.fromEntries(
-      Object.entries(acceptedInflows).map(([address, amount]) => [
-        address,
-        {
-          contribution: amount,
-          allocation: this.calculateAlloc(
-            amount,
-            totalAmountIn,
-            amountOut
-          ),
-        },
-      ])
-    );
-
-    return withAllocations;
-  }
-
-  calculateAlloc(contribution, totalAmountIn, amountOut) {
-    const contributionFloat = parseFloat(
-      formatUnits(contribution, 18)
-    );
-    const totalAmountInFloat = parseFloat(
-      formatUnits(totalAmountIn, 18)
-    );
-    const amountOutFloat = parseFloat(formatUnits(amountOut, 18));
-
-    return parseUnits(
+    // calculate individual and store individual cap
+    this.data.issuanceTokenCap = parseUnits(
       (
-        (contributionFloat / totalAmountInFloat) *
-        amountOutFloat
+        this.relativeCap * parseFloat(formatUnits(exAnteSupply, 18))
       ).toString(),
       18
     );
+
+    const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
+
+    // calculate excess contribution and store
+    for (const address of Object.keys(exAnteBalances)) {
+      const { contribution, permitted } =
+        this.data.participants[address];
+      const exAnteBalance = exAnteBalances[address];
+      const issuanceTokenPotential =
+        this.data.issuanceTokenCap - exAnteBalance; // how many issuance token, the address may buy
+
+      // if no more issuance token potential, all contributions are excess contributions
+      if (issuanceTokenPotential <= 0n) {
+        this.data.participants[address].excessContribution =
+          contribution;
+        continue;
+      }
+
+      // if user is not permitted, all contributions are excess contributions
+      if (!permitted) {
+        this.data.participants[address].excessContribution =
+          contribution;
+        continue;
+      }
+
+      // based on ex ante spot price, ex ante balance, and issuance token potential, calculate contribution potential
+      // store per address
+      const contributionPotentialFloat =
+        this.bigIntToFloat(issuanceTokenPotential) * relSpotPrice;
+      const contributionPotential = this.floatToBigInt(
+        contributionPotentialFloat
+      );
+
+      // if contribution is larger than contribution potential
+      // note excess contribution and actual contribution
+      // if contribution is below contribution potential
+      // all contributions are actual contributions
+      if (contribution > contributionPotential) {
+        const excess = contribution - contributionPotential;
+        this.data.participants[address].excessContribution = excess;
+        this.data.participants[address].validContribution =
+          contributionPotential;
+      } else {
+        this.data.participants[address].validContribution =
+          contribution;
+      }
+    }
   }
 
-  getAmountIn(contributions) {
-    return Object.values(contributions).reduce((a, b) => a + b, 0n);
+  calculateAllocations(amountOut) {
+    this.data.additionalIssuance = amountOut;
+
+    const {
+      totalValidContributions,
+      additionalIssuance,
+      participants,
+    } = this.data;
+
+    const totalValidContributionFloat = this.bigIntToFloat(
+      totalValidContributions
+    );
+    const additionalIssuanceFloat = this.bigIntToFloat(
+      additionalIssuance
+    );
+
+    for (const address of Object.keys(participants)) {
+      const { validContribution } = participants[address];
+      if (!validContribution) continue;
+
+      const validContributionFloat =
+        this.bigIntToFloat(validContribution);
+
+      const contributionShare =
+        validContributionFloat / totalValidContributionFloat;
+      const issuanceAllocation =
+        Math.floor(
+          contributionShare * additionalIssuanceFloat * 10000
+        ) / 10000;
+      this.data.participants[address].issuanceAllocation =
+        this.floatToBigInt(issuanceAllocation);
+    }
   }
 
-  getRelativeContributions(contributions) {
-    const totalContribution = this.getAmountIn(contributions);
-    return Object.entries(contributions)
-      .map(([address, amount]) => [
-        address,
-        {
-          absContribution: amount,
-          relContribution:
-            parseFloat(amount) / parseFloat(totalContribution),
-        },
-      ])
-      .reduce((acc, [address, data]) => {
-        acc[address] = data;
-        return acc;
-      }, {});
+  // GETTERS
+
+  getContributors() {
+    return Object.keys(this.data.participants).filter(
+      (address) => this.data.participants[address].permitted
+    );
+  }
+
+  getAllocations() {
+    const { participants } = this.data;
+    return Object.entries(participants)
+      .filter(([, data]) => data.issuanceAllocation)
+      .map(([address, data]) => {
+        return {
+          recipient: address,
+          amount: data.issuanceAllocation,
+        };
+      });
+  }
+
+  // UTILS
+
+  bigIntToFloat(bigInt) {
+    return parseFloat(formatUnits(bigInt, 18));
+  }
+
+  floatToBigInt(float) {
+    return parseUnits(float.toString(), 18);
   }
 }

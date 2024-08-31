@@ -1,109 +1,357 @@
-// import { describe, it, beforeEach } from 'node:test';
-// import assert from 'node:assert';
-// import { FundingPot } from './FundingPot.js';
+import { describe, it, beforeEach } from 'node:test';
+import assert from 'node:assert';
+import { Allocations } from './Allocations.js';
 
-// describe('FundingPot', () => {
-//   const indexerUrl =
-//     'https://indexer.bigdevenergy.link/a414bf3/v1/graphql';
+describe('Allocations', () => {
+  const addr1 = '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb';
+  const addr2 = '0x932285a2e33b89981d25eb586a3893e0f5a1a9da';
+  const addr3 = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
+  const addr4 = '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff';
+  const addr5 = '0x6bc66727a37f7c0e1039540e3dc2254d39f420eb';
+  const addr6 = '0x27276727a37f7c0e1039540e3dc2254d39f42027';
+  const contr1 = 3000000000000000000n;
+  const contr2 = 4000000000000000000n;
+  const contr3 = 5000000000000000000n;
+  const contr4 = 6000000000000000000n;
+  const contr5 = 7000000000000000000n;
 
-//   const nftContractAddress =
-//     '0xBCb0F73324F3Aff13e01cE81D85768FA55ff75Ea';
-//   const bondingCurveAddress =
-//     '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
-//   const multisigAddress =
-//     '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
+  describe('#calculateAggregateContributions', () => {
+    const dataWithEligibility = {
+      [addr1]: {
+        validContribution: contr1,
+      },
+      [addr2]: {
+        validContribution: contr2,
+      },
+      [addr3]: {
+        validContribution: contr3,
+        excessContribution: contr4,
+      },
+      [addr4]: {
+        excessContribution: contr5,
+      },
+    };
+    const allocationsService = new Allocations(dataWithEligibility);
 
-//   const FundingPot = new FundingPot({
-//     rpcUrl: 'https://sepolia.optimism.io',
-//     indexerUrl,
-//     multisigAddress,
-//     nftContractAddress,
-//     bondingCurveAddress,
-//     isPrivate: false,
-//   });
+    it('adds aggregate contribution data', () => {
+      allocationsService.calculateAggregateContributions(
+        dataWithEligibility
+      );
+      console.log(allocationsService.data);
 
-//   // const FundingPot = new FundingPot({
-//   //   rpcUrl: opSepoliaRpcUrl,
-//   //   indexerUrl,
-//   //   chainId,
-//   //   multisigAddress,
-//   //   blockExplorerUrl: opSepliaBlockExplorerUrl,
-//   //   nftContractAddress,
-//   //   bondingCurveAddress,
-//   //   isPrivate: false,
-//   // });
-//   //   describe('#enrichInflowData', () => {
-//   //     it('should return enriched inflow data', async () => {
-//   // const inflows = {
-//   //   '0x02b01ddf989b3502ebbf8fd5bd803bc1924cedfe':
-//   //     266076010000000n,
-//   //   '0x6609384111b3644628b8865050cda1ebf8d85bbd':
-//   //     150140000000000n,
-//   //   '0x1778b55d436b3266a17d022a01145b3e91cbdd2b':
-//   //     460539340000000n,
-//   // };
-//   //       const newSupply = 1000000000000000000n;
-//   //       const enrichedData = await FundingPot.enrichInflowData(
-//   //         inflows,
-//   //         newSupply
-//   //       );
-//   //       assert.deepStrictEqual(enrichedData, [
-//   //         [
-//   //           '0x02b01ddf989b3502ebbf8fd5bd803bc1924cedfe',
-//   //           {
-//   //             contribution: 266076010000000n,
-//   //             relBalance: 0.00026607601,
-//   //           },
-//   //         ],
-//   //         [
-//   //           '0x6609384111b3644628b8865050cda1ebf8d85bbd',
-//   //           { contribution: 150140000000000n, relBalance: 0.00015014 },
-//   //         ],
-//   //         [
-//   //           '0x1778b55d436b3266a17d022a01145b3e91cbdd2b',
-//   //           {
-//   //             contribution: 460539340000000n,
-//   //             relBalance: 0.00046053934,
-//   //           },
-//   //         ],
-//   //       ]);
-//   //     });
-//   //   });
+      assert.deepStrictEqual(allocationsService.data, {
+        totalValidContributions: contr1 + contr2 + contr3,
+        totalExcessContributions: contr4 + contr5,
+        participants: dataWithEligibility,
+      });
+    });
+  });
 
-//   describe('#getAllocations', () => {
-//     it('returns issuance allocations for a given set of contribution inflows', async () => {
-//       const inflows = {
-//         '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb':
-//           15560000000000000000n,
-//         '0x932285a2e33b89981d25eb586a3893e0f5a1a9da':
-//           11000000000000000000n,
-//         '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff':
-//           6000000000000000000n,
-//         '0xf7c3128a43446621430530d6267d0eb21061fab6':
-//           6020000000000000000n,
-//       };
+  describe('#checkEligibility', () => {
+    const eligibleAddresses = [addr1, addr2];
+    const nonEligibleAddress = addr3;
+    const data = {
+      [eligibleAddresses[0]]: {
+        contribution: contr1,
+      },
+      [eligibleAddresses[1]]: {
+        contribution: contr2,
+      },
+      [nonEligibleAddress]: {
+        contribution: contr3,
+      },
+    };
+    const allocationsService = new Allocations(data);
 
-//       const allocations = await FundingPot.getAllocations(
-//         inflows
-//       );
-//     });
-//   });
+    it('adds `permitted` flag per participant', () => {
+      allocationsService.checkEligibility(eligibleAddresses);
 
-//   // describe('#getRelativeContributions', () => {
-//   //   it('returns issuance allocations for a given set of contribution inflows', async () => {
-//   //     const inflows = {
-//   //       '0x02b01ddf989b3502ebbf8fd5bd803bc1924cedfe':
-//   //         266076010000000n,
-//   //       '0x6609384111b3644628b8865050cda1ebf8d85bbd':
-//   //         150140000000000n,
-//   //       '0x1778b55d436b3266a17d022a01145b3e91cbdd2b':
-//   //         460539340000000n,
-//   //     };
+      assert.deepStrictEqual(allocationsService.data, {
+        participants: {
+          [eligibleAddresses[0]]: {
+            contribution: data[eligibleAddresses[0]].contribution,
+            permitted: true,
+          },
+          [eligibleAddresses[1]]: {
+            contribution: data[eligibleAddresses[1]].contribution,
+            permitted: true,
+          },
+          [nonEligibleAddress]: {
+            contribution: data[nonEligibleAddress].contribution,
+            permitted: false,
+          },
+        },
+      });
+    });
+  });
 
-//   //     const contributions =
-//   //       FundingPot.getRelativeContributions(inflows);
+  describe('#getContributors', () => {
+    const data = {
+      participants: {
+        [addr1]: {
+          contribution: contr1,
+          permitted: true,
+        },
+        [addr2]: {
+          contribution: contr2,
+          permitted: true,
+        },
+        [addr3]: {
+          contribution: contr3,
+          permitted: false,
+        },
+      },
+    };
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
 
-//   //     console.log(contributions);
-//   //   });
-//   // });
-// });
+    it("returns a list of contributors' addresses (`eligible` = true)", () => {
+      const contributors = allocationsService.getContributors();
+
+      assert.deepStrictEqual(contributors, [addr1, addr2]);
+    });
+  });
+
+  describe('#calculateValidContributions', () => {
+    const exAnteSupply = 100_000_000_000_000_000_000n;
+    const exAnteBalances = {
+      [addr1]: 1_000_000_000_000_000_000n, // can still buy one more token (= 1_000_000_000_000_000_000n)
+      [addr2]: 1_000_000_000_000_000_000n, // can still buy one more token
+      [addr3]: 2_000_000_000_000_000_000n, // has already exactly reached the cap
+      [addr4]: 3_000_000_000_000_000_000n, // has already exceeded the cap
+      [addr5]: 1_000_000_000_000_000_000n, // can still buy one more token
+      [addr6]: 1_000_000_000_000_000_000n, // can still buy one more token
+    };
+    const exAnteSpotPrice = 500000n;
+
+    const data = {
+      participants: {
+        [addr1]: {
+          contribution: 5_000_000_000_000_000_000n, // matches exactly what can be bought
+          permitted: true,
+        },
+        [addr2]: {
+          contribution: 69_000_000_000_000_000_000n, // purchase will exceed cap by far
+          permitted: true,
+        },
+        [addr3]: {
+          contribution: 420_000_000_000_000_000_000n, // purchase would exceed cap by far
+          permitted: true,
+        },
+        [addr4]: {
+          contribution: 2_000_000_000_000_000_000n,
+          permitted: true,
+        },
+        [addr5]: {
+          contribution: 2_000_000_000_000_000_000n,
+          permitted: true,
+        },
+        [addr6]: {
+          contribution: 2_000_000_000_000_000_000n,
+          permitted: false,
+        },
+      },
+    };
+
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    beforeEach(() => {
+      allocationsService.calculateValidContributions(
+        exAnteSupply,
+        exAnteSpotPrice,
+        exAnteBalances
+      );
+    });
+
+    it('adds fields `exAnteSupply`, `exAnteSpotPrice`, `cap`', () => {
+      const {
+        exAnteSupply: receivedExAnteSupply,
+        exAnteSpotPrice: receivedExAnteSpotPrice,
+        issuanceTokenCap,
+      } = allocationsService.data;
+      assert.equal(receivedExAnteSupply, exAnteSupply);
+      assert.equal(receivedExAnteSpotPrice, exAnteSpotPrice);
+      assert.equal(issuanceTokenCap, 2_000_000_000_000_000_000n); // equals 2 tokens
+    });
+
+    describe('when contributor contributes exactly what they can contribute (addr1)', () => {
+      it('adds field `validContribution` which equals `contribution`', () => {
+        const { participants } = allocationsService.data;
+        const {
+          contribution,
+          validContribution,
+          excessContribution,
+        } = participants[addr1];
+        assert.equal(
+          contribution,
+          data.participants[addr1].contribution
+        );
+        assert.equal(contribution, validContribution);
+        assert.strictEqual(excessContribution, undefined);
+      });
+    });
+
+    describe('when contributor can still contribute but contributes too much', () => {
+      it('adds fields `excessContribution` and `validContribution`', () => {
+        const { participants, cap } = allocationsService.data;
+        const {
+          contribution,
+          excessContribution,
+          validContribution,
+        } = participants[addr2];
+        assert.equal(excessContribution, 64_000_000_000_000_000_000n);
+        assert.equal(contribution, 69_000_000_000_000_000_000n);
+        assert.equal(validContribution, 5_000_000_000_000_000_000n);
+      });
+    });
+
+    describe('when contributor has exactly reached cap ex ante (addr3)', () => {
+      it('adds field `excessContribution` which equals `contribution`', () => {
+        const { participants } = allocationsService.data;
+        const {
+          contribution,
+          excessContribution,
+          validContribution,
+        } = participants[addr3];
+        assert.equal(
+          contribution,
+          data.participants[addr3].contribution
+        );
+        assert.equal(excessContribution, contribution);
+        assert.strictEqual(validContribution, undefined);
+      });
+    });
+
+    describe('when contributor has already exceeded cap ex ante (addr4)', () => {
+      it('adds field `excessContribution` which equals `contribution`', () => {
+        const { participants } = allocationsService.data;
+        const {
+          contribution,
+          excessContribution,
+          validContribution,
+        } = participants[addr4];
+        assert.equal(
+          contribution,
+          data.participants[addr4].contribution
+        );
+        assert.equal(excessContribution, contribution);
+        assert.strictEqual(validContribution, undefined);
+      });
+    });
+
+    describe('when contributor contributes less than they could (addr5)', () => {
+      it('adds field `validContribution` which equals `contribution`', () => {
+        const { participants } = allocationsService.data;
+        const {
+          contribution,
+          excessContribution,
+          validContribution,
+        } = participants[addr5];
+        assert.equal(
+          contribution,
+          data.participants[addr5].contribution
+        );
+        assert.equal(contribution, validContribution);
+        assert.strictEqual(excessContribution, undefined);
+      });
+    });
+
+    describe('when contributor is not permitted to contribute (addr6)', () => {
+      it('adds field `excessContribution` which equals `contribution`', () => {
+        const { participants } = allocationsService.data;
+        const {
+          contribution,
+          excessContribution,
+          validContribution,
+        } = participants[addr6];
+        assert.equal(
+          contribution,
+          data.participants[addr6].contribution
+        );
+        assert.equal(excessContribution, contribution);
+        assert.strictEqual(validContribution, undefined);
+      });
+    });
+  });
+
+  describe('#calculateAllocations', () => {
+    const additionalIssuance = 100_000_000_000_000_000_000n;
+    const totalValidContributions = contr1 + contr2 + contr3;
+
+    const data = {
+      totalValidContributions,
+      additionalIssuance,
+      participants: {
+        [addr1]: {
+          validContribution: contr1,
+        },
+        [addr2]: {
+          validContribution: contr2,
+        },
+        [addr3]: {
+          validContribution: contr3,
+        },
+        [addr4]: {
+          excessContribution: contr4,
+        },
+      },
+    };
+
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    it('adds an `issuanceAllocation` field containing the allocation for each contributor', () => {
+      allocationsService.calculateAllocations(additionalIssuance);
+
+      const { participants, totalValidContributions } =
+        allocationsService.data;
+
+      assert.equal(
+        participants[addr1].issuanceAllocation,
+        25000000000000000000n // without decimals: 3 / 12 * 100 = 25
+      );
+      assert.equal(
+        participants[addr2].issuanceAllocation,
+        33333300000000000000n // without decimals: 4 / 12 * 100 = 33.3333 (rounded down)
+      );
+      assert.equal(
+        participants[addr3].issuanceAllocation,
+        41666600000000000000n // without decimals: 5 / 12 * 100 = 41.6666 (rounded down)
+      );
+    });
+  });
+
+  describe('#getAllocations', () => {
+    const data = {
+      participants: {
+        [addr1]: {
+          issuanceAllocation: contr1,
+        },
+        [addr2]: {
+          issuanceAllocation: contr2,
+        },
+        [addr3]: {
+          excessContribution: contr3,
+        },
+      },
+    };
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    it('returns an object with the addresses as keys and their allocations as values', () => {
+      const allocations = allocationsService.getAllocations();
+      console.log(allocations);
+      assert.deepStrictEqual(allocations, [
+        {
+          recipient: addr1,
+          amount: contr1,
+        },
+        {
+          recipient: addr2,
+          amount: contr2,
+        },
+      ]);
+    });
+  });
+});

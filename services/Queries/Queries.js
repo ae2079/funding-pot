@@ -37,15 +37,16 @@ export class Queries {
   // QUERIES
 
   async getTimeframe({ startBlock, endBlock, address }) {
-    if (!startBlock) {
+    if (!startBlock && startBlock !== 0) {
       startBlock = await this.getLastPurchaseBlock(address);
     }
     if (!endBlock) {
       endBlock = await this.getCurrentBlockNumber();
     }
+
     return {
-      startBlock: await this.getLastPurchaseBlock(address),
-      endBlock: await this.getCurrentBlockNumber(),
+      startBlock,
+      endBlock,
     };
   }
 
@@ -92,9 +93,14 @@ export class Queries {
       .reduce((acc, tx) => {
         const { fromAddress, value, tokenDecimals } = tx;
         if (!acc[fromAddress]) {
-          acc[fromAddress] = parseUnits(value, tokenDecimals);
+          acc[fromAddress] = {
+            contribution: parseUnits(value, tokenDecimals),
+          };
         } else {
-          acc[fromAddress] += parseUnits(value, tokenDecimals);
+          acc[fromAddress].contribution += parseUnits(
+            value,
+            tokenDecimals
+          );
         }
         return acc;
       }, {});
@@ -119,7 +125,7 @@ export class Queries {
         addresses.includes(holder.holderAddress.toLowerCase())
       )
       .reduce((obj, holder) => {
-        obj[holder.holderAddress] = holder.balanceRawInteger;
+        obj[holder.holderAddress] = BigInt(holder.balanceRawInteger);
         return obj;
       }, {});
 
@@ -128,6 +134,10 @@ export class Queries {
 
   async getIssuanceToken() {
     return await this.bondingCurve.read.getIssuanceToken();
+  }
+
+  async getSpotPrice() {
+    return await this.bondingCurve.read.getStaticPriceForBuying();
   }
 
   /* 
