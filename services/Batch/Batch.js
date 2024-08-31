@@ -154,8 +154,8 @@ export class Batch {
     }
   }
 
-  addVestingDetails(vestingDetails) {
-    this.data.vestindDetails = vestingDetails;
+  addVestingDetails({ start, cliff, end }) {
+    this.data.vestingDetails = { start, cliff, end };
   }
 
   addMetadata({

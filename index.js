@@ -49,12 +49,17 @@ async function main() {
   );
   const batchService = new Batch();
 
-  // get batch data
+  // define batch JSON
   await defineBatch({
     queryService,
     batchService,
     projectsConfig,
     batchConfig,
+  });
+
+  await prepareTransactions({
+    batchService,
+    transactionBuilderService,
   });
 }
 

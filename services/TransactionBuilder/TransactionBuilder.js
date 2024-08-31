@@ -5,9 +5,15 @@ import {
   erc20Abi,
 } from '../../data/abis.js';
 
+PAYMENT_PUSHER_ROLE =
+  '0x5041594d454e545f505553484552000000000000000000000000000000000000';
+
 export class TransactionBuilder {
-  PAYMENT_PUSHER_ROLE =
-    '0x5041594d454e545f505553484552000000000000000000000000000000000000';
+  transactions;
+
+  constructor() {
+    this.transactions = [];
+  }
 
   buy(bondingCurveAddress, depositAmount, minAmountOut) {
     return this.getEncodedTx(
@@ -49,7 +55,7 @@ export class TransactionBuilder {
       paymentRouter,
       paymentRouterAbi,
       'grantModuleRole(bytes32,address)',
-      [this.PAYMENT_PUSHER_ROLE, newRoleOwner]
+      [PAYMENT_PUSHER_ROLE, newRoleOwner]
     );
   }
 
