@@ -137,6 +137,10 @@ export class Queries {
     return await this.bondingCurve.read.getIssuanceToken();
   }
 
+  async getSpotPrice() {
+    return await this.bondingCurve.read.getStaticPriceForBuying();
+  }
+
   /* 
     CONNECTORS
   */

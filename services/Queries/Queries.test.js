@@ -147,4 +147,18 @@ describe('Queries', () => {
       });
     });
   });
+
+  describe('#getSpotPrice', () => {
+    const bondingCurveAddress =
+      '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
+    const querySevice = new Queries({
+      rpcUrl: 'https://sepolia.optimism.io',
+      bondingCurveAddress,
+    });
+
+    it('returns the spot price', async () => {
+      const spotPrice = await querySevice.getSpotPrice();
+      assert.equal(spotPrice, 2380143065n);
+    });
+  });
 });
