@@ -10,18 +10,34 @@ const PAYMENT_PUSHER_ROLE =
 
 export class TransactionBuilder {
   transactions;
+  safe;
+  paymentRouter;
+  issuanceToken;
+  collateralToken;
+  bondingCurve;
 
-  constructor() {
+  constructor({
+    safe,
+    paymentRouter,
+    issuanceToken,
+    collateralToken,
+    bondingCurve,
+  }) {
     this.transactions = [];
+    this.safe = safe;
+    this.paymentRouter = paymentRouter;
+    this.issuanceToken = issuanceToken;
+    this.collateralToken = collateralToken;
+    this.bondingCurve = bondingCurve;
   }
 
-  buy(bondingCurveAddress, depositAmount, minAmountOut) {
+  buy(depositAmount) {
     this.transactions.push(
       this.getEncodedTx(
-        bondingCurveAddress,
+        this.bondingCurve,
         bondingCurveAbi,
         'buy(uint256,uint256)',
-        [depositAmount, minAmountOut]
+        [depositAmount, 1n]
       )
     );
   }
@@ -37,15 +53,7 @@ export class TransactionBuilder {
     );
   }
 
-  createVesting(
-    paymentRouter,
-    recipient,
-    token,
-    amount,
-    start,
-    cliff,
-    end
-  ) {
+  createVesting(recipient, amount, start, cliff, end) {
     this.transactions.push(
       this.getEncodedTx(
         paymentRouter,
@@ -56,10 +64,10 @@ export class TransactionBuilder {
     );
   }
 
-  assignVestingAdmin(paymentRouter, newRoleOwner) {
+  assignVestingAdmin(newRoleOwner) {
     this.transactions.push(
       this.getEncodedTx(
-        paymentRouter,
+        this.paymentRouter,
         paymentRouterAbi,
         'grantModuleRole(bytes32,address)',
         [PAYMENT_PUSHER_ROLE, newRoleOwner]

@@ -12,4 +12,19 @@ export const prepareTransactions = async ({
     bondingCurve,
   } = batchService.data;
   const allocations = batchService.getAllocations();
+
+  // add batch buy tx
+  transactionBuilderService.buy(
+    bondingCurve,
+    totalValidContributions,
+    1
+  );
+
+  // add vesting txs
+  transactionBuilderService.createVesting(
+    safe,
+    vestingDetails.start,
+    vestingDetails.cliff,
+    vestingDetails.end
+  );
 };
