@@ -53,9 +53,10 @@ export class TransactionBuilder {
     );
   }
 
-  createVesting(vestingSpecs) {
+  createVestings(vestingSpecs) {
     for (const vestingSpec of vestingSpecs) {
       const [recipient, amount, start, cliff, end] = vestingSpec;
+
       this.transactions.push(
         this.getEncodedTx(
           this.paymentRouter,

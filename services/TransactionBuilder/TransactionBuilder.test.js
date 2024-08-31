@@ -9,18 +9,20 @@ describe('TransactionBuilder', () => {
   const mockAddress4 = '0xdbC3363De051550D122D9C623CBaff441AFb477C';
   const mockAddress5 = '0xEf409c51aDdCf4642E2C98e935Bc5D9AC273AF57';
 
-  const transactionBuilder = new TransactionBuilder({
-    safe: mockAddress1,
-    paymentRouter: mockAddress2,
-    issuanceToken: mockAddress3,
-    collateralToken: mockAddress4,
-    bondingCurve: mockAddress5,
-  });
+  const setupTransactionBuilder = () => {
+    return new TransactionBuilder({
+      safe: mockAddress1,
+      paymentRouter: mockAddress2,
+      issuanceToken: mockAddress3,
+      collateralToken: mockAddress4,
+      bondingCurve: mockAddress5,
+    });
+  };
 
   describe('#buy', () => {
     it('returns the raw tx', async () => {
+      const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.buy(10n);
-
       const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
@@ -35,10 +37,8 @@ describe('TransactionBuilder', () => {
     const recipient = '0x0000000000000000000000000000000000000001';
 
     it('returns the raw tx', async () => {
-      transactionBuilder.assignVestingAdmin(
-        paymentRouterAddress,
-        recipient
-      );
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.assignVestingAdmin(recipient);
       const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
@@ -49,38 +49,13 @@ describe('TransactionBuilder', () => {
     });
   });
 
-  describe('#createVesting', () => {
-    const recipient = '0x0000000000000000000000000000000000000002';
-    const amount = 10n;
-    const start = 10n;
-    const cliff = 10n;
-    const end = 10n;
-
-    it('returns the raw tx', async () => {
-      transactionBuilder.createVesting(
-        paymentRouterAddress,
-        recipient,
-        amount,
-        start,
-        cliff,
-        end
-      );
-      const [tx] = transactionBuilder.transactions;
-
-      assert.deepStrictEqual(tx, {
-        to: mockAddress2,
-        value: '0x00',
-        data: '0x8028b82f0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000478d97356251bf1f1e744587e67207dab100cadb000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a',
-      });
-    });
-  });
-
   describe('#transferTokens', () => {
     const recipient = '0x0000000000000000000000000000000000000002';
     const amount = 10n;
     const tokenAddress = mockAddress3;
 
     it('returns the raw tx', async () => {
+      const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.transferTokens(
         tokenAddress,
         recipient,
@@ -96,7 +71,7 @@ describe('TransactionBuilder', () => {
     });
   });
 
-  describe('createVesting', () => {
+  describe('createVestings', () => {
     const recipient = '0x0000000000000000000000000000000000000002';
     const amount = 10n;
     const start = 10n;
@@ -104,13 +79,11 @@ describe('TransactionBuilder', () => {
     const end = 12n;
 
     it('returns the raw tx', async () => {
-      const tx = transactionBuilder.createVesting(
-        recipient,
-        amount,
-        start,
-        cliff,
-        end
-      );
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.createVestings([
+        [recipient, amount, start, cliff, end],
+      ]);
+      const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
         to: mockAddress2,
