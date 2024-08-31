@@ -5,7 +5,7 @@ import {
   erc20Abi,
 } from '../../data/abis.js';
 
-PAYMENT_PUSHER_ROLE =
+const PAYMENT_PUSHER_ROLE =
   '0x5041594d454e545f505553484552000000000000000000000000000000000000';
 
 export class TransactionBuilder {
@@ -16,20 +16,24 @@ export class TransactionBuilder {
   }
 
   buy(bondingCurveAddress, depositAmount, minAmountOut) {
-    return this.getEncodedTx(
-      bondingCurveAddress,
-      bondingCurveAbi,
-      'buy(uint256,uint256)',
-      [depositAmount, minAmountOut]
+    this.transactions.push(
+      this.getEncodedTx(
+        bondingCurveAddress,
+        bondingCurveAbi,
+        'buy(uint256,uint256)',
+        [depositAmount, minAmountOut]
+      )
     );
   }
 
   transferTokens(token, to, amount) {
-    return this.getEncodedTx(
-      token,
-      erc20Abi,
-      'transfer(address,uint256)',
-      [to, amount]
+    this.transactions.push(
+      this.getEncodedTx(
+        token,
+        erc20Abi,
+        'transfer(address,uint256)',
+        [to, amount]
+      )
     );
   }
 
@@ -42,20 +46,24 @@ export class TransactionBuilder {
     cliff,
     end
   ) {
-    return this.getEncodedTx(
-      paymentRouter,
-      paymentRouterAbi,
-      'pushPayment(address,address,uint256,uint256,uint256,uint256)',
-      [recipient, token, amount, start, cliff, end]
+    this.transactions.push(
+      this.getEncodedTx(
+        paymentRouter,
+        paymentRouterAbi,
+        'pushPayment(address,address,uint256,uint256,uint256,uint256)',
+        [recipient, token, amount, start, cliff, end]
+      )
     );
   }
 
   assignVestingAdmin(paymentRouter, newRoleOwner) {
-    return this.getEncodedTx(
-      paymentRouter,
-      paymentRouterAbi,
-      'grantModuleRole(bytes32,address)',
-      [PAYMENT_PUSHER_ROLE, newRoleOwner]
+    this.transactions.push(
+      this.getEncodedTx(
+        paymentRouter,
+        paymentRouterAbi,
+        'grantModuleRole(bytes32,address)',
+        [PAYMENT_PUSHER_ROLE, newRoleOwner]
+      )
     );
   }
 

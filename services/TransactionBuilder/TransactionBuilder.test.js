@@ -12,11 +12,9 @@ describe('TransactionBuilder', () => {
     );
 
     it('returns the raw tx', async () => {
-      const tx = transactionBuilder.buy(
-        bondingCurveAddress,
-        10n,
-        10n
-      );
+      transactionBuilder.buy(bondingCurveAddress, 10n, 10n);
+
+      const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
         to: bondingCurveAddress,
@@ -33,10 +31,11 @@ describe('TransactionBuilder', () => {
 
     it('returns the raw tx', async () => {
       const transactionBuilder = new TransactionBuilder();
-      const tx = transactionBuilder.assignVestingAdmin(
+      transactionBuilder.assignVestingAdmin(
         paymentRouterAddress,
         recipient
       );
+      const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
         to: paymentRouterAddress,
@@ -58,7 +57,7 @@ describe('TransactionBuilder', () => {
 
     it('returns the raw tx', async () => {
       const transactionBuilder = new TransactionBuilder();
-      const tx = transactionBuilder.createVesting(
+      transactionBuilder.createVesting(
         paymentRouterAddress,
         recipient,
         token,
@@ -67,6 +66,7 @@ describe('TransactionBuilder', () => {
         cliff,
         end
       );
+      const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
         to: paymentRouterAddress,
@@ -83,11 +83,12 @@ describe('TransactionBuilder', () => {
 
     it('returns the raw tx', async () => {
       const transactionBuilder = new TransactionBuilder();
-      const tx = transactionBuilder.transferTokens(
+      transactionBuilder.transferTokens(
         tokenAddress,
         recipient,
         amount
       );
+      const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
         to: tokenAddress,
