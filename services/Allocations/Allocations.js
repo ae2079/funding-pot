@@ -2,9 +2,11 @@ import { formatUnits, parseUnits } from 'viem';
 
 export class Allocations {
   data;
+  relativeCap;
 
   constructor(participants) {
     this.data = { participants };
+    this.relativeCap = 0.02;
   }
 
   checkEligibility(qualifiedAddresses) {
@@ -76,29 +78,68 @@ export class Allocations {
     );
   }
 
-  checkBalanceLimit(currentIssuanceSupply, currentBalances) {
-    const { newIssuance } = this.data;
-    const newIssuanceSupply = currentIssuanceSupply + newIssuance;
-    this.data.currentIssuanceSupply = currentIssuanceSupply;
-    this.data.newIssuanceSupply = newIssuanceSupply;
-    const balanceLimitFloat =
-      0.02 * parseFloat(formatUnits(newIssuanceSupply, 18));
-    const balanceLimitBigInt = parseUnits(
-      balanceLimitFloat.toFixed(18),
+  calculateActualContributions(
+    exAnteSupply,
+    exAnteSpotPrice,
+    exAnteBalances
+  ) {
+    // store exAnteSupply and exAnteSpotPrice
+    this.data.exAnteSupply = exAnteSupply;
+    this.data.exAnteSpotPrice = exAnteSpotPrice;
+
+    // calculate individual and store individual cap
+    this.data.issuanceTokenCap = parseUnits(
+      (
+        this.relativeCap * parseFloat(formatUnits(exAnteSupply, 18))
+      ).toString(),
       18
     );
-    this.data.balanceLimit = balanceLimitBigInt;
 
-    for (const address of Object.keys(currentBalances)) {
-      const { rawIssuanceAllocation, permitted } =
+    const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
+
+    // calculate excess contribution and store
+    for (const address of Object.keys(exAnteBalances)) {
+      const { contribution, permitted } =
         this.data.participants[address];
-      if (!permitted) continue;
-      const currentBalance = currentBalances[address];
-      const newProspectiveBalance =
-        currentBalance + rawIssuanceAllocation;
-      const excess = newProspectiveBalance - balanceLimitBigInt;
-      if (excess <= 0n) continue;
-      this.data.participants[address].excess = excess;
+      const exAnteBalance = exAnteBalances[address];
+      const issuanceTokenPotential =
+        this.data.issuanceTokenCap - exAnteBalance; // how many issuance token, the address may buy
+
+      // if no more issuance token potential, all contributions are excess contributions
+      if (issuanceTokenPotential <= 0n) {
+        this.data.participants[address].excessContribution =
+          contribution;
+        continue;
+      }
+
+      // if user is not permitted, all contributions are excess contributions
+      if (!permitted) {
+        this.data.participants[address].excessContribution =
+          contribution;
+        continue;
+      }
+
+      // based on ex ante spot price, ex ante balance, and issuance token potential, calculate contribution potential
+      // store per address
+      const contributionPotentialFloat =
+        this.bigIntToFloat(issuanceTokenPotential) * relSpotPrice;
+      const contributionPotential = this.floatToBigInt(
+        contributionPotentialFloat
+      );
+
+      // if contribution is larger than contribution potential
+      // note excess contribution and actual contribution
+      // if contribution is below contribution potential
+      // all contributions are actual contributions
+      if (contribution > contributionPotential) {
+        const excess = contribution - contributionPotential;
+        this.data.participants[address].excessContribution = excess;
+        this.data.participants[address].actualContribution =
+          contributionPotential;
+      } else {
+        this.data.participants[address].actualContribution =
+          contribution;
+      }
     }
   }
 
@@ -183,5 +224,13 @@ export class Allocations {
         acc[address] = data;
         return acc;
       }, {});
+  }
+
+  bigIntToFloat(bigInt) {
+    return parseFloat(formatUnits(bigInt, 18));
+  }
+
+  floatToBigInt(float) {
+    return parseUnits(float.toString(), 18);
   }
 }
