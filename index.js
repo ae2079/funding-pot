@@ -31,8 +31,14 @@ async function main() {
   // checks if all required inputs are set
   validateInputs(projectsConfig, batchConfig);
 
-  const { SAFE, BONDING_CURVE, CHAIN_ID } =
-    projectsConfig[PROJECT_NAME];
+  const {
+    SAFE,
+    BONDING_CURVE,
+    CHAIN_ID,
+    PAYMENT_ROUTER,
+    ISSUANCE_TOKEN,
+    COLLATERAL_TOKEN,
+  } = projectsConfig[PROJECT_NAME];
 
   // instantiate services
   const queryService = new Queries({
@@ -41,7 +47,12 @@ async function main() {
     chainId: CHAIN_ID,
     bondingCurveAddress: BONDING_CURVE,
   });
-  const transactionBuilderService = new TransactionBuilder();
+  const transactionBuilderService = new TransactionBuilder({
+    safe: SAFE,
+    paymentRouter: PAYMENT_ROUTER,
+    issuanceToken: ISSUANCE_TOKEN,
+    collateralToken: COLLATERAL_TOKEN,
+  });
   const safeService = new Safe(
     CHAIN_ID,
     SAFE,

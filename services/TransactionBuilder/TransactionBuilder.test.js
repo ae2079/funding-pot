@@ -3,86 +3,66 @@ import assert from 'node:assert';
 import { TransactionBuilder } from './TransactionBuilder.js';
 
 describe('TransactionBuilder', () => {
+  const mockAddress1 = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
+  const mockAddress2 = '0xc0B16b40c6079b0A317a2fEBc062509CDF447f5c';
+  const mockAddress3 = '0x478D97356251BF1F1e744587E67207dAb100CaDb';
+  const mockAddress4 = '0xdbC3363De051550D122D9C623CBaff441AFb477C';
+  const mockAddress5 = '0xEf409c51aDdCf4642E2C98e935Bc5D9AC273AF57';
+
+  const start = 10n;
+  const cliff = 11n;
+  const end = 12n;
+
+  const setupTransactionBuilder = () => {
+    return new TransactionBuilder({
+      safe: mockAddress1,
+      paymentRouter: mockAddress2,
+      issuanceToken: mockAddress3,
+      collateralToken: mockAddress4,
+      bondingCurve: mockAddress5,
+      start,
+      cliff,
+      end,
+    });
+  };
+
   describe('#buy', () => {
-    const bondingCurveAddress =
-      '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
-    const transactionBuilder = new TransactionBuilder(
-      'mock',
-      bondingCurveAddress
-    );
-
     it('returns the raw tx', async () => {
-      transactionBuilder.buy(bondingCurveAddress, 10n, 10n);
-
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.buy(10n);
       const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
-        to: bondingCurveAddress,
+        to: mockAddress5,
         value: '0x00',
-        data: '0xd6febde8000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a',
+        data: '0xd6febde8000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000001',
       });
     });
   });
 
   describe('#assignVestingAdmin', () => {
-    const paymentRouterAddress =
-      '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'; // mock
     const recipient = '0x0000000000000000000000000000000000000001';
 
     it('returns the raw tx', async () => {
-      const transactionBuilder = new TransactionBuilder();
-      transactionBuilder.assignVestingAdmin(
-        paymentRouterAddress,
-        recipient
-      );
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.assignVestingAdmin(recipient);
       const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
-        to: paymentRouterAddress,
+        to: mockAddress2,
         value: '0x00',
         data: '0x6c67e8075041594d454e545f5055534845520000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
       });
     });
   });
 
-  describe('#createVesting', () => {
-    const paymentRouterAddress =
-      '0x0000000000000000000000000000000000000001'; // mock
-    const recipient = '0x0000000000000000000000000000000000000002';
-    const token = '0x0000000000000000000000000000000000000003';
-    const amount = 10n;
-    const start = 10n;
-    const cliff = 10n;
-    const end = 10n;
-
-    it('returns the raw tx', async () => {
-      const transactionBuilder = new TransactionBuilder();
-      transactionBuilder.createVesting(
-        paymentRouterAddress,
-        recipient,
-        token,
-        amount,
-        start,
-        cliff,
-        end
-      );
-      const [tx] = transactionBuilder.transactions;
-
-      assert.deepStrictEqual(tx, {
-        to: paymentRouterAddress,
-        value: '0x00',
-        data: '0x8028b82f00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a',
-      });
-    });
-  });
-
   describe('#transferTokens', () => {
-    const tokenAddress = '0x0000000000000000000000000000000000000001'; // mock
     const recipient = '0x0000000000000000000000000000000000000002';
     const amount = 10n;
+    const tokenAddress = mockAddress3;
 
     it('returns the raw tx', async () => {
-      const transactionBuilder = new TransactionBuilder();
+      const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.transferTokens(
         tokenAddress,
         recipient,
@@ -91,10 +71,40 @@ describe('TransactionBuilder', () => {
       const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {
-        to: tokenAddress,
+        to: mockAddress3,
         value: '0x00',
         data: '0xa9059cbb0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a',
       });
+    });
+  });
+
+  describe('createVestings', () => {
+    const recipient = '0x0000000000000000000000000000000000000002';
+    const amount = 10n;
+
+    it('returns the raw tx', async () => {
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.createVestings([{ recipient, amount }]);
+      const [tx] = transactionBuilder.transactions;
+
+      assert.deepStrictEqual(tx, {
+        to: mockAddress2,
+        value: '0x00',
+        data: '0x8028b82f0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000478d97356251bf1f1e744587e67207dab100cadb000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000c',
+      });
+    });
+  });
+
+  describe('batchTxs', () => {
+    const arr = [...Array(110).keys()];
+
+    it('slices the array into batches of 100 elements', () => {
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.transactions = arr;
+      transactionBuilder.batchTxs();
+      const [first, second] = transactionBuilder.batchedTransactions;
+      assert.equal(first.length, 100);
+      assert.equal(second.length, 10);
     });
   });
 });
