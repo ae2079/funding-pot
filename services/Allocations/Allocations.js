@@ -9,6 +9,8 @@ export class Allocations {
     this.relativeCap = 0.02;
   }
 
+  // STATE-MODIFYING METHODS
+
   checkEligibility(qualifiedAddresses) {
     const { participants } = this.data;
     for (const address of Object.keys(participants)) {
@@ -26,59 +28,31 @@ export class Allocations {
     }
   }
 
-  addContributionData() {
+  calculateAggregateContributions() {
     const { participants } = this.data;
-    const totalContributions = Object.entries(participants)
-      .filter(([address]) => participants[address].permitted)
-      .reduce((acc, [, data]) => {
-        return acc + data.contribution;
-      }, 0n);
-    const totalReimbursements = Object.entries(participants)
-      .filter(([address]) => !participants[address].permitted)
-      .reduce((acc, [, data]) => {
-        return acc + data.contribution;
-      }, 0n);
+
+    const totalValidContributions = Object.entries(
+      participants
+    ).reduce((acc, [, data]) => {
+      return data.validContribution
+        ? acc + data.validContribution
+        : acc;
+    }, 0n);
+    const totalExcessContributions = Object.entries(
+      participants
+    ).reduce((acc, [, data]) => {
+      return data.excessContribution
+        ? acc + data.excessContribution
+        : acc;
+    }, 0n);
     this.data = {
-      totalContributions,
-      totalReimbursements,
+      totalValidContributions,
+      totalExcessContributions,
       ...this.data,
     };
   }
 
-  calculateRawAllocations(amountOut) {
-    this.data.newIssuance = amountOut;
-
-    const { totalContributions, newIssuance, participants } =
-      this.data;
-
-    const totalContributionFloat = parseFloat(
-      formatUnits(totalContributions, 18)
-    );
-    const newIssuanceFloat = parseFloat(formatUnits(newIssuance, 18));
-
-    for (const address of Object.keys(participants)) {
-      const { contribution, permitted } = participants[address];
-      if (!permitted) continue;
-      const contributionFloat = parseFloat(
-        formatUnits(contribution, 18)
-      );
-      const contributionShare =
-        contributionFloat / totalContributionFloat;
-      const issuanceAllocation =
-        Math.floor(contributionShare * newIssuanceFloat * 10000) /
-        10000;
-      this.data.participants[address].rawIssuanceAllocation =
-        parseUnits(issuanceAllocation.toString(), 18);
-    }
-  }
-
-  getContributors() {
-    return Object.keys(this.data.participants).filter(
-      (address) => this.data.participants[address].permitted
-    );
-  }
-
-  calculateActualContributions(
+  calculateValidContributions(
     exAnteSupply,
     exAnteSpotPrice,
     exAnteBalances
@@ -134,74 +108,54 @@ export class Allocations {
       if (contribution > contributionPotential) {
         const excess = contribution - contributionPotential;
         this.data.participants[address].excessContribution = excess;
-        this.data.participants[address].actualContribution =
+        this.data.participants[address].validContribution =
           contributionPotential;
       } else {
-        this.data.participants[address].actualContribution =
+        this.data.participants[address].validContribution =
           contribution;
       }
     }
   }
 
-  async enrichInflowData(inflows, prospectiveNewSupply) {
-    this.issuanceToken = await this.Queries.getIssuanceToken();
+  calculateAllocations(amountOut) {
+    this.data.additionalIssuance = amountOut;
 
-    const x = await this.Queries.getBatchBalances(
-      this.issuanceToken,
-      inflows
+    const {
+      totalValidContributions,
+      additionalIssuance,
+      participants,
+    } = this.data;
+
+    const totalValidContributionFloat = this.bigIntToFloat(
+      totalValidContributions
+    );
+    const additionalIssuanceFloat = this.bigIntToFloat(
+      additionalIssuance
     );
 
-    const enrichedData = Object.entries(inflows)
-      .map(([address, amount]) => [address, { contribution: amount }])
-      .map(([address, data]) => [
-        address,
-        {
-          ...data,
-          relBalance:
-            parseFloat(data.contribution) /
-            parseFloat(prospectiveNewSupply),
-        },
-      ]);
+    for (const address of Object.keys(participants)) {
+      const { validContribution } = participants[address];
+      if (!validContribution) continue;
 
-    return enrichedData;
+      const validContributionFloat =
+        this.bigIntToFloat(validContribution);
+
+      const contributionShare =
+        validContributionFloat / totalValidContributionFloat;
+      const issuanceAllocation =
+        Math.floor(
+          contributionShare * additionalIssuanceFloat * 10000
+        ) / 10000;
+      this.data.participants[address].issuanceAllocation =
+        this.floatToBigInt(issuanceAllocation);
+    }
   }
 
-  async getAllocations(acceptedInflows) {
-    const totalAmountIn = this.getAmountIn(acceptedInflows);
-    const amountOut = await this.Queries.getAmountOut(totalAmountIn);
+  // GETTERS
 
-    const withAllocations = Object.fromEntries(
-      Object.entries(acceptedInflows).map(([address, amount]) => [
-        address,
-        {
-          contribution: amount,
-          allocation: this.calculateAlloc(
-            amount,
-            totalAmountIn,
-            amountOut
-          ),
-        },
-      ])
-    );
-
-    return withAllocations;
-  }
-
-  calculateAlloc(contribution, totalAmountIn, amountOut) {
-    const contributionFloat = parseFloat(
-      formatUnits(contribution, 18)
-    );
-    const totalAmountInFloat = parseFloat(
-      formatUnits(totalAmountIn, 18)
-    );
-    const amountOutFloat = parseFloat(formatUnits(amountOut, 18));
-
-    return parseUnits(
-      (
-        (contributionFloat / totalAmountInFloat) *
-        amountOutFloat
-      ).toString(),
-      18
+  getContributors() {
+    return Object.keys(this.data.participants).filter(
+      (address) => this.data.participants[address].permitted
     );
   }
 
@@ -209,22 +163,7 @@ export class Allocations {
     return Object.values(contributions).reduce((a, b) => a + b, 0n);
   }
 
-  getRelativeContributions(contributions) {
-    const totalContribution = this.getAmountIn(contributions);
-    return Object.entries(contributions)
-      .map(([address, amount]) => [
-        address,
-        {
-          absContribution: amount,
-          relContribution:
-            parseFloat(amount) / parseFloat(totalContribution),
-        },
-      ])
-      .reduce((acc, [address, data]) => {
-        acc[address] = data;
-        return acc;
-      }, {});
-  }
+  // UTILS
 
   bigIntToFloat(bigInt) {
     return parseFloat(formatUnits(bigInt, 18));

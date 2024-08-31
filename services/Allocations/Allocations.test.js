@@ -15,33 +15,33 @@ describe('Allocations', () => {
   const contr4 = 6000000000000000000n;
   const contr5 = 7000000000000000000n;
 
-  describe('#addContributionData', () => {
+  describe('#calculateAggregateContributions', () => {
     const dataWithEligibility = {
       [addr1]: {
-        contribution: contr1,
-        permitted: true,
+        validContribution: contr1,
       },
       [addr2]: {
-        contribution: contr2,
-        permitted: true,
+        validContribution: contr2,
       },
       [addr3]: {
-        contribution: contr3,
-        permitted: false,
+        validContribution: contr3,
+        excessContribution: contr4,
       },
       [addr4]: {
-        contribution: contr4,
-        permitted: false,
+        excessContribution: contr5,
       },
     };
     const allocationsService = new Allocations(dataWithEligibility);
 
     it('adds aggregate contribution data', () => {
-      allocationsService.addContributionData(dataWithEligibility);
+      allocationsService.calculateAggregateContributions(
+        dataWithEligibility
+      );
+      console.log(allocationsService.data);
 
       assert.deepStrictEqual(allocationsService.data, {
-        totalContributions: 7000000000000000000n,
-        totalReimbursements: 11000000000000000000n,
+        totalValidContributions: contr1 + contr2 + contr3,
+        totalExcessContributions: contr4 + contr5,
         participants: dataWithEligibility,
       });
     });
@@ -85,42 +85,6 @@ describe('Allocations', () => {
     });
   });
 
-  describe('#calculateRawAllocations', () => {
-    const totalAmountOut = 1234567789012345678900n;
-    const totalAmountIn = 12000000000000000000n;
-    const data = {
-      totalContributions: totalAmountIn,
-      newIssuance: totalAmountOut,
-      participants: {
-        [addr1]: {
-          contribution: contr1,
-          permitted: true,
-        },
-        [addr2]: {
-          contribution: contr2,
-          permitted: true,
-        },
-        [addr3]: {
-          contribution: contr3,
-          permitted: false,
-        },
-      },
-    };
-    const allocationsService = new Allocations();
-    allocationsService.data = data;
-
-    it('calculates allocations', () => {
-      allocationsService.calculateRawAllocations(totalAmountOut);
-
-      assert.deepStrictEqual(
-        Object.values(allocationsService.data.participants)
-          .filter((p) => p.permitted)
-          .map((p) => p.rawIssuanceAllocation),
-        [308641900000000000000n, 411522500000000000000n]
-      );
-    });
-  });
-
   describe('#getContributors', () => {
     const data = {
       participants: {
@@ -148,7 +112,7 @@ describe('Allocations', () => {
     });
   });
 
-  describe('#calculateActualContributions', () => {
+  describe('#calculateValidContributions', () => {
     const exAnteSupply = 100_000_000_000_000_000_000n;
     const exAnteBalances = {
       [addr1]: 1_000_000_000_000_000_000n, // can still buy one more token (= 1_000_000_000_000_000_000n)
@@ -193,7 +157,7 @@ describe('Allocations', () => {
     allocationsService.data = data;
 
     beforeEach(() => {
-      allocationsService.calculateActualContributions(
+      allocationsService.calculateValidContributions(
         exAnteSupply,
         exAnteSpotPrice,
         exAnteBalances
@@ -212,33 +176,33 @@ describe('Allocations', () => {
     });
 
     describe('when contributor contributes exactly what they can contribute (addr1)', () => {
-      it('adds field `actualContribution` which equals `contribution`', () => {
+      it('adds field `validContribution` which equals `contribution`', () => {
         const { participants } = allocationsService.data;
         const {
           contribution,
-          actualContribution,
+          validContribution,
           excessContribution,
         } = participants[addr1];
         assert.equal(
           contribution,
           data.participants[addr1].contribution
         );
-        assert.equal(contribution, actualContribution);
+        assert.equal(contribution, validContribution);
         assert.strictEqual(excessContribution, undefined);
       });
     });
 
     describe('when contributor can still contribute but contributes too much', () => {
-      it('adds fields `excessContribution` and `actualContribution`', () => {
+      it('adds fields `excessContribution` and `validContribution`', () => {
         const { participants, cap } = allocationsService.data;
         const {
           contribution,
           excessContribution,
-          actualContribution,
+          validContribution,
         } = participants[addr2];
         assert.equal(excessContribution, 64_000_000_000_000_000_000n);
         assert.equal(contribution, 69_000_000_000_000_000_000n);
-        assert.equal(actualContribution, 5_000_000_000_000_000_000n);
+        assert.equal(validContribution, 5_000_000_000_000_000_000n);
       });
     });
 
@@ -248,14 +212,14 @@ describe('Allocations', () => {
         const {
           contribution,
           excessContribution,
-          actualContribution,
+          validContribution,
         } = participants[addr3];
         assert.equal(
           contribution,
           data.participants[addr3].contribution
         );
         assert.equal(excessContribution, contribution);
-        assert.strictEqual(actualContribution, undefined);
+        assert.strictEqual(validContribution, undefined);
       });
     });
 
@@ -265,30 +229,30 @@ describe('Allocations', () => {
         const {
           contribution,
           excessContribution,
-          actualContribution,
+          validContribution,
         } = participants[addr4];
         assert.equal(
           contribution,
           data.participants[addr4].contribution
         );
         assert.equal(excessContribution, contribution);
-        assert.strictEqual(actualContribution, undefined);
+        assert.strictEqual(validContribution, undefined);
       });
     });
 
     describe('when contributor contributes less than they could (addr5)', () => {
-      it('adds field `actualContribution` which equals `contribution`', () => {
+      it('adds field `validContribution` which equals `contribution`', () => {
         const { participants } = allocationsService.data;
         const {
           contribution,
           excessContribution,
-          actualContribution,
+          validContribution,
         } = participants[addr5];
         assert.equal(
           contribution,
           data.participants[addr5].contribution
         );
-        assert.equal(contribution, actualContribution);
+        assert.equal(contribution, validContribution);
         assert.strictEqual(excessContribution, undefined);
       });
     });
@@ -299,15 +263,62 @@ describe('Allocations', () => {
         const {
           contribution,
           excessContribution,
-          actualContribution,
+          validContribution,
         } = participants[addr6];
         assert.equal(
           contribution,
           data.participants[addr6].contribution
         );
         assert.equal(excessContribution, contribution);
-        assert.strictEqual(actualContribution, undefined);
+        assert.strictEqual(validContribution, undefined);
       });
+    });
+  });
+
+  describe('#calculateAllocations', () => {
+    const additionalIssuance = 100_000_000_000_000_000_000n;
+    const totalValidContributions = contr1 + contr2 + contr3;
+
+    const data = {
+      totalValidContributions,
+      additionalIssuance,
+      participants: {
+        [addr1]: {
+          validContribution: contr1,
+        },
+        [addr2]: {
+          validContribution: contr2,
+        },
+        [addr3]: {
+          validContribution: contr3,
+        },
+        [addr4]: {
+          excessContribution: contr4,
+        },
+      },
+    };
+
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    it('adds an `issuanceAllocation` field containing the allocation for each contributor', () => {
+      allocationsService.calculateAllocations(additionalIssuance);
+
+      const { participants, totalValidContributions } =
+        allocationsService.data;
+
+      assert.equal(
+        participants[addr1].issuanceAllocation,
+        25000000000000000000n // without decimals: 3 / 12 * 100 = 25
+      );
+      assert.equal(
+        participants[addr2].issuanceAllocation,
+        33333300000000000000n // without decimals: 4 / 12 * 100 = 33.3333 (rounded down)
+      );
+      assert.equal(
+        participants[addr3].issuanceAllocation,
+        41666600000000000000n // without decimals: 5 / 12 * 100 = 41.6666 (rounded down)
+      );
     });
   });
 });

@@ -82,27 +82,28 @@ async function main() {
   allocationsService.checkEligibility(eligibleAddresses);
 
   // add aggregate contribution data
-  allocationsService.addContributionData();
+  // allocationsService.calculateAggregateContributions();
 
-  // add volume of batch purchase
-  const purchaseVolume = await queryService.getAmountOut(
-    allocationsService.data.totalContributions
-  );
-
-  // add allocation per address
-  allocationsService.calculateRawAllocations(purchaseVolume);
-
-  // get current balances of contributors to check max balance limit
+  // calculate actual contributions taking into account the individual contribution cap
   const contributors = allocationsService.getContributors();
-  const currentBalances = await queryService.getBalances(
+  const exAnteBalances = await queryService.getBalances(
     ISSUANCE_TOKEN,
     contributors
   );
-  const currentIssuanceSupply =
-    await queryService.getIssuanceSupply();
-  allocationsService.checkBalanceLimit(
-    currentBalances,
-    currentIssuanceSupply
+  const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
+  const exAnteSpotPrice = await queryService.getSpotPrice();
+  allocationsService.calculateValidContributions(
+    exAnteIssuanceSupply,
+    exAnteBalances,
+    exAnteSpotPrice
+  );
+
+  // calculate aggregate contribution data
+  allocationsService.calculateAggregateContributions();
+
+  // get amountOut based on aggregate valid contributions
+  const amountOut = await queryService.getAmountOut(
+    allocationsService.data.totalValidContributions
   );
 }
 
