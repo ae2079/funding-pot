@@ -9,6 +9,10 @@ describe('TransactionBuilder', () => {
   const mockAddress4 = '0xdbC3363De051550D122D9C623CBaff441AFb477C';
   const mockAddress5 = '0xEf409c51aDdCf4642E2C98e935Bc5D9AC273AF57';
 
+  const start = 10n;
+  const cliff = 11n;
+  const end = 12n;
+
   const setupTransactionBuilder = () => {
     return new TransactionBuilder({
       safe: mockAddress1,
@@ -16,6 +20,9 @@ describe('TransactionBuilder', () => {
       issuanceToken: mockAddress3,
       collateralToken: mockAddress4,
       bondingCurve: mockAddress5,
+      start,
+      cliff,
+      end,
     });
   };
 
@@ -74,15 +81,10 @@ describe('TransactionBuilder', () => {
   describe('createVestings', () => {
     const recipient = '0x0000000000000000000000000000000000000002';
     const amount = 10n;
-    const start = 10n;
-    const cliff = 11n;
-    const end = 12n;
 
     it('returns the raw tx', async () => {
       const transactionBuilder = setupTransactionBuilder();
-      transactionBuilder.createVestings([
-        [recipient, amount, start, cliff, end],
-      ]);
+      transactionBuilder.createVestings([{ recipient, amount }]);
       const [tx] = transactionBuilder.transactions;
 
       assert.deepStrictEqual(tx, {

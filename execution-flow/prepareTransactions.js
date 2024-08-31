@@ -5,7 +5,6 @@ export const prepareTransactions = async ({
 }) => {
   const {
     totalValidContributions,
-    vestingDetails: { start, cliff, end },
     safe,
     issuanceToken,
     collateralToken,
@@ -21,10 +20,5 @@ export const prepareTransactions = async ({
   );
 
   // add vesting txs
-  transactionBuilderService.createVesting(
-    safe,
-    vestingDetails.start,
-    vestingDetails.cliff,
-    vestingDetails.end
-  );
+  transactionBuilderService.createVestings(allocations);
 };

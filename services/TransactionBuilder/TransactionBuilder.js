@@ -15,6 +15,9 @@ export class TransactionBuilder {
   issuanceToken;
   collateralToken;
   bondingCurve;
+  start;
+  cliff;
+  end;
 
   constructor({
     safe,
@@ -22,6 +25,9 @@ export class TransactionBuilder {
     issuanceToken,
     collateralToken,
     bondingCurve,
+    start,
+    cliff,
+    end,
   }) {
     this.transactions = [];
     this.safe = safe;
@@ -29,6 +35,9 @@ export class TransactionBuilder {
     this.issuanceToken = issuanceToken;
     this.collateralToken = collateralToken;
     this.bondingCurve = bondingCurve;
+    this.start = start;
+    this.cliff = cliff;
+    this.end = end;
   }
 
   buy(depositAmount) {
@@ -55,14 +64,22 @@ export class TransactionBuilder {
 
   createVestings(vestingSpecs) {
     for (const vestingSpec of vestingSpecs) {
-      const [recipient, amount, start, cliff, end] = vestingSpec;
+      console.log(vestingSpec);
+      const { recipient, amount } = vestingSpec;
 
       this.transactions.push(
         this.getEncodedTx(
           this.paymentRouter,
           paymentRouterAbi,
           'pushPayment(address,address,uint256,uint256,uint256,uint256)',
-          [recipient, this.issuanceToken, amount, start, cliff, end]
+          [
+            recipient,
+            this.issuanceToken,
+            amount,
+            this.start,
+            this.cliff,
+            this.end,
+          ]
         )
       );
     }
