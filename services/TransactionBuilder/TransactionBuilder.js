@@ -3,7 +3,7 @@ import {
   bondingCurveAbi,
   paymentRouterAbi,
   erc20Abi,
-} from '../../abis.js';
+} from '../../data/abis.js';
 
 export class TransactionBuilder {
   PAYMENT_PUSHER_ROLE =

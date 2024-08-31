@@ -31,7 +31,8 @@ describe('Batch', () => {
         excessContribution: contr5,
       },
     };
-    const batchService = new Batch(dataWithEligibility);
+    const batchService = new Batch();
+    batchService.addInflows(dataWithEligibility);
 
     it('adds aggregate contribution data', () => {
       batchService.calculateAggregateContributions(
@@ -60,7 +61,8 @@ describe('Batch', () => {
         contribution: contr3,
       },
     };
-    const batchService = new Batch(data);
+    const batchService = new Batch();
+    batchService.addInflows(data);
 
     it('adds `permitted` flag per participant', () => {
       batchService.checkEligibility(eligibleAddresses);
@@ -86,23 +88,21 @@ describe('Batch', () => {
 
   describe('#getContributors', () => {
     const data = {
-      participants: {
-        [addr1]: {
-          contribution: contr1,
-          permitted: true,
-        },
-        [addr2]: {
-          contribution: contr2,
-          permitted: true,
-        },
-        [addr3]: {
-          contribution: contr3,
-          permitted: false,
-        },
+      [addr1]: {
+        contribution: contr1,
+        permitted: true,
+      },
+      [addr2]: {
+        contribution: contr2,
+        permitted: true,
+      },
+      [addr3]: {
+        contribution: contr3,
+        permitted: false,
       },
     };
     const batchService = new Batch();
-    batchService.data = data;
+    batchService.addInflows(data);
 
     it("returns a list of contributors' addresses (`eligible` = true)", () => {
       const contributors = batchService.getContributors();
@@ -320,6 +320,8 @@ describe('Batch', () => {
       );
     });
   });
+
+  describe('#addVestingSpecs', () => {});
 
   describe('#getAllocations', () => {
     const data = {
