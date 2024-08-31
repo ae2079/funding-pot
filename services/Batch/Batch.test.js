@@ -1,8 +1,8 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { Allocations } from './Allocations.js';
+import { Batch } from './Batch.js';
 
-describe('Allocations', () => {
+describe('Batch', () => {
   const addr1 = '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb';
   const addr2 = '0x932285a2e33b89981d25eb586a3893e0f5a1a9da';
   const addr3 = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
@@ -31,15 +31,14 @@ describe('Allocations', () => {
         excessContribution: contr5,
       },
     };
-    const allocationsService = new Allocations(dataWithEligibility);
+    const batchService = new Batch(dataWithEligibility);
 
     it('adds aggregate contribution data', () => {
-      allocationsService.calculateAggregateContributions(
+      batchService.calculateAggregateContributions(
         dataWithEligibility
       );
-      console.log(allocationsService.data);
 
-      assert.deepStrictEqual(allocationsService.data, {
+      assert.deepStrictEqual(batchService.data, {
         totalValidContributions: contr1 + contr2 + contr3,
         totalExcessContributions: contr4 + contr5,
         participants: dataWithEligibility,
@@ -61,12 +60,12 @@ describe('Allocations', () => {
         contribution: contr3,
       },
     };
-    const allocationsService = new Allocations(data);
+    const batchService = new Batch(data);
 
     it('adds `permitted` flag per participant', () => {
-      allocationsService.checkEligibility(eligibleAddresses);
+      batchService.checkEligibility(eligibleAddresses);
 
-      assert.deepStrictEqual(allocationsService.data, {
+      assert.deepStrictEqual(batchService.data, {
         participants: {
           [eligibleAddresses[0]]: {
             contribution: data[eligibleAddresses[0]].contribution,
@@ -102,11 +101,11 @@ describe('Allocations', () => {
         },
       },
     };
-    const allocationsService = new Allocations();
-    allocationsService.data = data;
+    const batchService = new Batch();
+    batchService.data = data;
 
     it("returns a list of contributors' addresses (`eligible` = true)", () => {
-      const contributors = allocationsService.getContributors();
+      const contributors = batchService.getContributors();
 
       assert.deepStrictEqual(contributors, [addr1, addr2]);
     });
@@ -153,11 +152,11 @@ describe('Allocations', () => {
       },
     };
 
-    const allocationsService = new Allocations();
-    allocationsService.data = data;
+    const batchService = new Batch();
+    batchService.data = data;
 
     beforeEach(() => {
-      allocationsService.calculateValidContributions(
+      batchService.calculateValidContributions(
         exAnteSupply,
         exAnteSpotPrice,
         exAnteBalances
@@ -169,7 +168,7 @@ describe('Allocations', () => {
         exAnteSupply: receivedExAnteSupply,
         exAnteSpotPrice: receivedExAnteSpotPrice,
         issuanceTokenCap,
-      } = allocationsService.data;
+      } = batchService.data;
       assert.equal(receivedExAnteSupply, exAnteSupply);
       assert.equal(receivedExAnteSpotPrice, exAnteSpotPrice);
       assert.equal(issuanceTokenCap, 2_000_000_000_000_000_000n); // equals 2 tokens
@@ -177,7 +176,7 @@ describe('Allocations', () => {
 
     describe('when contributor contributes exactly what they can contribute (addr1)', () => {
       it('adds field `validContribution` which equals `contribution`', () => {
-        const { participants } = allocationsService.data;
+        const { participants } = batchService.data;
         const {
           contribution,
           validContribution,
@@ -194,7 +193,7 @@ describe('Allocations', () => {
 
     describe('when contributor can still contribute but contributes too much', () => {
       it('adds fields `excessContribution` and `validContribution`', () => {
-        const { participants, cap } = allocationsService.data;
+        const { participants, cap } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -208,7 +207,7 @@ describe('Allocations', () => {
 
     describe('when contributor has exactly reached cap ex ante (addr3)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
-        const { participants } = allocationsService.data;
+        const { participants } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -225,7 +224,7 @@ describe('Allocations', () => {
 
     describe('when contributor has already exceeded cap ex ante (addr4)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
-        const { participants } = allocationsService.data;
+        const { participants } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -242,7 +241,7 @@ describe('Allocations', () => {
 
     describe('when contributor contributes less than they could (addr5)', () => {
       it('adds field `validContribution` which equals `contribution`', () => {
-        const { participants } = allocationsService.data;
+        const { participants } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -259,7 +258,7 @@ describe('Allocations', () => {
 
     describe('when contributor is not permitted to contribute (addr6)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
-        const { participants } = allocationsService.data;
+        const { participants } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -298,14 +297,14 @@ describe('Allocations', () => {
       },
     };
 
-    const allocationsService = new Allocations();
-    allocationsService.data = data;
+    const batchService = new Batch();
+    batchService.data = data;
 
     it('adds an `issuanceAllocation` field containing the allocation for each contributor', () => {
-      allocationsService.calculateAllocations(additionalIssuance);
+      batchService.calculateAllocations(additionalIssuance);
 
       const { participants, totalValidContributions } =
-        allocationsService.data;
+        batchService.data;
 
       assert.equal(
         participants[addr1].issuanceAllocation,
@@ -336,12 +335,11 @@ describe('Allocations', () => {
         },
       },
     };
-    const allocationsService = new Allocations();
-    allocationsService.data = data;
+    const batchService = new Batch();
+    batchService.data = data;
 
     it('returns an object with the addresses as keys and their allocations as values', () => {
-      const allocations = allocationsService.getAllocations();
-      console.log(allocations);
+      const allocations = batchService.getAllocations();
       assert.deepStrictEqual(allocations, [
         {
           recipient: addr1,
