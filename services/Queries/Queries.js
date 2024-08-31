@@ -37,7 +37,6 @@ export class Queries {
   // QUERIES
 
   async getTimeframe({ startBlock, endBlock, address }) {
-    console.log({ startBlock, endBlock, address });
     if (!startBlock && startBlock !== 0) {
       startBlock = await this.getLastPurchaseBlock(address);
     }
