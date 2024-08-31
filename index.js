@@ -102,9 +102,12 @@ async function main() {
   allocationsService.calculateAggregateContributions();
 
   // get amountOut based on aggregate valid contributions
-  const amountOut = await queryService.getAmountOut(
+  const additionalIssuance = await queryService.getAmountOut(
     allocationsService.data.totalValidContributions
   );
+
+  // calculate allocations
+  allocationsService.calculateAllocations(additionalIssuance);
 }
 
 main();

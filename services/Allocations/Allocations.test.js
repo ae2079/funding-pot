@@ -321,4 +321,37 @@ describe('Allocations', () => {
       );
     });
   });
+
+  describe('#getAllocations', () => {
+    const data = {
+      participants: {
+        [addr1]: {
+          issuanceAllocation: contr1,
+        },
+        [addr2]: {
+          issuanceAllocation: contr2,
+        },
+        [addr3]: {
+          excessContribution: contr3,
+        },
+      },
+    };
+    const allocationsService = new Allocations();
+    allocationsService.data = data;
+
+    it('returns an object with the addresses as keys and their allocations as values', () => {
+      const allocations = allocationsService.getAllocations();
+      console.log(allocations);
+      assert.deepStrictEqual(allocations, [
+        {
+          recipient: addr1,
+          amount: contr1,
+        },
+        {
+          recipient: addr2,
+          amount: contr2,
+        },
+      ]);
+    });
+  });
 });

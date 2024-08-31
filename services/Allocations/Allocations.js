@@ -159,8 +159,16 @@ export class Allocations {
     );
   }
 
-  getAmountIn(contributions) {
-    return Object.values(contributions).reduce((a, b) => a + b, 0n);
+  getAllocations() {
+    const { participants } = this.data;
+    return Object.entries(participants)
+      .filter(([, data]) => data.issuanceAllocation)
+      .map(([address, data]) => {
+        return {
+          recipient: address,
+          amount: data.issuanceAllocation,
+        };
+      });
   }
 
   // UTILS
