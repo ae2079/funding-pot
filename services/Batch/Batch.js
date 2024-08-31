@@ -1,6 +1,6 @@
 import { formatUnits, parseUnits } from 'viem';
 
-export class Allocations {
+export class Batch {
   data;
   relativeCap;
 

@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename); // get the name of the directory
 import { Queries } from './services/Queries/Queries.js';
 import { Safe } from './services/Safe/Safe.js';
 import { TransactionBuilder } from './services/TransactionBuilder/TransactionBuilder.js';
-import { Allocations } from './services/Allocations/Allocations.js';
+import { Batch } from './services/Allocations/Batch.js';
 
 const { ANKR_API_KEY } = process.env;
 const [, , PROJECT_NAME, STEP] = process.argv;
@@ -71,7 +71,7 @@ async function main() {
     endBlock
   );
 
-  const allocationsService = new Allocations(inflowsData);
+  const batchService = new Batch(inflowsData);
 
   // get addresses eligible for contribution
   const eligibleAddresses = allowlist
@@ -79,35 +79,35 @@ async function main() {
     : await queryService.getNftHolders(NFT);
 
   // earmark eligible addresses
-  allocationsService.checkEligibility(eligibleAddresses);
+  batchService.checkEligibility(eligibleAddresses);
 
   // add aggregate contribution data
-  // allocationsService.calculateAggregateContributions();
+  // batchService.calculateAggregateContributions();
 
   // calculate actual contributions taking into account the individual contribution cap
-  const contributors = allocationsService.getContributors();
+  const contributors = batchService.getContributors();
   const exAnteBalances = await queryService.getBalances(
     ISSUANCE_TOKEN,
     contributors
   );
   const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
   const exAnteSpotPrice = await queryService.getSpotPrice();
-  allocationsService.calculateValidContributions(
+  batchService.calculateValidContributions(
     exAnteIssuanceSupply,
     exAnteBalances,
     exAnteSpotPrice
   );
 
   // calculate aggregate contribution data
-  allocationsService.calculateAggregateContributions();
+  batchService.calculateAggregateContributions();
 
   // get amountOut based on aggregate valid contributions
   const additionalIssuance = await queryService.getAmountOut(
-    allocationsService.data.totalValidContributions
+    batchService.data.totalValidContributions
   );
 
   // calculate allocations
-  allocationsService.calculateAllocations(additionalIssuance);
+  batchService.calculateAllocations(additionalIssuance);
 }
 
 main();
