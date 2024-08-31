@@ -58,19 +58,21 @@ async function main() {
     SAFE,
     'https://rpc.ankr.com/optimism/' + ANKR_API_KEY
   );
-  const batchService = new Batch();
 
   // define batch JSON
   await defineBatch({
     queryService,
-    batchService,
     projectsConfig,
     batchConfig,
   });
 
-  await prepareTransactions({
-    batchService,
+  prepareTransactions({
     transactionBuilderService,
+  });
+
+  proposeTransactions({
+    transactionBuilderService,
+    safeService,
   });
 }
 

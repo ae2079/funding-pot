@@ -1,7 +1,6 @@
 export const prepareTransactions = async ({
   batchService,
   transactionBuilderService,
-  batchConfig,
 }) => {
   const { totalValidContributions } = batchService.data;
   const allocations = batchService.getAllocations();
@@ -12,6 +11,7 @@ export const prepareTransactions = async ({
   // add vesting txs
   transactionBuilderService.createVestings(allocations);
 
-  // get tx batches
-  const txBatches = transactionBuilderService.getTxBatches();
+
+  // create tx batches
+  transactionBuilderService.batchTxs();
 };
