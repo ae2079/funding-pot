@@ -4,12 +4,15 @@ export class Batch {
   data;
   relativeCap;
 
-  constructor(participants) {
-    this.data = { participants };
+  constructor() {
     this.relativeCap = 0.02;
   }
 
   // STATE-MODIFYING METHODS
+
+  addInflows(inflows) {
+    this.data = { participants: inflows };
+  }
 
   checkEligibility(qualifiedAddresses) {
     const { participants } = this.data;
@@ -149,6 +152,24 @@ export class Batch {
       this.data.participants[address].issuanceAllocation =
         this.floatToBigInt(issuanceAllocation);
     }
+  }
+
+  addVestingDetails(vestingDetails) {
+    this.data.vestindDetails = vestingDetails;
+  }
+
+  addMetadata({
+    safe,
+    issuanceToken,
+    collateralToken,
+    nft,
+    bondingCurve,
+  }) {
+    this.data.bondingCurve = bondingCurve;
+    this.data.safe = safe;
+    this.data.issuanceToken = issuanceToken;
+    this.data.collateralToken = collateralToken;
+    this.data.nft = nft;
   }
 
   // GETTERS

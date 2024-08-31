@@ -7,7 +7,7 @@ import {
   parseUnits,
 } from 'viem';
 import { queryBuilder } from './queryBuilder.js';
-import { bondingCurveAbi } from '../../abis.js';
+import { bondingCurveAbi } from '../../data/abis.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 
 export class Queries {
