@@ -95,13 +95,14 @@ describe('TransactionBuilder', () => {
     });
   });
 
-  describe('getTxBatches', () => {
+  describe('batchTxs', () => {
     const arr = [...Array(110).keys()];
 
     it('slices the array into batches of 100 elements', () => {
       const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.transactions = arr;
-      const [first, second] = transactionBuilder.getTxBatches();
+      transactionBuilder.batchTxs();
+      const [first, second] = transactionBuilder.batchedTransactions;
       assert.equal(first.length, 100);
       assert.equal(second.length, 10);
     });

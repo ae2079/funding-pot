@@ -11,6 +11,7 @@ const PAYMENT_PUSHER_ROLE =
 
 export class TransactionBuilder {
   transactions;
+  batchedTransactions;
   safe;
   paymentRouter;
   issuanceToken;
@@ -31,6 +32,7 @@ export class TransactionBuilder {
     end,
   }) {
     this.transactions = [];
+    this.batchedTransactions = [];
     this.safe = safe;
     this.paymentRouter = paymentRouter;
     this.issuanceToken = issuanceToken;
@@ -107,16 +109,12 @@ export class TransactionBuilder {
     });
   }
 
-  getTxBatches() {
+  batchTxs() {
     const { transactions } = this;
-    const txBatches = [];
-
     const chunkSize = batchSize;
     for (let i = 0; i < transactions.length; i += chunkSize) {
       const chunk = transactions.slice(i, i + chunkSize);
-      txBatches.push(chunk);
+      this.batchedTransactions.push(chunk);
     }
-
-    return txBatches;
   }
 }
