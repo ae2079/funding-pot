@@ -53,15 +53,18 @@ export class TransactionBuilder {
     );
   }
 
-  createVesting(recipient, amount, start, cliff, end) {
-    this.transactions.push(
-      this.getEncodedTx(
-        paymentRouter,
-        paymentRouterAbi,
-        'pushPayment(address,address,uint256,uint256,uint256,uint256)',
-        [recipient, token, amount, start, cliff, end]
-      )
-    );
+  createVesting(vestingSpecs) {
+    for (const vestingSpec of vestingSpecs) {
+      const [recipient, amount, start, cliff, end] = vestingSpec;
+      this.transactions.push(
+        this.getEncodedTx(
+          this.paymentRouter,
+          paymentRouterAbi,
+          'pushPayment(address,address,uint256,uint256,uint256,uint256)',
+          [recipient, this.issuanceToken, amount, start, cliff, end]
+        )
+      );
+    }
   }
 
   assignVestingAdmin(newRoleOwner) {
