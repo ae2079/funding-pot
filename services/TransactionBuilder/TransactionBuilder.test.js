@@ -95,4 +95,28 @@ describe('TransactionBuilder', () => {
       });
     });
   });
+
+  describe('createVesting', () => {
+    const recipient = '0x0000000000000000000000000000000000000002';
+    const amount = 10n;
+    const start = 10n;
+    const cliff = 11n;
+    const end = 12n;
+
+    it('returns the raw tx', async () => {
+      const tx = transactionBuilder.createVesting(
+        recipient,
+        amount,
+        start,
+        cliff,
+        end
+      );
+
+      assert.deepStrictEqual(tx, {
+        to: mockAddress2,
+        value: '0x00',
+        data: '0x8028b82f0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000478d97356251bf1f1e744587e67207dab100cadb000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000c',
+      });
+    });
+  });
 });
