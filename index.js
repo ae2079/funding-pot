@@ -62,15 +62,13 @@ async function main() {
   // define batch JSON
   await defineBatch({
     queryService,
+    batchService,
     projectsConfig,
     batchConfig,
   });
 
-  prepareTransactions({
-    transactionBuilderService,
-  });
-
-  proposeTransactions({
+  await proposeTransactions({
+    batchService,
     transactionBuilderService,
     safeService,
   });
