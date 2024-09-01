@@ -49,7 +49,9 @@ describe('Safe', () => {
         recipient,
         amount
       );
-      const txs = transactionBuilder.getTxBatches();
+      const txs = transactionBuilder.getTxBatches(
+        transactionBuilder.getEncodedTxs()
+      );
       const apiKit = new SafeApiKit.default({
         chainId: baseSepoliaChainId,
       });
@@ -65,7 +67,9 @@ describe('Safe', () => {
         recipient,
         amount
       );
-      const txs = transactionBuilder.getTxBatches();
+      const txs = transactionBuilder.getTxBatches(
+        transactionBuilder.getEncodedTxs()
+      );
       await safe.proposeTxs(txs);
       assert.equal(safe.safeTransactions.length, txs.length);
     });
