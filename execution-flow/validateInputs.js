@@ -7,7 +7,6 @@ export const validateInputs = (projectsConfig, batchConfig) => {
     SAFE,
     ISSUANCE_TOKEN,
     COLLATERAL_TOKEN,
-    NFT,
     PAYMENT_ROUTER,
     CHAIN_ID,
   } = projectsConfig[PROJECT_NAME];
@@ -15,7 +14,6 @@ export const validateInputs = (projectsConfig, batchConfig) => {
   if (!SAFE) throw new Error('SAFE missing');
   if (!ISSUANCE_TOKEN) throw new Error('ISSUANCE_TOKEN missing');
   if (!COLLATERAL_TOKEN) throw new Error('COLLATERAL_TOKEN missing');
-  if (!NFT) throw new Error('NFT missing');
   if (!PAYMENT_ROUTER) throw new Error('PAYMENT_ROUTER missing');
   if (!CHAIN_ID) throw new Error('CHAIN_ID missing');
 

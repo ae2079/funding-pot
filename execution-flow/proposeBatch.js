@@ -1,4 +1,4 @@
-export const proposeTransactions = async ({
+export const proposeBatch = async ({
   batchService,
   transactionBuilderService,
   safeService,
@@ -12,11 +12,8 @@ export const proposeTransactions = async ({
   // add vesting txs
   transactionBuilderService.createVestings(allocations);
 
-  // create tx batches
-  transactionBuilderService.batchTxs();
-
   // propose tx batches
-  for (const txBatch of transactionBuilderService.batchedTransactions) {
+  for (const txBatch of transactionBuilderService.getTxBatches()) {
     await safeService.proposeTxs(txBatch);
   }
 };

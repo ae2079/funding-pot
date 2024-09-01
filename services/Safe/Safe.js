@@ -7,6 +7,7 @@ export class Safe {
   safeAddress;
   apiKit;
   protocolKit;
+  safeTransactions;
 
   constructor(chainId, safeAddress, rpcUrl) {
     this.apiKit = new SafeApiKit.default({
@@ -14,6 +15,7 @@ export class Safe {
     });
     this.rpcUrl = rpcUrl;
     this.safeAddress = safeAddress;
+    this.safeTransactions = [];
   }
 
   async addDelegate(delegateAddress) {
@@ -37,29 +39,34 @@ export class Safe {
         safeAddress: this.safeAddress,
       });
     }
-    const nonce = await this.apiKit.getNextNonce(this.safeAddress);
-    const safeTransaction = await this.protocolKit.createTransaction({
-      transactions: txs,
-      options: { nonce },
-    });
-    const safeTxHash = await this.protocolKit.getTransactionHash(
-      safeTransaction
-    );
-    const senderSignature = await this.protocolKit.signHash(
-      safeTxHash
-    );
-    await this.apiKit.proposeTransaction({
-      safeAddress: this.safeAddress,
-      safeTransactionData: safeTransaction.data,
-      safeTxHash,
-      senderAddress: senderSignature.signer,
-      senderSignature: senderSignature.data,
-      origin: '0',
-    });
-    return safeTxHash;
+
+    for (const batchTxs of txs) {
+      const nonce = await this.apiKit.getNextNonce(this.safeAddress);
+      const safeTransaction =
+        await this.protocolKit.createTransaction({
+          transactions: batchTxs,
+          options: { nonce },
+        });
+      const safeTxHash = await this.protocolKit.getTransactionHash(
+        safeTransaction
+      );
+      const senderSignature = await this.protocolKit.signHash(
+        safeTxHash
+      );
+      await this.apiKit.proposeTransaction({
+        safeAddress: this.safeAddress,
+        safeTransactionData: safeTransaction.data,
+        safeTxHash,
+        senderAddress: senderSignature.signer,
+        senderSignature: senderSignature.data,
+        origin: '0',
+      });
+      // TODO: add tx hashes to state
+      this.safeTransactions.push(safeTxHash);
+    }
   }
 
-  // THIS IS A VALID REQUEST BODY
+  // THIS IS A VALID REQUEST BODY FOR DEBUGGING SAFE API ISSUES
   // {
   //   "to": "0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B",
   //   "value": "0",

@@ -13,7 +13,6 @@ export const defineBatch = async ({
     SAFE,
     ISSUANCE_TOKEN,
     COLLATERAL_TOKEN,
-    NFT,
     PAYMENT_ROUTER,
     BONDING_CURVE,
   } = projectConfig[PROJECT_NAME];
@@ -36,7 +35,6 @@ export const defineBatch = async ({
     safe: SAFE,
     issuanceToken: ISSUANCE_TOKEN,
     collateralToken: COLLATERAL_TOKEN,
-    nft: NFT,
     bondingCurve: BONDING_CURVE,
   });
 
@@ -44,9 +42,7 @@ export const defineBatch = async ({
   batchService.addInflows(inflowsData);
 
   // get addresses eligible for contribution
-  const eligibleAddresses = ALLOWLIST
-    ? ALLOWLIST
-    : await queryService.getNftHolders(NFT);
+  const eligibleAddresses = ALLOWLIST;
 
   // earmark eligible addresses
   batchService.checkEligibility(eligibleAddresses);

@@ -156,14 +156,12 @@ export class Batch {
     safe,
     issuanceToken,
     collateralToken,
-    nft,
     bondingCurve,
   }) {
     this.data.bondingCurve = bondingCurve;
     this.data.safe = safe;
     this.data.issuanceToken = issuanceToken;
     this.data.collateralToken = collateralToken;
-    this.data.nft = nft;
   }
 
   // GETTERS

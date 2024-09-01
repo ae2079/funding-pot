@@ -34,7 +34,7 @@ describe('TransactionBuilder', () => {
 
       assert.deepStrictEqual(tx, {
         to: mockAddress5,
-        value: '0x00',
+        value: '0',
         data: '0xd6febde8000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000001',
       });
     });
@@ -50,7 +50,7 @@ describe('TransactionBuilder', () => {
 
       assert.deepStrictEqual(tx, {
         to: mockAddress2,
-        value: '0x00',
+        value: '0',
         data: '0x6c67e8075041594d454e545f5055534845520000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
       });
     });
@@ -72,7 +72,7 @@ describe('TransactionBuilder', () => {
 
       assert.deepStrictEqual(tx, {
         to: mockAddress3,
-        value: '0x00',
+        value: '0',
         data: '0xa9059cbb0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000a',
       });
     });
@@ -89,20 +89,20 @@ describe('TransactionBuilder', () => {
 
       assert.deepStrictEqual(tx, {
         to: mockAddress2,
-        value: '0x00',
+        value: '0',
         data: '0x8028b82f0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000478d97356251bf1f1e744587e67207dab100cadb000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000c',
       });
     });
   });
 
-  describe('batchTxs', () => {
+  describe('getTxBatches', () => {
     const arr = [...Array(110).keys()];
 
     it('slices the array into batches of 100 elements', () => {
       const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.transactions = arr;
-      transactionBuilder.batchTxs();
-      const [first, second] = transactionBuilder.batchedTransactions;
+      const txs = transactionBuilder.getTxBatches();
+      const [first, second] = txs;
       assert.equal(first.length, 100);
       assert.equal(second.length, 10);
     });

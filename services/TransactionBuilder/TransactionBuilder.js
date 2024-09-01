@@ -11,7 +11,6 @@ const PAYMENT_PUSHER_ROLE =
 
 export class TransactionBuilder {
   transactions;
-  batchedTransactions;
   safe;
   paymentRouter;
   issuanceToken;
@@ -32,7 +31,6 @@ export class TransactionBuilder {
     end,
   }) {
     this.transactions = [];
-    this.batchedTransactions = [];
     this.safe = safe;
     this.paymentRouter = paymentRouter;
     this.issuanceToken = issuanceToken;
@@ -98,7 +96,7 @@ export class TransactionBuilder {
   }
 
   getEncodedTx(to, abi, functionSignature, inputValues) {
-    return encodeSingle({
+    const encoded = encodeSingle({
       type: TransactionType.callContract,
       id: '0',
       to,
@@ -107,14 +105,18 @@ export class TransactionBuilder {
       functionSignature,
       inputValues,
     });
+    // encodeSingle returns a value of '0x00' for value
+    // but the Safe API only accepts '0' => overwrite
+    return { ...encoded, value: '0' };
   }
 
-  batchTxs() {
+  getTxBatches() {
+    const txBatch = [];
     const { transactions } = this;
-    const chunkSize = batchSize;
-    for (let i = 0; i < transactions.length; i += chunkSize) {
-      const chunk = transactions.slice(i, i + chunkSize);
-      this.batchedTransactions.push(chunk);
+    for (let i = 0; i < transactions.length; i += batchSize) {
+      const chunk = transactions.slice(i, i + batchSize);
+      txBatch.push(chunk);
     }
+    return txBatch;
   }
 }
