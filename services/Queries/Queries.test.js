@@ -138,7 +138,6 @@ describe('Queries', () => {
         token,
         addresses
       );
-      console.log(balances);
       assert.deepStrictEqual(balances, {
         '0x27905e39b5eb4ebfdfbc285f209f46d92b01f3a0':
           3067718287019563653n,

@@ -98,7 +98,7 @@ export class TransactionBuilder {
   }
 
   getEncodedTx(to, abi, functionSignature, inputValues) {
-    return encodeSingle({
+    const encoded = encodeSingle({
       type: TransactionType.callContract,
       id: '0',
       to,
@@ -107,6 +107,9 @@ export class TransactionBuilder {
       functionSignature,
       inputValues,
     });
+    // encodeSingle returns a value of '0x00' for value
+    // but the Safe API only accepts '0' => overwrite
+    return { ...encoded, value: '0' };
   }
 
   batchTxs() {
