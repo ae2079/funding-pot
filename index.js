@@ -8,7 +8,11 @@ const __filename = fileURLToPath(import.meta.url); // get the resolved path to t
 const __dirname = path.dirname(__filename); // get the name of the directory
 
 import { Queries, Safe, TransactionBuilder, Batch } from './services';
-import { defineBatch, validateInputs } from './execution-flow';
+import {
+  validateInputs,
+  proposeBatch,
+  defineBatch,
+} from './execution-flow';
 
 const { ANKR_API_KEY } = process.env;
 const [, , PROJECT_NAME, BATCH] = process.argv;
@@ -67,7 +71,7 @@ async function main() {
     batchConfig,
   });
 
-  await proposeTransactions({
+  await proposeBatch({
     batchService,
     transactionBuilderService,
     safeService,

@@ -1,4 +1,4 @@
-export const proposeTransactions = async ({
+export const proposeBatch = async ({
   batchService,
   transactionBuilderService,
   safeService,
