@@ -46,14 +46,6 @@ export class TransactionBuilder {
       'buy(uint256,uint256)',
       [depositAmount, 1n]
     );
-    // this.transactions.push(
-    //   this.getEncodedTx(
-    //     this.bondingCurve,
-    //     'bondingCurveAbi',
-    //     'buy(uint256,uint256)',
-    //     [depositAmount, 1n]
-    //   )
-    // );
   }
 
   transferTokens(token, to, amount) {
@@ -61,14 +53,6 @@ export class TransactionBuilder {
       to,
       amount,
     ]);
-    // this.transactions.push(
-    //   this.getEncodedTx(
-    //     token,
-    //     'erc20Abi',
-    //     'transfer(address,uint256)',
-    //     [to, amount]
-    //   )
-    // );
   }
 
   createVestings(vestingSpecs) {
@@ -129,11 +113,24 @@ export class TransactionBuilder {
     return encodedTxs;
   }
 
-  getTxBatches() {
+  // removes abi field from transactions
+  getReadableTxBatches() {
+    return this.getTxBatches(
+      this.transactions.map((tx) => {
+        const { to, functionSignature, inputValues } = tx;
+        return {
+          to,
+          functionSignature,
+          inputValues,
+        };
+      })
+    );
+  }
+
+  getTxBatches(txs) {
     const txBatch = [];
-    const encodedTransactions = this.getEncodedTxs();
-    for (let i = 0; i < encodedTransactions.length; i += batchSize) {
-      const chunk = encodedTransactions.slice(i, i + batchSize);
+    for (let i = 0; i < txs.length; i += batchSize) {
+      const chunk = txs.slice(i, i + batchSize);
       txBatch.push(chunk);
     }
     return txBatch;

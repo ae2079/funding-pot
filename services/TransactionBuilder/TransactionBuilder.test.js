@@ -95,16 +95,43 @@ describe('TransactionBuilder', () => {
     });
   });
 
-  // describe('getTxBatches', () => {
-  //   const arr = [...Array(110).keys()];
+  describe('getTxBatches', () => {
+    const arr = [...Array(110).keys()];
 
-  //   it('slices the array into batches of 100 elements', () => {
-  //     const transactionBuilder = setupTransactionBuilder();
-  //     transactionBuilder.encodedTransactions = arr;
-  //     const txs = transactionBuilder.getTxBatches();
-  //     const [first, second] = txs;
-  //     assert.equal(first.length, 100);
-  //     assert.equal(second.length, 10);
-  //   });
-  // });
+    it('slices the array into batches of 100 elements', () => {
+      const transactionBuilder = setupTransactionBuilder();
+      const txs = transactionBuilder.getTxBatches(arr);
+      const [first, second] = txs;
+      assert.equal(first.length, 100);
+      assert.equal(second.length, 10);
+    });
+  });
+
+  describe('getReadableTxBatches', () => {
+    const recipient = '0x0000000000000000000000000000000000000002';
+    const amount = 10n;
+
+    it('returns the raw tx', async () => {
+      const transactionBuilder = setupTransactionBuilder();
+      transactionBuilder.createVestings([{ recipient, amount }]);
+      const txs = transactionBuilder.getReadableTxBatches();
+      assert.deepStrictEqual(txs, [
+        [
+          {
+            to: mockAddress2,
+            functionSignature:
+              'pushPayment(address,address,uint256,uint256,uint256,uint256)',
+            inputValues: [
+              recipient,
+              mockAddress3,
+              amount,
+              start,
+              cliff,
+              end,
+            ],
+          },
+        ],
+      ]);
+    });
+  });
 });
