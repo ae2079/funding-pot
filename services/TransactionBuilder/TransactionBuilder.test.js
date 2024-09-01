@@ -30,7 +30,7 @@ describe('TransactionBuilder', () => {
     it('returns the raw tx', async () => {
       const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.buy(10n);
-      const [tx] = transactionBuilder.transactions;
+      const [tx] = transactionBuilder.encodedTransactions;
 
       assert.deepStrictEqual(tx, {
         to: mockAddress5,
@@ -46,7 +46,7 @@ describe('TransactionBuilder', () => {
     it('returns the raw tx', async () => {
       const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.assignVestingAdmin(recipient);
-      const [tx] = transactionBuilder.transactions;
+      const [tx] = transactionBuilder.encodedTransactions;
 
       assert.deepStrictEqual(tx, {
         to: mockAddress2,
@@ -68,7 +68,7 @@ describe('TransactionBuilder', () => {
         recipient,
         amount
       );
-      const [tx] = transactionBuilder.transactions;
+      const [tx] = transactionBuilder.encodedTransactions;
 
       assert.deepStrictEqual(tx, {
         to: mockAddress3,
@@ -85,7 +85,7 @@ describe('TransactionBuilder', () => {
     it('returns the raw tx', async () => {
       const transactionBuilder = setupTransactionBuilder();
       transactionBuilder.createVestings([{ recipient, amount }]);
-      const [tx] = transactionBuilder.transactions;
+      const [tx] = transactionBuilder.encodedTransactions;
 
       assert.deepStrictEqual(tx, {
         to: mockAddress2,
@@ -100,7 +100,7 @@ describe('TransactionBuilder', () => {
 
     it('slices the array into batches of 100 elements', () => {
       const transactionBuilder = setupTransactionBuilder();
-      transactionBuilder.transactions = arr;
+      transactionBuilder.encodedTransactions = arr;
       const txs = transactionBuilder.getTxBatches();
       const [first, second] = txs;
       assert.equal(first.length, 100);

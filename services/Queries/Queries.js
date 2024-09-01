@@ -7,7 +7,7 @@ import {
   parseUnits,
 } from 'viem';
 import { queryBuilder } from './queryBuilder.js';
-import { bondingCurveAbi } from '../../data/abis.js';
+import abis from '../../data/abis.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 
 export class Queries {
@@ -30,7 +30,7 @@ export class Queries {
     this.bondingCurve = getContract({
       address: bondingCurveAddress,
       client: this.publicClient,
-      abi: bondingCurveAbi,
+      abi: abis.bondingCurveAbi,
     });
   }
 

@@ -47,6 +47,8 @@ export class Safe {
           transactions: batchTxs,
           options: { nonce },
         });
+      console.log(69);
+      console.log(safeTransaction);
       const safeTxHash = await this.protocolKit.getTransactionHash(
         safeTransaction
       );
@@ -62,7 +64,7 @@ export class Safe {
         origin: '0',
       });
       // TODO: add tx hashes to state
-      this.safeTransactions.push(safeTxHash);
+      this.safeTransactions.push({ safeTxHash });
     }
   }
 

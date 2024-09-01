@@ -1,13 +1,11 @@
 import { encodeSingle, TransactionType } from 'ethers-multisend';
-import {
-  bondingCurveAbi,
-  paymentRouterAbi,
-  erc20Abi,
-} from '../../data/abis.js';
+import abis from '../../data/abis.js';
 import { batchSize } from '../../config.js';
 
 const PAYMENT_PUSHER_ROLE =
   '0x5041594d454e545f505553484552000000000000000000000000000000000000';
+
+const { bondingCurveAbi, paymentRouterAbi, erc20Abi } = abis;
 
 export class TransactionBuilder {
   transactions;
@@ -45,7 +43,7 @@ export class TransactionBuilder {
     this.transactions.push(
       this.getEncodedTx(
         this.bondingCurve,
-        bondingCurveAbi,
+        'bondingCurveAbi',
         'buy(uint256,uint256)',
         [depositAmount, 1n]
       )
@@ -56,7 +54,7 @@ export class TransactionBuilder {
     this.transactions.push(
       this.getEncodedTx(
         token,
-        erc20Abi,
+        'erc20Abi',
         'transfer(address,uint256)',
         [to, amount]
       )
@@ -69,7 +67,7 @@ export class TransactionBuilder {
       this.transactions.push(
         this.getEncodedTx(
           this.paymentRouter,
-          paymentRouterAbi,
+          'paymentRouterAbi',
           'pushPayment(address,address,uint256,uint256,uint256,uint256)',
           [
             recipient,
@@ -88,14 +86,15 @@ export class TransactionBuilder {
     this.transactions.push(
       this.getEncodedTx(
         this.paymentRouter,
-        paymentRouterAbi,
+        'paymentRouterAbi',
         'grantModuleRole(bytes32,address)',
         [PAYMENT_PUSHER_ROLE, newRoleOwner]
       )
     );
   }
 
-  getEncodedTx(to, abi, functionSignature, inputValues) {
+  getEncodedTx(to, abiName, functionSignature, inputValues) {
+    const abi = abis[abiName];
     const encoded = encodeSingle({
       type: TransactionType.callContract,
       id: '0',
@@ -118,5 +117,13 @@ export class TransactionBuilder {
       txBatch.push(chunk);
     }
     return txBatch;
+  }
+
+  getEncodedTxs() {
+    const encodedTxs = [];
+    for (const tx of this.transactions) {
+      encodedTxs.push(this.getEncodedTx(tx));
+    }
+    return encodedTxs;
   }
 }

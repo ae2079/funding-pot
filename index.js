@@ -63,7 +63,7 @@ async function main() {
     'https://rpc.ankr.com/optimism/' + ANKR_API_KEY
   );
 
-  // define batch JSON
+  // define batch (= contributions, eligibility, received allocations, vesting details etc.)
   await defineBatch({
     queryService,
     batchService,
@@ -71,11 +71,25 @@ async function main() {
     batchConfig,
   });
 
+  // propose batch transactions to safe (= batch buy tx, vesting txs)
   await proposeBatch({
     batchService,
     transactionBuilderService,
     safeService,
   });
+
+  // TODO: store comprehensive batch data in a JSON file
+  const batchData = batchService.data;
+  const safeTransactions = safeService.safeTransactions;
+  const transactions = transactionBuilderService.transactions;
+
+  console.log(420);
+  console.log(transactions);
+
+  fs.writeFileSync(
+    path.join(__dirname, `./data/output/batches/${BATCH}.json`),
+    JSON.stringify(batchData, null, 2)
+  );
 }
 
 main();
