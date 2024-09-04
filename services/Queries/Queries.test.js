@@ -7,21 +7,22 @@ import { Queries } from './Queries.js';
 
 describe('Queries', () => {
   const indexerUrl =
-    'https://indexer.bigdevenergy.link/a414bf3/v1/graphql';
+    'https://indexer.bigdevenergy.link/7612f58/v1/graphql';
   const mockMulitSigAddress =
     '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
 
   describe('#getLastPurchaseBlock', () => {
     const querySevice = new Queries({
       indexerUrl,
-      rpcUrl: 'https://sepolia.optimism.io',
+      rpcUrl: 'https://sepolia.base.org',
+      chainId: 84532,
     });
 
     it('should return the blocknumber of the BUY', async () => {
       const startBlock = await querySevice.getLastPurchaseBlock(
         mockMulitSigAddress
       );
-      assert.equal(startBlock, 1721806864);
+      assert.equal(startBlock, 1725444354);
     });
   });
 

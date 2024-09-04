@@ -4,9 +4,10 @@ import {
   getContract,
   parseUnits,
 } from 'viem';
+import { AnkrProvider } from '@ankr.com/ankr.js';
+
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
-import { AnkrProvider } from '@ankr.com/ankr.js';
 
 export class Queries {
   indexerUrl;
@@ -16,6 +17,7 @@ export class Queries {
 
   constructor({ rpcUrl, indexerUrl, chainId, bondingCurveAddress }) {
     this.indexerUrl = indexerUrl;
+    this.chainId = chainId;
     this.publicClient = createPublicClient({
       chain: chainId,
       transport: http(rpcUrl),
@@ -52,7 +54,7 @@ export class Queries {
     const {
       Swap: [lastBuy],
     } = await this.indexerConnector(
-      queryBuilder.indexer.lastBuyBlocknumber(address)
+      queryBuilder.indexer.lastBuyBlocknumber(address, this.chainId)
     );
     return lastBuy.blockTimestamp;
   }
