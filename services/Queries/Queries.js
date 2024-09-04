@@ -2,8 +2,6 @@ import {
   createPublicClient,
   http,
   getContract,
-  erc20Abi,
-  formatUnits,
   parseUnits,
 } from 'viem';
 import { queryBuilder } from './queryBuilder.js';
