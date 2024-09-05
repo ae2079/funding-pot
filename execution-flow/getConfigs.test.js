@@ -9,6 +9,7 @@ describe('#getConfigs', () => {
       const batchConfig = getConfigs(batchNumber);
       assert.deepEqual(Object.keys(batchConfig), [
         'projectsConfig',
+        'allowlist',
         'batchConfig',
       ]);
     });

@@ -1,5 +1,5 @@
 import { formatUnits, parseUnits } from 'viem';
-import { cap } from '../../config.js';
+import { CAP } from '../../config.js';
 
 export class Batch {
   data;
@@ -60,9 +60,9 @@ export class Batch {
     this.data.exAnteSupply = exAnteSupply;
     this.data.exAnteSpotPrice = exAnteSpotPrice;
 
-    // calculate individual and store individual cap
+    // calculate individual and store individual CAP
     this.data.issuanceTokenCap = parseUnits(
-      (cap * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
+      (CAP * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
       18
     );
 

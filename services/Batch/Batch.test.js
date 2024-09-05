@@ -116,8 +116,8 @@ describe('Batch', () => {
     const exAnteBalances = {
       [addr1]: 1_000_000_000_000_000_000n, // can still buy one more token (= 1_000_000_000_000_000_000n)
       [addr2]: 1_000_000_000_000_000_000n, // can still buy one more token
-      [addr3]: 2_000_000_000_000_000_000n, // has already exactly reached the cap
-      [addr4]: 3_000_000_000_000_000_000n, // has already exceeded the cap
+      [addr3]: 2_000_000_000_000_000_000n, // has already exactly reached the CAP
+      [addr4]: 3_000_000_000_000_000_000n, // has already exceeded the CAP
       [addr5]: 1_000_000_000_000_000_000n, // can still buy one more token
       [addr6]: 1_000_000_000_000_000_000n, // can still buy one more token
     };
@@ -130,11 +130,11 @@ describe('Batch', () => {
           permitted: true,
         },
         [addr2]: {
-          contribution: 69_000_000_000_000_000_000n, // purchase will exceed cap by far
+          contribution: 69_000_000_000_000_000_000n, // purchase will exceed CAP by far
           permitted: true,
         },
         [addr3]: {
-          contribution: 420_000_000_000_000_000_000n, // purchase would exceed cap by far
+          contribution: 420_000_000_000_000_000_000n, // purchase would exceed CAP by far
           permitted: true,
         },
         [addr4]: {
@@ -163,7 +163,7 @@ describe('Batch', () => {
       );
     });
 
-    it('adds fields `exAnteSupply`, `exAnteSpotPrice`, `cap`', () => {
+    it('adds fields `exAnteSupply`, `exAnteSpotPrice`, `CAP`', () => {
       const {
         exAnteSupply: receivedExAnteSupply,
         exAnteSpotPrice: receivedExAnteSpotPrice,
@@ -193,7 +193,7 @@ describe('Batch', () => {
 
     describe('when contributor can still contribute but contributes too much', () => {
       it('adds fields `excessContribution` and `validContribution`', () => {
-        const { participants, cap } = batchService.data;
+        const { participants, CAP } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -205,7 +205,7 @@ describe('Batch', () => {
       });
     });
 
-    describe('when contributor has exactly reached cap ex ante (addr3)', () => {
+    describe('when contributor has exactly reached CAP ex ante (addr3)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
         const { participants } = batchService.data;
         const {
@@ -222,7 +222,7 @@ describe('Batch', () => {
       });
     });
 
-    describe('when contributor has already exceeded cap ex ante (addr4)', () => {
+    describe('when contributor has already exceeded CAP ex ante (addr4)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
         const { participants } = batchService.data;
         const {

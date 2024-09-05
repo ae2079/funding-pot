@@ -19,6 +19,13 @@ export const getConfigs = (batch) => {
     )
   );
 
+  // load allowlist
+  const allowlist = JSON.parse(
+    fs.readFileSync(
+      path.join(__dirname, `../data/${dataDir}/input/allowlist.json`)
+    )
+  );
+
   // load batch config (batch-specific constants such as allowlist, start & end block, vesting schedule)
   const batchConfig = JSON.parse(
     fs.readFileSync(
@@ -29,5 +36,5 @@ export const getConfigs = (batch) => {
     )
   );
 
-  return { projectsConfig, batchConfig };
+  return { projectsConfig, allowlist, batchConfig };
 };

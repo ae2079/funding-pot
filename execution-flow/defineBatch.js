@@ -7,7 +7,7 @@ export const defineBatch = async ({
   const {
     TIMEFRAME,
     ALLOWLIST,
-    VESTING_SPECS: { START, CLIFF, END },
+    VESTING_DETAILS: { START, CLIFF, END },
   } = batchConfig;
   const {
     SAFE,
@@ -47,7 +47,7 @@ export const defineBatch = async ({
   // earmark eligible addresses
   batchService.checkEligibility(eligibleAddresses);
 
-  // calculate actual contributions taking into account the individual contribution cap
+  // calculate actual contributions taking into account the individual contribution CAP
   const contributors = batchService.getContributors();
   const exAnteBalances = await queryService.getBalances(
     ISSUANCE_TOKEN,
