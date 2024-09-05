@@ -14,6 +14,7 @@ export const validateInputs = ({
 };
 
 const validateEnvVars = () => {
+  console.log(process.env);
   const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
     process.env;
 

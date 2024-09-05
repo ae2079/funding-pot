@@ -14,7 +14,6 @@ export class Queries {
   publicClient;
   ankrProvider;
   networkIdString;
-  sdk;
 
   constructor({ rpcUrl, indexerUrl, chainId }) {
     this.indexerUrl = indexerUrl;

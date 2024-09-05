@@ -1,6 +1,6 @@
 import '../env.js';
 
-import { describe, it } from 'node:test';
+import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
 import { instantiateServices } from './instantiateServices.js';
 
@@ -9,10 +9,75 @@ describe('#instantiateServices', () => {
     ORCHESTRATOR: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
     SAFE: '0x4ffe42c1666e50104e997DD07E43c673FD39C81d',
   };
+  const batchConfig = {
+    VESTING_DETAILS: {
+      START: 1,
+      CLIFF: 2,
+      END: 10,
+    },
+  };
 
-  describe('with all params set', () => {
-    it('instantiates the services', () => {
-      instantiateServices(projectConfig);
-    });
+  let queryService,
+    safeService,
+    transactionBuilderService,
+    batchService;
+
+  before(async () => {
+    ({
+      queryService,
+      safeService,
+      transactionBuilderService,
+      batchService,
+    } = await instantiateServices(projectConfig, batchConfig));
+  });
+
+  it('instantiates the query service including setup step', () => {
+    assert.deepEqual(Object.keys(queryService), [
+      'indexerUrl',
+      'publicClient',
+      'ankrProvider',
+      'networkIdString',
+      'chainId',
+      'addresses',
+      'bondingCurve',
+    ]);
+
+    for (const value of Object.values(queryService)) {
+      assert.notStrictEqual(value, undefined);
+    }
+  });
+
+  it('instantiates the safe service', () => {
+    assert.deepEqual(Object.keys(safeService), [
+      'safeAddress',
+      'apiKit',
+      'protocolKit',
+      'safeTransactions',
+      'rpcUrl',
+    ]);
+  });
+
+  it('instantiates the transaction builder service', () => {
+    assert.deepEqual(Object.keys(transactionBuilderService), [
+      'transactions',
+      'safe',
+      'paymentRouter',
+      'issuanceToken',
+      'collateralToken',
+      'bondingCurve',
+      'start',
+      'cliff',
+      'end',
+    ]);
+
+    for (const value of Object.values(transactionBuilderService)) {
+      assert.notStrictEqual(value, undefined);
+    }
+  });
+
+  it('instantiates the batch service', () => {
+    assert.deepStrictEqual(Object.entries(batchService), [
+      ['data', undefined],
+    ]);
   });
 });
