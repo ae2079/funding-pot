@@ -16,7 +16,7 @@ export class Queries {
   networkIdString;
   sdk;
 
-  constructor({ rpcUrl, indexerUrl, chainId, bondingCurveAddress }) {
+  constructor({ rpcUrl, indexerUrl, chainId }) {
     this.indexerUrl = indexerUrl;
     this.chainId = chainId;
     this.publicClient = createPublicClient({
@@ -27,12 +27,40 @@ export class Queries {
     this.ankrProvider = new AnkrProvider(
       this.getAdvancedApiEndpoint(rpcUrl)
     );
+    this.addresses = {};
+  }
 
+  async setup(orchestratorAddress) {
+    const orchestrator = getContract({
+      address: orchestratorAddress,
+      client: this.publicClient,
+      abi: abis.orchestratorAbi,
+    });
+    this.addresses.orchestrator = orchestratorAddress;
+    this.addresses.bondingCurve =
+      await orchestrator.read.fundingManager();
     this.bondingCurve = getContract({
-      address: bondingCurveAddress,
+      address: this.addresses.bondingCurve,
       client: this.publicClient,
       abi: abis.bondingCurveAbi,
     });
+    this.addresses.collateralToken =
+      await this.bondingCurve.read.token();
+    this.addresses.issuanceToken =
+      await this.bondingCurve.read.getIssuanceToken();
+
+    const modules = await orchestrator.read.listModules();
+    for (const module of modules) {
+      const moduleContract = getContract({
+        address: module,
+        client: this.publicClient,
+        abi: abis.bondingCurveAbi,
+      });
+      const moduleName = await moduleContract.read.title();
+      if (moduleName === 'LM_PC_PaymentRouter_v1') {
+        this.addresses.paymentRouter = module;
+      }
+    }
   }
 
   // QUERIES
@@ -51,11 +79,11 @@ export class Queries {
     };
   }
 
-  async getLastPurchaseBlock(address) {
+  async getLastPurchaseBlock(multisig) {
     const {
       Swap: [lastBuy],
     } = await this.indexerConnector(
-      queryBuilder.indexer.lastBuyBlocknumber(address, this.chainId)
+      queryBuilder.indexer.lastBuyBlocknumber(multisig, this.chainId)
     );
     return lastBuy.blockTimestamp;
   }
@@ -115,9 +143,12 @@ export class Queries {
     return await this.bondingCurve.read.getStaticPriceForBuying();
   }
 
-  async getBalances(orchestratorAddress) {
+  async getBalances() {
     const { LinearVesting: vestings } = await this.indexerConnector(
-      queryBuilder.indexer.vestings(this.chainId, orchestratorAddress)
+      queryBuilder.indexer.vestings(
+        this.chainId,
+        this.addresses.orchestrator
+      )
     );
 
     return vestings.reduce((acc, vesting) => {
