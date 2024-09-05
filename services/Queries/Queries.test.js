@@ -104,32 +104,6 @@ describe('Queries', () => {
     });
   });
 
-  describe('#getBalances', () => {
-    const token = '0x0c5b4c92c948691EEBf185C17eeB9c230DC019E9';
-    const addresses = [
-      '0x2e26ff7bc1ba49c4a234858f6a75379c56a9c85b',
-      '0x27905e39b5eb4ebfdfbc285f209f46d92b01f3a0',
-    ];
-
-    const querySevice = new Queries({
-      rpcUrl:
-        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
-    });
-
-    it('returns list of token holders that sent tokens to funding pot with balances', async () => {
-      const balances = await querySevice.getBalances(
-        token,
-        addresses
-      );
-      assert.deepStrictEqual(balances, {
-        '0x27905e39b5eb4ebfdfbc285f209f46d92b01f3a0':
-          3067718287019563653n,
-        '0x2e26ff7bc1ba49c4a234858f6a75379c56a9c85b':
-          152112944197275n,
-      });
-    });
-  });
-
   describe('#getSpotPrice', () => {
     const bondingCurveAddress =
       '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
@@ -144,7 +118,7 @@ describe('Queries', () => {
     });
   });
 
-  describe('#getAggregateVestings', () => {
+  describe('#getBalances', () => {
     const indexerUrl =
       'https://indexer.bigdevenergy.link/3e4a36f/v1/graphql';
     const querySevice = new Queries({
@@ -156,7 +130,7 @@ describe('Queries', () => {
       '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3';
 
     it('gets aggregate vestings', async () => {
-      const vestings = await querySevice.getAggregateVestings(
+      const vestings = await querySevice.getBalances(
         orchestratorAddress
       );
 

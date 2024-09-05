@@ -107,24 +107,6 @@ export class Queries {
       }, {});
   }
 
-  async getBalances(token, addresses) {
-    const { holders } = await this.ankrProvider.getTokenHolders({
-      blockchain: this.networkIdString,
-      contractAddress: token,
-    });
-
-    const filteredHolders = holders
-      .filter((holder) =>
-        addresses.includes(holder.holderAddress.toLowerCase())
-      )
-      .reduce((obj, holder) => {
-        obj[holder.holderAddress] = BigInt(holder.balanceRawInteger);
-        return obj;
-      }, {});
-
-    return filteredHolders;
-  }
-
   async getIssuanceToken() {
     return await this.bondingCurve.read.getIssuanceToken();
   }
@@ -133,7 +115,7 @@ export class Queries {
     return await this.bondingCurve.read.getStaticPriceForBuying();
   }
 
-  async getAggregateVestings(orchestratorAddress) {
+  async getBalances(orchestratorAddress) {
     const { LinearVesting: vestings } = await this.indexerConnector(
       queryBuilder.indexer.vestings(this.chainId, orchestratorAddress)
     );
