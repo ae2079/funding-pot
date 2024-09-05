@@ -2,22 +2,23 @@ import {
   createPublicClient,
   http,
   getContract,
-  erc20Abi,
-  formatUnits,
   parseUnits,
 } from 'viem';
+import { AnkrProvider } from '@ankr.com/ankr.js';
+
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
-import { AnkrProvider } from '@ankr.com/ankr.js';
 
 export class Queries {
   indexerUrl;
   publicClient;
   ankrProvider;
   networkIdString;
+  sdk;
 
   constructor({ rpcUrl, indexerUrl, chainId, bondingCurveAddress }) {
     this.indexerUrl = indexerUrl;
+    this.chainId = chainId;
     this.publicClient = createPublicClient({
       chain: chainId,
       transport: http(rpcUrl),
@@ -54,7 +55,7 @@ export class Queries {
     const {
       Swap: [lastBuy],
     } = await this.indexerConnector(
-      queryBuilder.indexer.lastBuyBlocknumber(address)
+      queryBuilder.indexer.lastBuyBlocknumber(address, this.chainId)
     );
     return lastBuy.blockTimestamp;
   }
@@ -106,30 +107,27 @@ export class Queries {
       }, {});
   }
 
-  async getBalances(token, addresses) {
-    const { holders } = await this.ankrProvider.getTokenHolders({
-      blockchain: this.networkIdString,
-      contractAddress: token,
-    });
-
-    const filteredHolders = holders
-      .filter((holder) =>
-        addresses.includes(holder.holderAddress.toLowerCase())
-      )
-      .reduce((obj, holder) => {
-        obj[holder.holderAddress] = BigInt(holder.balanceRawInteger);
-        return obj;
-      }, {});
-
-    return filteredHolders;
-  }
-
   async getIssuanceToken() {
     return await this.bondingCurve.read.getIssuanceToken();
   }
 
   async getSpotPrice() {
     return await this.bondingCurve.read.getStaticPriceForBuying();
+  }
+
+  async getBalances(orchestratorAddress) {
+    const { LinearVesting: vestings } = await this.indexerConnector(
+      queryBuilder.indexer.vestings(this.chainId, orchestratorAddress)
+    );
+
+    return vestings.reduce((acc, vesting) => {
+      if (!acc[vesting.recipient]) {
+        acc[vesting.recipient] = BigInt(vesting.amountRaw);
+      } else {
+        acc[vesting.recipient] += BigInt(vesting.amountRaw);
+      }
+      return acc;
+    }, {});
   }
 
   /* 
