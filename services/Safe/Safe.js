@@ -47,8 +47,6 @@ export class Safe {
           transactions: batchTxs,
           options: { nonce },
         });
-      console.log(69);
-      console.log(safeTransaction);
       const safeTxHash = await this.protocolKit.getTransactionHash(
         safeTransaction
       );

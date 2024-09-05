@@ -5,8 +5,6 @@ import { BATCH_SIZE } from '../../config.js';
 const PAYMENT_PUSHER_ROLE =
   '0x5041594d454e545f505553484552000000000000000000000000000000000000';
 
-console.log(abis);
-
 export class TransactionBuilder {
   transactions;
   safe;

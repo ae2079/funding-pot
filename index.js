@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 import { getConfigs } from './execution-flow/getConfigs.js';
 import { validateInputs } from './execution-flow/validateInputs.js';
@@ -12,7 +12,8 @@ const [, , PROJECT_NAME, BATCH] = process.argv;
 
 async function main() {
   // load configs
-  const { projectsConfig, batchConfig } = getConfigs(BATCH);
+  const { projectsConfig, batchConfig, allowlist } =
+    getConfigs(BATCH);
 
   // checks if all required inputs are set in configs
   validateInputs(projectsConfig, batchConfig);

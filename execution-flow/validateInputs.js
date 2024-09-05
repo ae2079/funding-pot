@@ -5,6 +5,29 @@ export const validateInputs = ({
   batchConfig,
   allowlist,
 }) => {
+  validateEnvVars();
+  validateConfigs({
+    projectConfig,
+    batchConfig,
+    allowlist,
+  });
+};
+
+const validateEnvVars = () => {
+  const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
+    process.env;
+
+  if (!ANKR_API_KEY) throw new Error('ANKR_API_KEY missing');
+  if (!ANKR_NETWORK_ID) throw new Error('ANKR_NETWORK_ID missing');
+  if (!CHAIN_ID) throw new Error('CHAIN_ID missing');
+  if (!INDEXER_URL) throw new Error('INDEXER_URL missing');
+};
+
+const validateConfigs = ({
+  projectConfig,
+  batchConfig,
+  allowlist,
+}) => {
   const {
     VESTING_DETAILS: { START, CLIFF, END },
   } = batchConfig;
