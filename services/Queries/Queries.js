@@ -5,7 +5,6 @@ import {
   parseUnits,
 } from 'viem';
 import { AnkrProvider } from '@ankr.com/ankr.js';
-import { Inverter } from '@inverter-network/sdk';
 
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
@@ -33,23 +32,6 @@ export class Queries {
       address: bondingCurveAddress,
       client: this.publicClient,
       abi: abis.bondingCurveAbi,
-    });
-
-    this.sdk = new Inverter({
-      publicClient: this.publicClient,
-    });
-  }
-
-  async loadSdk(orchestratorAddress) {
-    await this.sdk.getWorkflow({
-      orchestratorAddress,
-      requestedModules: {
-        fundingManager:
-          'FM_BC_Restricted_Bancor_Redeeming_VirtualSupply_v1',
-        paymentProcessor: 'PP_Streaming_v1',
-        authorizer: 'AUT_Roles_v1',
-        optionalModules: ['LM_PC_PaymentRouter_v1'],
-      },
     });
   }
 
