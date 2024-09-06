@@ -1,0 +1,27 @@
+import '../env.js';
+
+import { Safe } from '../services/Safe/Safe.js';
+
+// requires to have PK of safe owner stored in env
+async function main() {
+  const [, , SAFE, DELEGATE] = process.argv;
+
+  console.log(SAFE);
+  console.log(DELEGATE);
+
+  const safeService = new Safe(
+    process.env.CHAIN_ID,
+    SAFE,
+    process.env.RPC_URL
+  );
+
+  console.log(
+    `Adding delegate ${DELEGATE} to safe ${SAFE} on chain ${process.env.CHAIN_ID}`
+  );
+
+  const response = await safeService.addDelegate(DELEGATE);
+
+  console.log(response);
+}
+
+main();
