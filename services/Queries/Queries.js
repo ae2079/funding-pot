@@ -15,6 +15,7 @@ export class Queries {
   publicClient;
   ankrProvider;
   networkIdString;
+  inflows;
 
   constructor({ rpcUrl, indexerUrl, chainId }) {
     this.indexerUrl = indexerUrl;
@@ -28,6 +29,7 @@ export class Queries {
       this.getAdvancedApiEndpoint(rpcUrl)
     );
     this.addresses = {};
+    this.queries = {};
   }
 
   async setup(orchestratorAddress) {
@@ -135,7 +137,7 @@ export class Queries {
         return acc;
       }, {});
 
-    return keysToLowerCase(inflows);
+    this.queries.inflows = keysToLowerCase(inflows);
   }
 
   async getIssuanceToken() {

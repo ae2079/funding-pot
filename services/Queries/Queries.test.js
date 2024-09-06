@@ -175,11 +175,11 @@ describe('Queries', () => {
       const vestings = await querySevice.getBalances();
 
       assert.deepStrictEqual(vestings, {
-        '0xa6e12EDe427516a56a5F6ab6e06dD335075eb04b': 420n,
-        '0xCb1eDf0E617c0FaB6408701d58b746451EE6cE2f': 28n,
-        '0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4': 82n,
-        '0x6747772f37a4F7CfDEA180D38e8ad372516c9548': 4n,
-        '0xCacC010EC451Cb33a7aE7cBa14de0a49293c2877': 7n,
+        '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b': 420n,
+        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': 28n,
+        '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': 82n,
+        '0x6747772f37a4f7cfdea180d38e8ad372516c9548': 4n,
+        '0xcacc010ec451cb33a7ae7cba14de0a49293c2877': 7n,
       });
     });
   });
