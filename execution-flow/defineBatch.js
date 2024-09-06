@@ -27,11 +27,8 @@ export const defineBatch = async ({
     toTimestamp
   );
 
-  // add inflows to batch service
-  batchService.addInflows(inflowsData);
-
   // earmark eligible addresses
-  batchService.checkEligibility(allowlist);
+  batchService.checkEligibility(inflowsData, allowlist);
 
   // calculate actual contributions taking into account the individual contribution CAP
   const contributors = batchService.getContributors();

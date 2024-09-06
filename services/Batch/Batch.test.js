@@ -32,7 +32,7 @@ describe('Batch', () => {
       },
     };
     const batchService = new Batch();
-    batchService.addInflows(dataWithEligibility);
+    batchService.data.participants = dataWithEligibility;
 
     it('adds aggregate contribution data', () => {
       batchService.calculateAggregateContributions(
@@ -50,7 +50,7 @@ describe('Batch', () => {
   describe('#checkEligibility', () => {
     const eligibleAddresses = [addr1, addr2];
     const nonEligibleAddress = addr3;
-    const data = {
+    const participants = {
       [eligibleAddresses[0]]: {
         contribution: contr1,
       },
@@ -62,23 +62,25 @@ describe('Batch', () => {
       },
     };
     const batchService = new Batch();
-    batchService.addInflows(data);
 
     it('adds `permitted` flag per participant', () => {
-      batchService.checkEligibility(eligibleAddresses);
+      batchService.checkEligibility(participants, eligibleAddresses);
 
       assert.deepStrictEqual(batchService.data, {
         participants: {
           [eligibleAddresses[0]]: {
-            contribution: data[eligibleAddresses[0]].contribution,
+            contribution:
+              participants[eligibleAddresses[0]].contribution,
             permitted: true,
           },
           [eligibleAddresses[1]]: {
-            contribution: data[eligibleAddresses[1]].contribution,
+            contribution:
+              participants[eligibleAddresses[1]].contribution,
             permitted: true,
           },
           [nonEligibleAddress]: {
-            contribution: data[nonEligibleAddress].contribution,
+            contribution:
+              participants[nonEligibleAddress].contribution,
             permitted: false,
           },
         },
@@ -87,7 +89,7 @@ describe('Batch', () => {
   });
 
   describe('#getContributors', () => {
-    const data = {
+    const participants = {
       [addr1]: {
         contribution: contr1,
         permitted: true,
@@ -102,7 +104,7 @@ describe('Batch', () => {
       },
     };
     const batchService = new Batch();
-    batchService.addInflows(data);
+    batchService.data.participants = participants;
 
     it("returns a list of contributors' addresses (`eligible` = true)", () => {
       const contributors = batchService.getContributors();

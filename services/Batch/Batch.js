@@ -4,13 +4,15 @@ import { CAP } from '../../config.js';
 export class Batch {
   data;
 
-  // STATE-MODIFYING METHODS
-
-  addInflows(inflows) {
-    this.data = { participants: inflows };
+  constructor() {
+    this.data = {};
   }
 
-  checkEligibility(qualifiedAddresses) {
+  // STATE-MODIFYING METHODS
+
+  checkEligibility(inflows, qualifiedAddresses) {
+    this.data = { participants: inflows };
+
     const { participants } = this.data;
     for (const address of Object.keys(participants)) {
       if (
