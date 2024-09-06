@@ -9,15 +9,10 @@ import abis from '../../data/abis.js';
 import { Queries } from './Queries.js';
 
 describe('Queries', () => {
-  const indexerUrl =
-    'https://indexer.bigdevenergy.link/7612f58/v1/graphql';
-  const mockMulitSigAddress =
-    '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
-
-  const orchestratorAddress =
-    '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3';
-
   describe('#setup', () => {
+    const orchestratorAddress =
+      '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3';
+
     const querySevice = new Queries({
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
@@ -40,6 +35,9 @@ describe('Queries', () => {
   });
 
   describe('#getLastPurchaseBlock', () => {
+    const mockMulitSigAddress =
+      '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
+
     const querySevice = new Queries({
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
@@ -67,17 +65,17 @@ describe('Queries', () => {
     });
   });
 
-  // NOTE: requires the secret ANKR API key to be set in .env.example
-  // TODO: fix this test
+  // NOTE: requires the secret ANKR API key to be set in .env.test
   describe.skip('#getInflows', () => {
-    const fromTimestamp = '124058551';
-    const toTimestamp = '124058578';
-    const token = '0xdC6fF44d5d932Cbd77B52E5612Ba0529DC6226F1';
-    const recipient = '0x253DD57300904225762960755B7662e6ae06492d';
+    const fromTimestamp = '1725654505';
+    const toTimestamp = '1725655119';
+    const token = '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3';
+    const recipient = '0x5e657719AEE21a6BB1BCaAd7781DcE222186Ca72';
 
     const querySevice = new Queries({
-      rpcUrl:
-        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: `https://rpc.ankr.com/${process.env.ANKR_NETWORK_ID}/${process.env.ANKR_API_KEY}`,
+      chainId: process.env.CHAIN_ID,
     });
 
     it('should return all inflows within the timeframe', async () => {
@@ -89,17 +87,17 @@ describe('Queries', () => {
       );
 
       assert.deepStrictEqual(inflows, {
-        '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb': {
-          contribution: 15560000000000000000n,
+        '0x6747772f37a4f7cfdea180d38e8ad372516c9548': {
+          contribution: 21300000000000000000000n,
         },
-        '0x932285a2e33b89981d25eb586a3893e0f5a1a9da': {
-          contribution: 11000000000000000000n,
+        '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b': {
+          contribution: 110000000000000000000n,
         },
-        '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff': {
-          contribution: 6000000000000000000n,
+        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': {
+          contribution: 15422100000000000000n,
         },
-        '0xf7c3128a43446621430530d6267d0eb21061fab6': {
-          contribution: 6020000000000000000n,
+        '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': {
+          contribution: 420690000000000000000n,
         },
       });
     });

@@ -11,7 +11,7 @@ import abis from '../../data/abis.js';
 import { keysToLowerCase } from '../../utils/helpers.js';
 
 export class Queries {
-  indexerUrl;
+  indexerUrlenv;
   publicClient;
   ankrProvider;
   networkIdString;
@@ -110,6 +110,13 @@ export class Queries {
   }
 
   async getInflows(token, recipient, fromTimestamp, toTimestamp) {
+    console.log({
+      address: recipient,
+      fromTimestamp,
+      toTimestamp,
+      blockchain: this.networkIdString,
+      pageSize: 10000,
+    });
     const transactions = await this.ankrProvider.getTokenTransfers({
       address: recipient,
       fromTimestamp,
@@ -117,6 +124,8 @@ export class Queries {
       blockchain: this.networkIdString,
       pageSize: 10000,
     });
+
+    console.log('transactions: ', transactions);
 
     const inflows = transactions.transfers
       .filter(
@@ -127,6 +136,7 @@ export class Queries {
           tx.contractAddress.toLowerCase() === token.toLowerCase()
       )
       .reduce((acc, tx) => {
+        console.log(acc);
         const { fromAddress, value, tokenDecimals } = tx;
         if (!acc[fromAddress]) {
           acc[fromAddress] = {

@@ -61,7 +61,7 @@ export class Safe {
         senderSignature: senderSignature.data,
         origin: '0',
       });
-      // TODO: add tx hashes to state
+
       this.safeTransactions.push({ safeTxHash });
     }
   }
