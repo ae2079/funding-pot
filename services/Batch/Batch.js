@@ -62,7 +62,6 @@ export class Batch {
     exAnteSpotPrice,
     exAnteBalances
   ) {
-    console.log('calculateValidContributions');
     // store exAnteSupply and exAnteSpotPrice
     this.data.exAnteSupply = exAnteSupply;
     this.data.exAnteSpotPrice = exAnteSpotPrice;
@@ -73,20 +72,11 @@ export class Batch {
       18
     );
 
-    console.log(
-      'this.data.issuanceTokenCap: ',
-      this.data.issuanceTokenCap
-    );
-
     const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
-    console.log('exAnteBalances: ', exAnteBalances);
-    console.log('this.data.participants: ', this.data.participants);
     // calculate excess contribution and store
     for (const address of Object.keys(exAnteBalances)) {
-      console.log(address);
-      console.log(this.data.participants[address]);
       if (!this.data.participants[address]) continue;
-      console.log(address);
+
       const { contribution, permitted } =
         this.data.participants[address];
 
@@ -130,7 +120,6 @@ export class Batch {
           contribution;
       }
     }
-    console.log('END-WTF');
   }
 
   calculateAllocations(amountOut) {

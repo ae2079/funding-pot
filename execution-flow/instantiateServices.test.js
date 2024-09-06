@@ -37,8 +37,10 @@ describe('#instantiateServices', () => {
       'publicClient',
       'ankrProvider',
       'networkIdString',
+      'inflows',
       'chainId',
       'addresses',
+      'queries',
       'bondingCurve',
     ]);
 

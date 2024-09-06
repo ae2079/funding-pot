@@ -15,7 +15,6 @@ export class Queries {
   publicClient;
   ankrProvider;
   networkIdString;
-  inflows;
 
   constructor({ rpcUrl, indexerUrl, chainId }) {
     this.indexerUrl = indexerUrl;
@@ -28,8 +27,7 @@ export class Queries {
     this.ankrProvider = new AnkrProvider(
       this.getAdvancedApiEndpoint(rpcUrl)
     );
-    this.addresses = {};
-    this.queries = {};
+    this.queries = { addresses: {} };
   }
 
   async setup(orchestratorAddress) {
@@ -38,17 +36,17 @@ export class Queries {
       client: this.publicClient,
       abi: abis.orchestratorAbi,
     });
-    this.addresses.orchestrator = orchestratorAddress;
-    this.addresses.bondingCurve =
+    this.queries.addresses.orchestrator = orchestratorAddress;
+    this.queries.addresses.bondingCurve =
       await orchestrator.read.fundingManager();
     this.bondingCurve = getContract({
-      address: this.addresses.bondingCurve,
+      address: this.queries.addresses.bondingCurve,
       client: this.publicClient,
       abi: abis.bondingCurveAbi,
     });
-    this.addresses.collateralToken =
+    this.queries.addresses.collateralToken =
       await this.bondingCurve.read.token();
-    this.addresses.issuanceToken =
+    this.queries.addresses.issuanceToken =
       await this.bondingCurve.read.getIssuanceToken();
 
     const modules = await orchestrator.read.listModules();
@@ -60,13 +58,14 @@ export class Queries {
       });
       const moduleName = await moduleContract.read.title();
       if (moduleName === 'LM_PC_PaymentRouter_v1') {
-        this.addresses.paymentRouter = module;
+        this.queries.addresses.paymentRouter = module;
       }
     }
   }
 
   // QUERIES
 
+  // TODO: test what happens with predefined timeframe
   async getTimeframe({ fromTimestamp, toTimestamp, address }) {
     if (!fromTimestamp && fromTimestamp !== 0) {
       fromTimestamp = await this.getLastPurchaseBlock(address);
@@ -74,11 +73,11 @@ export class Queries {
     if (!toTimestamp) {
       toTimestamp = await this.getCurrentBlockNumber();
     }
-
-    return {
+    this.queries.timeframe = {
       fromTimestamp: parseInt(fromTimestamp),
       toTimestamp: parseInt(toTimestamp),
     };
+    return this.queries.timeframe;
   }
 
   async getLastPurchaseBlock(multisig) {
@@ -92,17 +91,22 @@ export class Queries {
 
   async getCurrentBlockNumber() {
     const block = await this.publicClient.getBlock();
-    return block.timestamp;
+    this.queries.blockTimestamp = block.timestamp;
+    return this.queries.blockTimestamp;
   }
 
   async getAmountOut(collateralIn) {
-    return await this.bondingCurve.read.calculatePurchaseReturn([
-      collateralIn,
-    ]);
+    this.queries.amountOut =
+      await this.bondingCurve.read.calculatePurchaseReturn([
+        collateralIn,
+      ]);
+    return this.queries.amountOut;
   }
 
   async getIssuanceSupply() {
-    return await this.bondingCurve.read.getVirtualIssuanceSupply();
+    this.queries.issuanceSupply =
+      await this.bondingCurve.read.getVirtualIssuanceSupply();
+    return this.queries.issuanceSupply;
   }
 
   async getInflows(token, recipient, fromTimestamp, toTimestamp) {
@@ -138,21 +142,26 @@ export class Queries {
       }, {});
 
     this.queries.inflows = keysToLowerCase(inflows);
+    return this.queries.inflows;
   }
 
   async getIssuanceToken() {
-    return await this.bondingCurve.read.getIssuanceToken();
+    this.queries.issuanceToken =
+      await this.bondingCurve.read.getIssuanceToken();
+    return this.queries.issuanceToken;
   }
 
   async getSpotPrice() {
-    return await this.bondingCurve.read.getStaticPriceForBuying();
+    this.queries.spotPrice =
+      await this.bondingCurve.read.getStaticPriceForBuying();
+    return this.queries.spotPrice;
   }
 
   async getBalances() {
     const { LinearVesting: vestings } = await this.indexerConnector(
       queryBuilder.indexer.vestings(
         this.chainId,
-        this.addresses.orchestrator
+        this.queries.addresses.orchestrator
       )
     );
 
@@ -165,7 +174,8 @@ export class Queries {
       return acc;
     }, {});
 
-    return keysToLowerCase(vestedBalances);
+    this.queries.vestedBalances = keysToLowerCase(vestedBalances);
+    return this.queries.vestedBalances;
   }
 
   /* 

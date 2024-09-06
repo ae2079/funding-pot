@@ -26,10 +26,10 @@ export const instantiateServices = async (
 
   const transactionBuilderService = new TransactionBuilder({
     safe: SAFE,
-    paymentRouter: queryService.addresses.paymentRouter,
-    issuanceToken: queryService.addresses.issuanceToken,
-    collateralToken: queryService.addresses.collateralToken,
-    bondingCurve: queryService.addresses.bondingCurve,
+    paymentRouter: queryService.queries.addresses.paymentRouter,
+    issuanceToken: queryService.queries.addresses.issuanceToken,
+    collateralToken: queryService.queries.addresses.collateralToken,
+    bondingCurve: queryService.queries.addresses.bondingCurve,
     start: START,
     cliff: CLIFF,
     end: END,

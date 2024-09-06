@@ -20,20 +20,20 @@ export const defineBatch = async ({
     });
 
   // get inflows
-  const inflowsData = await queryService.getInflows(
-    queryService.addresses.collateralToken,
+  const inflows = await queryService.getInflows(
+    queryService.queries.addresses.collateralToken,
     SAFE,
     fromTimestamp,
     toTimestamp
   );
 
   // earmark eligible addresses
-  batchService.checkEligibility(inflowsData, allowlist);
+  batchService.checkEligibility(inflows, allowlist);
 
   // calculate actual contributions taking into account the individual contribution CAP
   const contributors = batchService.getContributors();
   const exAnteBalances = await queryService.getBalances(
-    queryService.addresses.issuanceToken,
+    queryService.queries.addresses.issuanceToken,
     contributors
   );
   const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
@@ -54,6 +54,4 @@ export const defineBatch = async ({
 
   // calculate allocations
   batchService.calculateAllocations(additionalIssuance);
-
-  console.log(batchService.data);
 };

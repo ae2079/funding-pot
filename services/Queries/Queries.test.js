@@ -24,9 +24,9 @@ describe('Queries', () => {
       chainId: process.env.CHAIN_ID,
     });
 
-    it("sets the bonding curve's address", async () => {
+    it('sets relevant workflow addresses', async () => {
       await querySevice.setup(orchestratorAddress);
-      assert.deepStrictEqual(querySevice.addresses, {
+      assert.deepStrictEqual(querySevice.queries.addresses, {
         bondingCurve: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
         collateralToken: '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3',
         issuanceToken: '0xD7b25E43A017795e98173820fE0AdBe20fE725Ad',
@@ -167,7 +167,7 @@ describe('Queries', () => {
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
     });
-    querySevice.addresses = {
+    querySevice.queries.addresses = {
       orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
     };
 
