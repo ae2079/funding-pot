@@ -1,7 +1,7 @@
 {
   "TIMEFRAME": {
-    "START_BLOCK": 0,
-    "END_BLOCK": 100
+    "FROM_TIMESTAMP": 0,
+    "TO_TIMESTAMP": 100
   },
   "VESTING_DETAILS": {
     "START": 0,

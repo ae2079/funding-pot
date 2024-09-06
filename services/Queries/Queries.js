@@ -64,17 +64,19 @@ export class Queries {
 
   // QUERIES
 
-  async getTimeframe({ startBlock, endBlock, address }) {
-    if (!startBlock && startBlock !== 0) {
-      startBlock = await this.getLastPurchaseBlock(address);
+  async getTimeframe({ fromTimestamp, toTimestamp, address }) {
+    console.log('getTimeframe');
+    console.log(fromTimestamp, toTimestamp);
+    if (!fromTimestamp && fromTimestamp !== 0) {
+      fromTimestamp = await this.getLastPurchaseBlock(address);
     }
-    if (!endBlock) {
-      endBlock = await this.getCurrentBlockNumber();
+    if (!toTimestamp) {
+      toTimestamp = await this.getCurrentBlockNumber();
     }
 
     return {
-      startBlock,
-      endBlock,
+      fromTimestamp: parseInt(fromTimestamp),
+      toTimestamp: parseInt(toTimestamp),
     };
   }
 
@@ -88,7 +90,8 @@ export class Queries {
   }
 
   async getCurrentBlockNumber() {
-    return await this.publicClient.getBlockNumber();
+    const block = await this.publicClient.getBlock();
+    return block.timestamp;
   }
 
   async getAmountOut(collateralIn) {
@@ -101,14 +104,16 @@ export class Queries {
     return await this.bondingCurve.read.getVirtualIssuanceSupply();
   }
 
-  async getInflows(token, recipient, startBlock, endBlock) {
+  async getInflows(token, recipient, fromTimestamp, toTimestamp) {
     const transactions = await this.ankrProvider.getTokenTransfers({
       address: recipient,
-      fromBlock: startBlock,
-      toBlock: endBlock,
+      fromTimestamp,
+      toTimestamp,
       blockchain: this.networkIdString,
       pageSize: 10000,
     });
+
+    console.log(transactions);
 
     return transactions.transfers
       .filter(
