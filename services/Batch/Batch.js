@@ -13,7 +13,11 @@ export class Batch {
   checkEligibility(qualifiedAddresses) {
     const { participants } = this.data;
     for (const address of Object.keys(participants)) {
-      if (!qualifiedAddresses.includes(address)) {
+      if (
+        !qualifiedAddresses
+          .map((addr) => addr.toLowerCase())
+          .includes(address.toLowerCase())
+      ) {
         this.data.participants[address] = {
           ...participants[address],
           permitted: false,
@@ -56,6 +60,7 @@ export class Batch {
     exAnteSpotPrice,
     exAnteBalances
   ) {
+    console.log('calculateValidContributions');
     // store exAnteSupply and exAnteSpotPrice
     this.data.exAnteSupply = exAnteSupply;
     this.data.exAnteSpotPrice = exAnteSpotPrice;
@@ -66,12 +71,23 @@ export class Batch {
       18
     );
 
-    const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
+    console.log(
+      'this.data.issuanceTokenCap: ',
+      this.data.issuanceTokenCap
+    );
 
+    const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
+    console.log('exAnteBalances: ', exAnteBalances);
+    console.log('this.data.participants: ', this.data.participants);
     // calculate excess contribution and store
     for (const address of Object.keys(exAnteBalances)) {
+      console.log(address);
+      console.log(this.data.participants[address]);
+      if (!this.data.participants[address]) continue;
+      console.log(address);
       const { contribution, permitted } =
         this.data.participants[address];
+
       const exAnteBalance = exAnteBalances[address];
       const issuanceTokenPotential =
         this.data.issuanceTokenCap - exAnteBalance; // how many issuance token, the address may buy
@@ -112,6 +128,7 @@ export class Batch {
           contribution;
       }
     }
+    console.log('END-WTF');
   }
 
   calculateAllocations(amountOut) {
@@ -150,18 +167,6 @@ export class Batch {
 
   addVestingDetails({ start, cliff, end }) {
     this.data.vestingDetails = { start, cliff, end };
-  }
-
-  addMetadata({
-    safe,
-    issuanceToken,
-    collateralToken,
-    bondingCurve,
-  }) {
-    this.data.bondingCurve = bondingCurve;
-    this.data.safe = safe;
-    this.data.issuanceToken = issuanceToken;
-    this.data.collateralToken = collateralToken;
   }
 
   // GETTERS

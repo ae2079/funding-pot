@@ -8,6 +8,7 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
+import { keysToLowerCase } from '../../utils/helpers.js';
 
 export class Queries {
   indexerUrl;
@@ -65,8 +66,6 @@ export class Queries {
   // QUERIES
 
   async getTimeframe({ fromTimestamp, toTimestamp, address }) {
-    console.log('getTimeframe');
-    console.log(fromTimestamp, toTimestamp);
     if (!fromTimestamp && fromTimestamp !== 0) {
       fromTimestamp = await this.getLastPurchaseBlock(address);
     }
@@ -113,9 +112,7 @@ export class Queries {
       pageSize: 10000,
     });
 
-    console.log(transactions);
-
-    return transactions.transfers
+    const inflows = transactions.transfers
       .filter(
         (tx) => tx.toAddress.toLowerCase() === recipient.toLowerCase()
       )
@@ -137,6 +134,8 @@ export class Queries {
         }
         return acc;
       }, {});
+
+    return keysToLowerCase(inflows);
   }
 
   async getIssuanceToken() {
@@ -155,7 +154,7 @@ export class Queries {
       )
     );
 
-    return vestings.reduce((acc, vesting) => {
+    const vestedBalances = vestings.reduce((acc, vesting) => {
       if (!acc[vesting.recipient]) {
         acc[vesting.recipient] = BigInt(vesting.amountRaw);
       } else {
@@ -163,6 +162,8 @@ export class Queries {
       }
       return acc;
     }, {});
+
+    return keysToLowerCase(vestedBalances);
   }
 
   /* 

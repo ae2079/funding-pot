@@ -3,62 +3,48 @@ export const defineBatch = async ({
   batchService,
   projectConfig,
   batchConfig,
+  allowlist,
 }) => {
+  // get project & batch specific config
   const {
     TIMEFRAME,
-    ALLOWLIST,
     VESTING_DETAILS: { START, CLIFF, END },
   } = batchConfig;
-  const {
-    SAFE,
-    ISSUANCE_TOKEN,
-    COLLATERAL_TOKEN,
-    PAYMENT_ROUTER,
-    BONDING_CURVE,
-  } = projectConfig[PROJECT_NAME];
+  const { SAFE } = projectConfig;
+
   // get timeframe
-  const { startBlock, endBlock } = await queryService.getTimeframe({
-    ...TIMEFRAME,
-    address: SAFE,
-  });
+  const { fromTimestamp, toTimestamp } =
+    await queryService.getTimeframe({
+      ...TIMEFRAME,
+      address: SAFE,
+    });
 
   // get inflows
   const inflowsData = await queryService.getInflows(
-    COLLATERAL_TOKEN,
+    queryService.addresses.collateralToken,
     SAFE,
-    startBlock,
-    endBlock
+    fromTimestamp,
+    toTimestamp
   );
-
-  // add relevant metadata
-  batchService.addMetadata({
-    safe: SAFE,
-    issuanceToken: ISSUANCE_TOKEN,
-    collateralToken: COLLATERAL_TOKEN,
-    bondingCurve: BONDING_CURVE,
-  });
 
   // add inflows to batch service
   batchService.addInflows(inflowsData);
 
-  // get addresses eligible for contribution
-  const eligibleAddresses = ALLOWLIST;
-
   // earmark eligible addresses
-  batchService.checkEligibility(eligibleAddresses);
+  batchService.checkEligibility(allowlist);
 
   // calculate actual contributions taking into account the individual contribution CAP
   const contributors = batchService.getContributors();
   const exAnteBalances = await queryService.getBalances(
-    ISSUANCE_TOKEN,
+    queryService.addresses.issuanceToken,
     contributors
   );
   const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
   const exAnteSpotPrice = await queryService.getSpotPrice();
   batchService.calculateValidContributions(
     exAnteIssuanceSupply,
-    exAnteBalances,
-    exAnteSpotPrice
+    exAnteSpotPrice,
+    exAnteBalances
   );
 
   // calculate aggregate contribution data
@@ -72,11 +58,5 @@ export const defineBatch = async ({
   // calculate allocations
   batchService.calculateAllocations(additionalIssuance);
 
-  // add vesting specs
-  batchService.addVestingSpecs({
-    paymentRounter: PAYMENT_ROUTER,
-    start: START,
-    cliff: CLIFF,
-    end: END,
-  });
+  console.log(batchService.data);
 };
