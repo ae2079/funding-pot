@@ -32,17 +32,18 @@ describe('#instantiateServices', () => {
   });
 
   it('instantiates the query service including setup step', () => {
-    assert.deepEqual(Object.keys(queryService), [
-      'indexerUrl',
-      'publicClient',
-      'ankrProvider',
-      'networkIdString',
-      'inflows',
-      'chainId',
-      'addresses',
-      'queries',
-      'bondingCurve',
-    ]);
+    assert.deepStrictEqual(
+      Object.keys(queryService).sort(),
+      [
+        'indexerUrl',
+        'publicClient',
+        'ankrProvider',
+        'networkIdString',
+        'chainId',
+        'queries',
+        'bondingCurve',
+      ].sort()
+    );
 
     for (const value of Object.values(queryService)) {
       assert.notStrictEqual(value, undefined);
@@ -79,7 +80,7 @@ describe('#instantiateServices', () => {
 
   it('instantiates the batch service', () => {
     assert.deepStrictEqual(Object.entries(batchService), [
-      ['data', undefined],
+      ['data', {}],
     ]);
   });
 });

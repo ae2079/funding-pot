@@ -6,9 +6,6 @@ import { Safe } from '../services/Safe/Safe.js';
 async function main() {
   const [, , SAFE, DELEGATE] = process.argv;
 
-  console.log(SAFE);
-  console.log(DELEGATE);
-
   const safeService = new Safe(
     process.env.CHAIN_ID,
     SAFE,

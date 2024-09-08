@@ -11,10 +11,13 @@ import abis from '../../data/abis.js';
 import { keysToLowerCase } from '../../utils/helpers.js';
 
 export class Queries {
-  indexerUrlenv;
+  indexerUrl;
+  chainId;
   publicClient;
-  ankrProvider;
   networkIdString;
+  ankrProvider;
+  bondingCurve;
+  queries;
 
   constructor({ rpcUrl, indexerUrl, chainId }) {
     this.indexerUrl = indexerUrl;
