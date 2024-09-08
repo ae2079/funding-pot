@@ -16,7 +16,11 @@ async function main() {
     getConfigs(BATCH);
 
   // checks if all required inputs are set in configs
-  validateInputs(projectsConfig, batchConfig);
+  validateInputs({
+    projectConfig: projectsConfig[PROJECT_NAME],
+    batchConfig,
+    allowlist,
+  });
 
   // instantiate services
   const {

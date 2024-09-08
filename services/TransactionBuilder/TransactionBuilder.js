@@ -53,6 +53,13 @@ export class TransactionBuilder {
     ]);
   }
 
+  approve(token, spender, amount) {
+    this.addTx(token, 'erc20Abi', 'approve(address,uint256)', [
+      spender,
+      amount,
+    ]);
+  }
+
   createVestings(vestingSpecs) {
     for (const vestingSpec of vestingSpecs) {
       const { recipient, amount } = vestingSpec;
@@ -90,6 +97,8 @@ export class TransactionBuilder {
     });
   }
 
+  // GETTERS
+
   getEncodedTxs() {
     const encodedTxs = [];
     for (const tx of this.transactions) {
@@ -111,6 +120,10 @@ export class TransactionBuilder {
     return encodedTxs;
   }
 
+  getEncodedTxBatches() {
+    return this.getTxBatches(this.getEncodedTxs());
+  }
+
   // removes abi field from transactions
   getReadableTxBatches() {
     return this.getTxBatches(
@@ -126,6 +139,7 @@ export class TransactionBuilder {
   }
 
   getTxBatches(txs) {
+    console.log(this.transactions);
     const txBatch = [];
     for (let i = 0; i < txs.length; i += BATCH_SIZE) {
       const chunk = txs.slice(i, i + BATCH_SIZE);
