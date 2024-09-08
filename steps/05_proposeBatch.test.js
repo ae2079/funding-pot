@@ -2,11 +2,11 @@ import '../env.js';
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
-import { proposeBatch } from './proposeBatch.js';
-import { instantiateServices } from './instantiateServices.js';
+import { proposeBatch } from './05_proposeBatch.js';
+import { instantiateServices } from './03_instantiateServices.js';
 import { keysToLowerCase } from '../utils/helpers.js';
 import { mintMockTokens } from '../utils/testHelpers.js';
-import { getAddress, getContract } from 'viem';
+import { getAddress } from 'viem';
 
 describe('#proposeBatch', () => {
   const projectConfig = {

@@ -2,7 +2,7 @@ import '../env.js';
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
-import { instantiateServices } from './instantiateServices.js';
+import { instantiateServices } from './03_instantiateServices.js';
 
 describe('#instantiateServices', () => {
   const projectConfig = {

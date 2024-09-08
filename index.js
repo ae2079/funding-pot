@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
-import { getConfigs } from './execution-flow/getConfigs.js';
-import { validateInputs } from './execution-flow/validateInputs.js';
-import { instantiateServices } from './execution-flow/instantiateServices.js';
-import { defineBatch } from './execution-flow/defineBatch.js';
-import { proposeBatch } from './execution-flow/proposeBatch.js';
-import { storeBatchReport } from './execution-flow/storeBatchReport.js';
+import { getConfigs } from './execution-flow/01_getConfigs.js';
+import { validateInputs } from './execution-flow/02_validateInputs.js';
+import { instantiateServices } from './execution-flow/03_instantiateServices.js';
+import { defineBatch } from './execution-flow/04_defineBatch.js';
+import { proposeBatch } from './execution-flow/05_proposeBatch.js';
+import { storeBatchReport } from './execution-flow/06_storeBatchReport.js';
 
 const [, , PROJECT_NAME, BATCH] = process.argv;
 

@@ -3,8 +3,7 @@ import '../env.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
-import { validateInputs } from './validateInputs.js';
-import { isAddress } from 'viem';
+import { validateInputs } from './02_validateInputs.js';
 
 describe('#validateInputs', () => {
   const projectConfig = {

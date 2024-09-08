@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { getConfigs } from './getConfigs.js';
+import { getConfigs } from './01_getConfigs.js';
 
 describe('#getConfigs', () => {
   describe('with existing batch number', () => {
