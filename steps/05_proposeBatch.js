@@ -21,19 +21,17 @@ export const proposeBatch = async ({
   transactionBuilderService.buy(totalValidContributions);
 
   // send issuance tokens to payment router
-  // transactionBuilderService.transferTokens(
-  //   queryService.queries.addresses.issuanceToken,
-  //   queryService.queries.addresses.paymentRouter,
-  //   additionalIssuance
-  // );
+  transactionBuilderService.transferTokens(
+    queryService.queries.addresses.issuanceToken,
+    queryService.queries.addresses.paymentRouter,
+    additionalIssuance
+  );
 
   // get parsed allocations
-  // const allocations = await batchService.getAllocations();
+  const allocations = await batchService.getAllocations();
 
   // add vesting txs
-  // transactionBuilderService.createVestings(allocations);
-
-  console.log(await transactionBuilderService.getReadableTxBatches());
+  transactionBuilderService.createVestings(allocations);
 
   // get encoded tx batches from transaction service
   const txBatches = transactionBuilderService.getEncodedTxBatches();

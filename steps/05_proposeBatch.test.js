@@ -5,14 +5,12 @@ import assert from 'node:assert';
 import { proposeBatch } from './05_proposeBatch.js';
 import { instantiateServices } from './03_instantiateServices.js';
 import { keysToLowerCase } from '../utils/helpers.js';
-import { mintMockTokens } from '../utils/testHelpers.js';
+import { mintMockTokens, setupForE2E } from '../utils/testHelpers.js';
 import { getAddress } from 'viem';
 
 describe('#proposeBatch', () => {
-  const projectConfig = {
-    ORCHESTRATOR: '0x19114C0E1F1c3F51681387Ff92Aa39C9A9b59b2F',
-    SAFE: '0x8Ea0F5104cd76659dFe0b3c07F8643D90151be89',
-  };
+  let projectConfig;
+
   const batchConfig = {
     VESTING_DETAILS: {
       START: 1,
@@ -35,6 +33,9 @@ describe('#proposeBatch', () => {
     batchService;
 
   before(async () => {
+    // get project config (create if not exists)
+    projectConfig = await setupForE2E();
+
     // instantiate services
     ({
       queryService,
@@ -42,6 +43,14 @@ describe('#proposeBatch', () => {
       transactionBuilderService,
       batchService,
     } = await instantiateServices(projectConfig, batchConfig));
+
+    // mint "collateralToken" to safe (so that it can buy from curve)
+    await mintMockTokens(
+      getAddress(queryService.queries.addresses.collateralToken),
+      queryService.publicClient,
+      totalValidContributions,
+      getAddress(projectConfig.SAFE)
+    );
 
     // set numbers
     batchService.data.totalValidContributions =
@@ -55,23 +64,19 @@ describe('#proposeBatch', () => {
         issuanceAllocation: issuance2,
       },
     });
+  });
 
-    // set up state
-    // 1. mint "collateralToken" to safe
-    await mintMockTokens(
-      getAddress(queryService.queries.addresses.collateralToken),
-      queryService.publicClient,
-      totalValidContributions,
-      getAddress(projectConfig.SAFE)
-    );
-
+  it('proposes the batch', async () => {
     await proposeBatch({
       queryService,
       batchService,
       transactionBuilderService,
       safeService,
     });
-  });
 
-  it('', () => {});
+    console.warn(
+      '❗❗❗ You can find (and sign and execute) the proposed tx here: ',
+      `https://app.safe.global/transactions/queue?safe=basesep:${projectConfig.SAFE} ❗❗❗`
+    );
+  });
 });

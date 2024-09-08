@@ -5,9 +5,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import dotenv from 'dotenv';
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-
 export const getConfigs = (batch) => {
   const dataDir =
     process.env.NODE_ENV === 'production' ? 'production' : 'test';

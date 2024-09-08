@@ -19,7 +19,7 @@ export class Safe {
   }
 
   async addDelegate(delegateAddress) {
-    const wallet = new ethers.Wallet('0x' + process.env.PK);
+    const wallet = new ethers.Wallet(process.env.PK);
     const response = await this.apiKit.addSafeDelegate({
       delegateAddress,
       delegatorAddress: wallet.address,
@@ -36,7 +36,7 @@ export class Safe {
     console.log('txs: ', txs);
     if (!this.protocolKit) {
       this.protocolKit = await ProtocolKit.default.init({
-        signer: '0x' + process.env.DELEGATE,
+        signer: process.env.DELEGATE,
         provider: this.rpcUrl,
         safeAddress: this.safeAddress,
       });

@@ -1,3 +1,5 @@
+import '../env.js';
+
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { getConfigs } from './01_getConfigs.js';
