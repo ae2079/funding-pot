@@ -12,7 +12,7 @@ async function main() {
     process.env.RPC_URL
   );
 
-  console.log(
+  console.info(
     `Adding delegate ${DELEGATE} to safe ${SAFE} on chain ${process.env.CHAIN_ID}`
   );
 

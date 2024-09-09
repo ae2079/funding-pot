@@ -3,6 +3,7 @@ import { validateInputs } from './02_validateInputs.js';
 import { instantiateServices } from './03_instantiateServices.js';
 import { defineBatch } from './04_defineBatch.js';
 import { proposeBatch } from './05_proposeBatch.js';
+import { storeReport } from './06_storeReport.js';
 
 export const main = async (projectName, batchNr) => {
   // load configs
@@ -43,13 +44,10 @@ export const main = async (projectName, batchNr) => {
   });
 
   // TODO: store comprehensive batch data in a JSON file
-  // await storeBatchReport(
-  //   {
-  //     batchService,
-  //     safeService,
-  //     transactionBuilderService,
-  //   },
-  //   batchNr,
-  //   projectName
-  // );
+  await storeReport(projectName, batchNr, {
+    batchService,
+    safeService,
+    transactionBuilderService,
+    queryService,
+  });
 };

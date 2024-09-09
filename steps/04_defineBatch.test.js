@@ -53,8 +53,6 @@ describe('#defineBatch', () => {
       allowlist,
     });
 
-    console.log(batchService.data);
-
     assert.deepStrictEqual(batchService.data, {
       totalValidContributions: 13185855190790067000000n,
       totalExcessContributions: 999940149144809209933000000n,

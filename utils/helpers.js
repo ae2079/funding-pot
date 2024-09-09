@@ -7,3 +7,12 @@ export const keysToLowerCase = (obj) =>
       value,
     ])
   );
+
+export const serializeBigInt = (obj) => {
+  return JSON.stringify(
+    obj,
+    (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    4
+  );
+};

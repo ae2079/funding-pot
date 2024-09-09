@@ -7,10 +7,14 @@ import {
   http,
   getContract,
   toHex,
+  decodeEventLog,
 } from 'viem';
 import * as chains from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import { SafeFactory } from '@safe-global/protocol-kit';
+import ProtocolKit, {
+  SafeFactory,
+  SigningMethod,
+} from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
@@ -99,7 +103,7 @@ export const deployTestSafe = async () => {
   return safeAddress;
 };
 
-const getTestClients = () => {
+export const getTestClients = () => {
   const baseConfig = {
     chain: getChain(process.env.CHAIN_ID),
     transport: http(process.env.RPC_URL),
@@ -271,12 +275,17 @@ export const getProjectConfig = async () => {
 
     fs.writeFileSync(
       filePath,
-      JSON.stringify({
-        TESTPROJECT: {
-          SAFE: safeAddress,
-          ORCHESTRATOR: orchestratorAddress,
+      JSON.stringify(
+        {
+          ...projectsConfig,
+          TESTPROJECT: {
+            SAFE: safeAddress,
+            ORCHESTRATOR: orchestratorAddress,
+          },
         },
-      }),
+        null,
+        2
+      ),
       'utf8'
     );
 
@@ -410,4 +419,78 @@ export const setupForE2E = async () => {
   await getBatchConfig(SAFE);
 };
 
-// export const signAndExecuteSafeTx = async () => {};
+export const signAndExecutePendingTxs = async (safeAddress) => {
+  const apiKit = new SafeApiKit.default({
+    chainId: process.env.CHAIN_ID,
+  });
+  const protocolKit = await ProtocolKit.default.init({
+    signer: process.env.PK,
+    provider: process.env.RPC_URL,
+    safeAddress: safeAddress,
+  });
+  const pendingTxs = await apiKit.getPendingTransactions(safeAddress);
+
+  for (const tx of pendingTxs.results) {
+    const { safeTxHash } = tx;
+    const signature = await protocolKit.signHash(safeTxHash);
+    await apiKit.confirmTransaction(safeTxHash, signature.data);
+  }
+
+  const receipts = [];
+
+  for (const tx of pendingTxs.results) {
+    const { safeTxHash } = tx;
+    const safeTransaction = await apiKit.getTransaction(safeTxHash);
+    const executeTxResponse = await protocolKit.executeTransaction(
+      safeTransaction
+    );
+    const receipt =
+      executeTxResponse.transactionResponse &&
+      (await executeTxResponse.transactionResponse.wait());
+
+    receipts.push(receipt);
+  }
+
+  return receipts;
+};
+
+export const getVestings = async (txHash) => {
+  const {
+    owner: { publicClient },
+  } = getTestClients();
+
+  const receipt = await publicClient.getTransactionReceipt({
+    hash: txHash,
+  });
+
+  const eventLogs = receipt.logs.map((log) => {
+    try {
+      // Step 3: Attempt to decode the log using the ABI and event name
+      return decodeEventLog({
+        abi: abis.streamingProcessorAbi,
+        data: log.data,
+        topics: log.topics,
+      });
+    } catch (error) {
+      // If log doesn't match the event type, return null
+      return null;
+    }
+  });
+
+  const filtered = eventLogs.filter(
+    (log) => log !== null && log.eventName === 'StreamingPaymentAdded'
+  );
+
+  return filtered.map((f) => f.args);
+};
+
+export const getReport = (projectName, batchNr) => {
+  const filePath = path.join(
+    __dirname,
+    `../data/test/output/${projectName}/${batchNr}.json`
+  );
+
+  const report = JSON.parse(fs.readFileSync(path.join(filePath)));
+
+  return report;
+};
