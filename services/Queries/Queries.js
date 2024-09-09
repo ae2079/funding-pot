@@ -8,15 +8,18 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
+import { keysToLowerCase } from '../../utils/helpers.js';
 
 export class Queries {
   indexerUrl;
+  chainId;
   publicClient;
-  ankrProvider;
   networkIdString;
-  sdk;
+  ankrProvider;
+  bondingCurve;
+  queries;
 
-  constructor({ rpcUrl, indexerUrl, chainId, bondingCurveAddress }) {
+  constructor({ rpcUrl, indexerUrl, chainId }) {
     this.indexerUrl = indexerUrl;
     this.chainId = chainId;
     this.publicClient = createPublicClient({
@@ -27,63 +30,107 @@ export class Queries {
     this.ankrProvider = new AnkrProvider(
       this.getAdvancedApiEndpoint(rpcUrl)
     );
+    this.queries = { addresses: {} };
+  }
 
+  async setup(orchestratorAddress) {
+    const orchestrator = getContract({
+      address: orchestratorAddress,
+      client: this.publicClient,
+      abi: abis.orchestratorAbi,
+    });
+    this.queries.addresses.orchestrator = orchestratorAddress;
+    this.queries.addresses.bondingCurve =
+      await orchestrator.read.fundingManager();
     this.bondingCurve = getContract({
-      address: bondingCurveAddress,
+      address: this.queries.addresses.bondingCurve,
       client: this.publicClient,
       abi: abis.bondingCurveAbi,
     });
+    this.queries.addresses.collateralToken =
+      await this.bondingCurve.read.token();
+    this.queries.addresses.issuanceToken =
+      await this.bondingCurve.read.getIssuanceToken();
+
+    const modules = await orchestrator.read.listModules();
+    for (const module of modules) {
+      const moduleContract = getContract({
+        address: module,
+        client: this.publicClient,
+        abi: abis.bondingCurveAbi,
+      });
+      const moduleName = await moduleContract.read.title();
+      if (moduleName === 'LM_PC_PaymentRouter_v1') {
+        this.queries.addresses.paymentRouter = module;
+      }
+    }
   }
 
   // QUERIES
 
-  async getTimeframe({ startBlock, endBlock, address }) {
-    if (!startBlock && startBlock !== 0) {
-      startBlock = await this.getLastPurchaseBlock(address);
-    }
-    if (!endBlock) {
-      endBlock = await this.getCurrentBlockNumber();
+  async getTimeframe({ configuration, safe }) {
+    const timeframe = {};
+
+    if (configuration && configuration.FROM_TIMESTAMP) {
+      timeframe.fromTimestamp = configuration.FROM_TIMESTAMP;
+    } else {
+      timeframe.fromTimestamp = (
+        await this.getLastPurchaseBlock(safe)
+      ).toString();
     }
 
-    return {
-      startBlock,
-      endBlock,
-    };
+    if (configuration && configuration.TO_TIMESTAMP) {
+      timeframe.toTimestamp = configuration.TO_TIMESTAMP;
+    } else {
+      timeframe.toTimestamp = (
+        await this.getCurrentBlockNumber()
+      ).toString();
+    }
+
+    this.queries.timeframe = timeframe;
+
+    return this.queries.timeframe;
   }
 
-  async getLastPurchaseBlock(address) {
+  async getLastPurchaseBlock(multisig) {
     const {
       Swap: [lastBuy],
     } = await this.indexerConnector(
-      queryBuilder.indexer.lastBuyBlocknumber(address, this.chainId)
+      queryBuilder.indexer.lastBuyBlocknumber(multisig, this.chainId)
     );
     return lastBuy.blockTimestamp;
   }
 
   async getCurrentBlockNumber() {
-    return await this.publicClient.getBlockNumber();
+    const block = await this.publicClient.getBlock();
+    this.queries.blockTimestamp = block.timestamp;
+    return this.queries.blockTimestamp;
   }
 
   async getAmountOut(collateralIn) {
-    return await this.bondingCurve.read.calculatePurchaseReturn([
-      collateralIn,
-    ]);
+    this.queries.amountOut =
+      await this.bondingCurve.read.calculatePurchaseReturn([
+        collateralIn,
+      ]);
+    return this.queries.amountOut;
   }
 
   async getIssuanceSupply() {
-    return await this.bondingCurve.read.getVirtualIssuanceSupply();
+    this.queries.issuanceSupply =
+      await this.bondingCurve.read.getVirtualIssuanceSupply();
+    return this.queries.issuanceSupply;
   }
 
-  async getInflows(token, recipient, startBlock, endBlock) {
+  async getInflows(token, recipient, fromTimestamp, toTimestamp) {
     const transactions = await this.ankrProvider.getTokenTransfers({
       address: recipient,
-      fromBlock: startBlock,
-      toBlock: endBlock,
+      fromTimestamp,
+      toTimestamp,
       blockchain: this.networkIdString,
       pageSize: 10000,
     });
 
-    return transactions.transfers
+    const inflows = transactions.transfers
       .filter(
         (tx) => tx.toAddress.toLowerCase() === recipient.toLowerCase()
       )
@@ -105,22 +152,32 @@ export class Queries {
         }
         return acc;
       }, {});
+
+    this.queries.inflows = keysToLowerCase(inflows);
+    return this.queries.inflows;
   }
 
   async getIssuanceToken() {
-    return await this.bondingCurve.read.getIssuanceToken();
+    this.queries.issuanceToken =
+      await this.bondingCurve.read.getIssuanceToken();
+    return this.queries.issuanceToken;
   }
 
   async getSpotPrice() {
-    return await this.bondingCurve.read.getStaticPriceForBuying();
+    this.queries.spotPrice =
+      await this.bondingCurve.read.getStaticPriceForBuying();
+    return this.queries.spotPrice;
   }
 
-  async getBalances(orchestratorAddress) {
+  async getBalances() {
     const { LinearVesting: vestings } = await this.indexerConnector(
-      queryBuilder.indexer.vestings(this.chainId, orchestratorAddress)
+      queryBuilder.indexer.vestings(
+        this.chainId,
+        this.queries.addresses.orchestrator
+      )
     );
 
-    return vestings.reduce((acc, vesting) => {
+    const vestedBalances = vestings.reduce((acc, vesting) => {
       if (!acc[vesting.recipient]) {
         acc[vesting.recipient] = BigInt(vesting.amountRaw);
       } else {
@@ -128,6 +185,9 @@ export class Queries {
       }
       return acc;
     }, {});
+
+    this.queries.vestedBalances = keysToLowerCase(vestedBalances);
+    return this.queries.vestedBalances;
   }
 
   /* 

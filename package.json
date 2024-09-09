@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "NODE_ENV=production node index.js",
+    "test": "NODE_ENV=test node --test",
+    "clean": "NODE_ENV=test node utils/scripts/resetTestFiles.js"
   },
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
     "@ankr.com/ankr.js": "^0.5.1",
+    "@inverter-network/sdk": "^0.2.8",
     "@safe-global/api-kit": "^2.4.4",
     "@safe-global/protocol-kit": "^4.0.4",
     "@safe-global/safe-core-sdk-types": "^5.0.3",

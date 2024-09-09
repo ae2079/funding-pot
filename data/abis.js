@@ -2034,6 +2034,24 @@ export default {
   erc20Abi: [
     {
       type: 'function',
+      name: 'mint',
+      inputs: [
+        {
+          name: 'to',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'value',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
       name: 'allowance',
       inputs: [
         {
@@ -2287,6 +2305,1922 @@ export default {
       inputs: [
         {
           name: 'spender',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+  ],
+
+  orchestratorAbi: [
+    {
+      type: 'constructor',
+      inputs: [
+        {
+          name: '_trustedForwarder',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'MODULE_UPDATE_TIMELOCK',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'authorizer',
+      inputs: [],
+      outputs: [
+        {
+          name: '',
+          type: 'address',
+          internalType: 'contract IAuthorizer_v1',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'cancelAuthorizerUpdate',
+      inputs: [
+        {
+          name: 'authorizer_',
+          type: 'address',
+          internalType: 'contract IAuthorizer_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'cancelFundingManagerUpdate',
+      inputs: [
+        {
+          name: 'fundingManager_',
+          type: 'address',
+          internalType: 'contract IFundingManager_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'cancelModuleUpdate',
+      inputs: [
+        {
+          name: 'module_',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'cancelPaymentProcessorUpdate',
+      inputs: [
+        {
+          name: 'paymentProcessor_',
+          type: 'address',
+          internalType: 'contract IPaymentProcessor_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'executeAddModule',
+      inputs: [
+        {
+          name: 'module_',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'executeRemoveModule',
+      inputs: [
+        {
+          name: 'module_',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'executeSetAuthorizer',
+      inputs: [
+        {
+          name: 'newAuthorizer',
+          type: 'address',
+          internalType: 'contract IAuthorizer_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'executeSetFundingManager',
+      inputs: [
+        {
+          name: 'newFundingManager',
+          type: 'address',
+          internalType: 'contract IFundingManager_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'executeSetPaymentProcessor',
+      inputs: [
+        {
+          name: 'newPaymentProcessor',
+          type: 'address',
+          internalType: 'contract IPaymentProcessor_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'fundingManager',
+      inputs: [],
+      outputs: [
+        {
+          name: '',
+          type: 'address',
+          internalType: 'contract IFundingManager_v1',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'governor',
+      inputs: [],
+      outputs: [
+        {
+          name: '',
+          type: 'address',
+          internalType: 'contract IGovernor_v1',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'init',
+      inputs: [
+        {
+          name: 'orchestratorId_',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+        {
+          name: 'moduleFactory_',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'modules',
+          type: 'address[]',
+          internalType: 'address[]',
+        },
+        {
+          name: 'fundingManager_',
+          type: 'address',
+          internalType: 'contract IFundingManager_v1',
+        },
+        {
+          name: 'authorizer_',
+          type: 'address',
+          internalType: 'contract IAuthorizer_v1',
+        },
+        {
+          name: 'paymentProcessor_',
+          type: 'address',
+          internalType: 'contract IPaymentProcessor_v1',
+        },
+        {
+          name: 'governor_',
+          type: 'address',
+          internalType: 'contract IGovernor_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'initiateAddModuleWithTimelock',
+      inputs: [
+        {
+          name: 'module_',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'initiateRemoveModuleWithTimelock',
+      inputs: [
+        {
+          name: 'module_',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'initiateSetAuthorizerWithTimelock',
+      inputs: [
+        {
+          name: 'newAuthorizer',
+          type: 'address',
+          internalType: 'contract IAuthorizer_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'initiateSetFundingManagerWithTimelock',
+      inputs: [
+        {
+          name: 'newFundingManager',
+          type: 'address',
+          internalType: 'contract IFundingManager_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'initiateSetPaymentProcessorWithTimelock',
+      inputs: [
+        {
+          name: 'newPaymentProcessor',
+          type: 'address',
+          internalType: 'contract IPaymentProcessor_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'isModule',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'isTrustedForwarder',
+      inputs: [
+        {
+          name: 'forwarder',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'listModules',
+      inputs: [],
+      outputs: [
+        {
+          name: '',
+          type: 'address[]',
+          internalType: 'address[]',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'moduleAddressToTimelock',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [
+        {
+          name: 'timelockActive',
+          type: 'bool',
+          internalType: 'bool',
+        },
+        {
+          name: 'timelockUntil',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'moduleFactory',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'address', internalType: 'address' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'modulesSize',
+      inputs: [],
+      outputs: [{ name: '', type: 'uint8', internalType: 'uint8' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'orchestratorId',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'paymentProcessor',
+      inputs: [],
+      outputs: [
+        {
+          name: '',
+          type: 'address',
+          internalType: 'contract IPaymentProcessor_v1',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'supportsInterface',
+      inputs: [
+        {
+          name: 'interfaceId',
+          type: 'bytes4',
+          internalType: 'bytes4',
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'trustedForwarder',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'address', internalType: 'address' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'event',
+      name: 'AuthorizerUpdated',
+      inputs: [
+        {
+          name: '_address',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'FundingManagerUpdated',
+      inputs: [
+        {
+          name: '_address',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'Initialized',
+      inputs: [
+        {
+          name: 'version',
+          type: 'uint64',
+          indexed: false,
+          internalType: 'uint64',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'ModuleAdded',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'ModuleRemoved',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'ModuleTimelockStarted',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'timelockUntil',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'ModuleUpdateCanceled',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'OrchestratorInitialized',
+      inputs: [
+        {
+          name: 'orchestratorId_',
+          type: 'uint256',
+          indexed: true,
+          internalType: 'uint256',
+        },
+        {
+          name: 'fundingManager',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'authorizer',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentProcessor',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'modules',
+          type: 'address[]',
+          indexed: false,
+          internalType: 'address[]',
+        },
+        {
+          name: 'governor',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'PaymentProcessorUpdated',
+      inputs: [
+        {
+          name: '_address',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'error',
+      name: 'InvalidInitialization',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__CallerNotAuthorized',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__InvalidModuleAddress',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__IsModule',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__IsNotModule',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__ModuleAmountOverLimits',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__ModuleFactoryInvalid',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__ModuleNotRegistered',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__ModuleUpdateAlreadyStarted',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__ModuleUpdateTimelockStillActive',
+      inputs: [
+        {
+          name: '_module',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: '_timelockUntil',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'ModuleManagerBase__OnlyCallableByModule',
+      inputs: [],
+    },
+    { type: 'error', name: 'NotInitializing', inputs: [] },
+    {
+      type: 'error',
+      name: 'Orchestrator__CallerNotAuthorized',
+      inputs: [
+        {
+          name: 'role',
+          type: 'bytes32',
+          internalType: 'bytes32',
+        },
+        {
+          name: 'caller',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Orchestrator__DependencyInjection__ModuleNotUsedInOrchestrator',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Orchestrator__InvalidModuleType',
+      inputs: [
+        {
+          name: 'module',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Orchestrator__InvalidRemovalOfAuthorizer',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Orchestrator__InvalidRemovalOfFundingManager',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Orchestrator__InvalidRemovalOfPaymentProcessor',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Orchestrator__MismatchedTokenForFundingManager',
+      inputs: [
+        {
+          name: 'currentToken',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'newToken',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+  ],
+  streamingProcessorAbi: [
+    {
+      type: 'function',
+      name: 'cancelRunningPayments',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'contract IERC20PaymentClientBase_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'claimAll',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'claimForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'claimPreviouslyUnclaimable',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'token',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'receiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'cliffForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'endForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'grantModuleRole',
+      inputs: [
+        {
+          name: 'role',
+          type: 'bytes32',
+          internalType: 'bytes32',
+        },
+        {
+          name: 'target',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'grantModuleRoleBatched',
+      inputs: [
+        {
+          name: 'role',
+          type: 'bytes32',
+          internalType: 'bytes32',
+        },
+        {
+          name: 'targets',
+          type: 'address[]',
+          internalType: 'address[]',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'identifier',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'bytes32', internalType: 'bytes32' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'init',
+      inputs: [
+        {
+          name: 'orchestrator_',
+          type: 'address',
+          internalType: 'contract IOrchestrator_v1',
+        },
+        {
+          name: 'metadata',
+          type: 'tuple',
+          internalType: 'struct IModule_v1.Metadata',
+          components: [
+            {
+              name: 'majorVersion',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'minorVersion',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'patchVersion',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'url',
+              type: 'string',
+              internalType: 'string',
+            },
+            {
+              name: 'title',
+              type: 'string',
+              internalType: 'string',
+            },
+          ],
+        },
+        { name: '', type: 'bytes', internalType: 'bytes' },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'isActivePaymentReceiver',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'isTrustedForwarder',
+      inputs: [
+        {
+          name: 'forwarder',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'numStreams',
+      inputs: [
+        { name: '', type: 'address', internalType: 'address' },
+        { name: '', type: 'address', internalType: 'address' },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'orchestrator',
+      inputs: [],
+      outputs: [
+        {
+          name: '',
+          type: 'address',
+          internalType: 'contract IOrchestrator_v1',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'processPayments',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'contract IERC20PaymentClientBase_v1',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'releasableForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'releasedForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'removeAllPaymentReceiverPayments',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'removePaymentForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'revokeModuleRole',
+      inputs: [
+        {
+          name: 'role',
+          type: 'bytes32',
+          internalType: 'bytes32',
+        },
+        {
+          name: 'target',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'revokeModuleRoleBatched',
+      inputs: [
+        {
+          name: 'role',
+          type: 'bytes32',
+          internalType: 'bytes32',
+        },
+        {
+          name: 'targets',
+          type: 'address[]',
+          internalType: 'address[]',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'startForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'streamedAmountForSpecificStream',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+        {
+          name: 'timestamp',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'supportsInterface',
+      inputs: [
+        {
+          name: 'interfaceId',
+          type: 'bytes4',
+          internalType: 'bytes4',
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'title',
+      inputs: [],
+      outputs: [{ name: '', type: 'string', internalType: 'string' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'trustedForwarder',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'address', internalType: 'address' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'unclaimable',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'token',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [
+        {
+          name: 'amount',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'url',
+      inputs: [],
+      outputs: [{ name: '', type: 'string', internalType: 'string' }],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'validPaymentOrder',
+      inputs: [
+        {
+          name: 'order',
+          type: 'tuple',
+          internalType:
+            'struct IERC20PaymentClientBase_v1.PaymentOrder',
+          components: [
+            {
+              name: 'recipient',
+              type: 'address',
+              internalType: 'address',
+            },
+            {
+              name: 'paymentToken',
+              type: 'address',
+              internalType: 'address',
+            },
+            {
+              name: 'amount',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'start',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'cliff',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'end',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+          ],
+        },
+      ],
+      outputs: [{ name: '', type: 'bool', internalType: 'bool' }],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
+      name: 'version',
+      inputs: [],
+      outputs: [
+        { name: '', type: 'uint256', internalType: 'uint256' },
+        { name: '', type: 'uint256', internalType: 'uint256' },
+        { name: '', type: 'uint256', internalType: 'uint256' },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'function',
+      name: 'viewAllPaymentOrders',
+      inputs: [
+        {
+          name: 'client',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+      outputs: [
+        {
+          name: '',
+          type: 'tuple[]',
+          internalType: 'struct IPP_Streaming_v1.Stream[]',
+          components: [
+            {
+              name: '_paymentToken',
+              type: 'address',
+              internalType: 'address',
+            },
+            {
+              name: '_streamId',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: '_total',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: '_released',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: '_start',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: '_cliff',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: '_end',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+          ],
+        },
+      ],
+      stateMutability: 'view',
+    },
+    {
+      type: 'event',
+      name: 'Initialized',
+      inputs: [
+        {
+          name: 'version',
+          type: 'uint64',
+          indexed: false,
+          internalType: 'uint64',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'InvalidStreamingOrderDiscarded',
+      inputs: [
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentToken',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'start',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'cliff',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'end',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'ModuleInitialized',
+      inputs: [
+        {
+          name: 'parentOrchestrator',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'metadata',
+          type: 'tuple',
+          indexed: false,
+          internalType: 'struct IModule_v1.Metadata',
+          components: [
+            {
+              name: 'majorVersion',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'minorVersion',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'patchVersion',
+              type: 'uint256',
+              internalType: 'uint256',
+            },
+            {
+              name: 'url',
+              type: 'string',
+              internalType: 'string',
+            },
+            {
+              name: 'title',
+              type: 'string',
+              internalType: 'string',
+            },
+          ],
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'PaymentOrderProcessed',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentToken',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'start',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'cliff',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'end',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'PaymentOrderProcessed',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentToken',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'start',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'cliff',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'end',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'PaymentReceiverRemoved',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'StreamingPaymentAdded',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentToken',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'start',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'cliff',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'end',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'StreamingPaymentRemoved',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'TokensReleased',
+      inputs: [
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'token',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'UnclaimableAmountAdded',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'token',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'event',
+      name: 'UnclaimableAmountAdded',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'recipient',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'paymentToken',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+        {
+          name: 'amount',
+          type: 'uint256',
+          indexed: false,
+          internalType: 'uint256',
+        },
+      ],
+      anonymous: false,
+    },
+    {
+      type: 'error',
+      name: 'AddressEmptyCode',
+      inputs: [
+        {
+          name: 'target',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'AddressInsufficientBalance',
+      inputs: [
+        {
+          name: 'account',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    { type: 'error', name: 'FailedInnerCall', inputs: [] },
+    {
+      type: 'error',
+      name: 'InvalidInitialization',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module_OrchestratorCallbackFailed',
+      inputs: [
+        {
+          name: 'funcSig',
+          type: 'string',
+          internalType: 'string',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Module__CallerNotAuthorized',
+      inputs: [
+        {
+          name: 'role',
+          type: 'bytes32',
+          internalType: 'bytes32',
+        },
+        {
+          name: 'caller',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Module__InvalidAddress',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__InvalidMetadata',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__InvalidOrchestratorAddress',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__OnlyCallableByOrchestrator',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__OnlyCallableByPaymentClient',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__PP_Streaming__In_validPaymentReceiver',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Module__PP_Streaming__InactiveStream',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Module__PP_Streaming__InsufficientTokenBalanceInClient',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__PP_Streaming__InvalidStream',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'streamId',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Module__PaymentProcessor__CannotCallOnOtherClientsOrders',
+      inputs: [],
+    },
+    {
+      type: 'error',
+      name: 'Module__PaymentProcessor__NothingToClaim',
+      inputs: [
+        {
+          name: 'paymentClient',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'paymentReceiver',
+          type: 'address',
+          internalType: 'address',
+        },
+      ],
+    },
+    {
+      type: 'error',
+      name: 'Module__PaymentProcessor__OnlyCallableByModule',
+      inputs: [],
+    },
+    { type: 'error', name: 'NotInitializing', inputs: [] },
+    {
+      type: 'error',
+      name: 'SafeERC20FailedOperation',
+      inputs: [
+        {
+          name: 'token',
           type: 'address',
           internalType: 'address',
         },

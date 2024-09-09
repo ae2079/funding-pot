@@ -1,11 +1,9 @@
 import { encodeSingle, TransactionType } from 'ethers-multisend';
 import abis from '../../data/abis.js';
-import { batchSize } from '../../config.js';
+import { BATCH_SIZE } from '../../config.js';
 
 const PAYMENT_PUSHER_ROLE =
   '0x5041594d454e545f505553484552000000000000000000000000000000000000';
-
-console.log(abis);
 
 export class TransactionBuilder {
   transactions;
@@ -55,6 +53,13 @@ export class TransactionBuilder {
     ]);
   }
 
+  approve(token, spender, amount) {
+    this.addTx(token, 'erc20Abi', 'approve(address,uint256)', [
+      spender,
+      amount,
+    ]);
+  }
+
   createVestings(vestingSpecs) {
     for (const vestingSpec of vestingSpecs) {
       const { recipient, amount } = vestingSpec;
@@ -92,6 +97,8 @@ export class TransactionBuilder {
     });
   }
 
+  // GETTERS
+
   getEncodedTxs() {
     const encodedTxs = [];
     for (const tx of this.transactions) {
@@ -113,6 +120,10 @@ export class TransactionBuilder {
     return encodedTxs;
   }
 
+  getEncodedTxBatches() {
+    return this.getTxBatches(this.getEncodedTxs());
+  }
+
   // removes abi field from transactions
   getReadableTxBatches() {
     return this.getTxBatches(
@@ -129,8 +140,8 @@ export class TransactionBuilder {
 
   getTxBatches(txs) {
     const txBatch = [];
-    for (let i = 0; i < txs.length; i += batchSize) {
-      const chunk = txs.slice(i, i + batchSize);
+    for (let i = 0; i < txs.length; i += BATCH_SIZE) {
+      const chunk = txs.slice(i, i + BATCH_SIZE);
       txBatch.push(chunk);
     }
     return txBatch;

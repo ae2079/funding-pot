@@ -1,19 +1,25 @@
 import { formatUnits, parseUnits } from 'viem';
-import { cap } from '../../config.js';
+import { CAP } from '../../config.js';
 
 export class Batch {
   data;
 
-  // STATE-MODIFYING METHODS
-
-  addInflows(inflows) {
-    this.data = { participants: inflows };
+  constructor() {
+    this.data = {};
   }
 
-  checkEligibility(qualifiedAddresses) {
+  // STATE-MODIFYING METHODS
+
+  checkEligibility(inflows, qualifiedAddresses) {
+    this.data = { participants: inflows };
+
     const { participants } = this.data;
     for (const address of Object.keys(participants)) {
-      if (!qualifiedAddresses.includes(address)) {
+      if (
+        !qualifiedAddresses
+          .map((addr) => addr.toLowerCase())
+          .includes(address.toLowerCase())
+      ) {
         this.data.participants[address] = {
           ...participants[address],
           permitted: false,
@@ -60,21 +66,23 @@ export class Batch {
     this.data.exAnteSupply = exAnteSupply;
     this.data.exAnteSpotPrice = exAnteSpotPrice;
 
-    // calculate individual and store individual cap
+    // calculate individual and store individual CAP
     this.data.issuanceTokenCap = parseUnits(
-      (cap * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
+      (CAP * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
       18
     );
 
     const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
 
-    // calculate excess contribution and store
-    for (const address of Object.keys(exAnteBalances)) {
+    // TODO: iterate over contributions and check against CAP
+    // otherwise we might miss some contributions
+    for (const address of Object.keys(this.data.participants)) {
       const { contribution, permitted } =
         this.data.participants[address];
-      const exAnteBalance = exAnteBalances[address];
+
+      const exAnteBalance = exAnteBalances[address] || 0n;
       const issuanceTokenPotential =
-        this.data.issuanceTokenCap - exAnteBalance; // how many issuance token, the address may buy
+        this.data.issuanceTokenCap - exAnteBalance; // how many issuance tokens the address may buy
 
       // if no more issuance token potential, all contributions are excess contributions
       if (issuanceTokenPotential <= 0n) {
@@ -150,18 +158,6 @@ export class Batch {
 
   addVestingDetails({ start, cliff, end }) {
     this.data.vestingDetails = { start, cliff, end };
-  }
-
-  addMetadata({
-    safe,
-    issuanceToken,
-    collateralToken,
-    bondingCurve,
-  }) {
-    this.data.bondingCurve = bondingCurve;
-    this.data.safe = safe;
-    this.data.issuanceToken = issuanceToken;
-    this.data.collateralToken = collateralToken;
   }
 
   // GETTERS

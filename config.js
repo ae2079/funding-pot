@@ -1,2 +1,5 @@
-export const cap = 0.02;
-export const batchSize = 100;
+// BUSINESS LOGIC
+export const CAP = 0.02;
+
+// TRANSACTION BATCH SIZE FOR SAFE
+export const BATCH_SIZE = 100;

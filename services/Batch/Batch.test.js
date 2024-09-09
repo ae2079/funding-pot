@@ -32,7 +32,7 @@ describe('Batch', () => {
       },
     };
     const batchService = new Batch();
-    batchService.addInflows(dataWithEligibility);
+    batchService.data.participants = dataWithEligibility;
 
     it('adds aggregate contribution data', () => {
       batchService.calculateAggregateContributions(
@@ -50,7 +50,7 @@ describe('Batch', () => {
   describe('#checkEligibility', () => {
     const eligibleAddresses = [addr1, addr2];
     const nonEligibleAddress = addr3;
-    const data = {
+    const participants = {
       [eligibleAddresses[0]]: {
         contribution: contr1,
       },
@@ -62,23 +62,25 @@ describe('Batch', () => {
       },
     };
     const batchService = new Batch();
-    batchService.addInflows(data);
 
     it('adds `permitted` flag per participant', () => {
-      batchService.checkEligibility(eligibleAddresses);
+      batchService.checkEligibility(participants, eligibleAddresses);
 
       assert.deepStrictEqual(batchService.data, {
         participants: {
           [eligibleAddresses[0]]: {
-            contribution: data[eligibleAddresses[0]].contribution,
+            contribution:
+              participants[eligibleAddresses[0]].contribution,
             permitted: true,
           },
           [eligibleAddresses[1]]: {
-            contribution: data[eligibleAddresses[1]].contribution,
+            contribution:
+              participants[eligibleAddresses[1]].contribution,
             permitted: true,
           },
           [nonEligibleAddress]: {
-            contribution: data[nonEligibleAddress].contribution,
+            contribution:
+              participants[nonEligibleAddress].contribution,
             permitted: false,
           },
         },
@@ -87,7 +89,7 @@ describe('Batch', () => {
   });
 
   describe('#getContributors', () => {
-    const data = {
+    const participants = {
       [addr1]: {
         contribution: contr1,
         permitted: true,
@@ -102,7 +104,7 @@ describe('Batch', () => {
       },
     };
     const batchService = new Batch();
-    batchService.addInflows(data);
+    batchService.data.participants = participants;
 
     it("returns a list of contributors' addresses (`eligible` = true)", () => {
       const contributors = batchService.getContributors();
@@ -116,8 +118,8 @@ describe('Batch', () => {
     const exAnteBalances = {
       [addr1]: 1_000_000_000_000_000_000n, // can still buy one more token (= 1_000_000_000_000_000_000n)
       [addr2]: 1_000_000_000_000_000_000n, // can still buy one more token
-      [addr3]: 2_000_000_000_000_000_000n, // has already exactly reached the cap
-      [addr4]: 3_000_000_000_000_000_000n, // has already exceeded the cap
+      [addr3]: 2_000_000_000_000_000_000n, // has already exactly reached the CAP
+      [addr4]: 3_000_000_000_000_000_000n, // has already exceeded the CAP
       [addr5]: 1_000_000_000_000_000_000n, // can still buy one more token
       [addr6]: 1_000_000_000_000_000_000n, // can still buy one more token
     };
@@ -130,11 +132,11 @@ describe('Batch', () => {
           permitted: true,
         },
         [addr2]: {
-          contribution: 69_000_000_000_000_000_000n, // purchase will exceed cap by far
+          contribution: 69_000_000_000_000_000_000n, // purchase will exceed CAP by far
           permitted: true,
         },
         [addr3]: {
-          contribution: 420_000_000_000_000_000_000n, // purchase would exceed cap by far
+          contribution: 420_000_000_000_000_000_000n, // purchase would exceed CAP by far
           permitted: true,
         },
         [addr4]: {
@@ -163,7 +165,7 @@ describe('Batch', () => {
       );
     });
 
-    it('adds fields `exAnteSupply`, `exAnteSpotPrice`, `cap`', () => {
+    it('adds fields `exAnteSupply`, `exAnteSpotPrice`, `CAP`', () => {
       const {
         exAnteSupply: receivedExAnteSupply,
         exAnteSpotPrice: receivedExAnteSpotPrice,
@@ -193,7 +195,7 @@ describe('Batch', () => {
 
     describe('when contributor can still contribute but contributes too much', () => {
       it('adds fields `excessContribution` and `validContribution`', () => {
-        const { participants, cap } = batchService.data;
+        const { participants, CAP } = batchService.data;
         const {
           contribution,
           excessContribution,
@@ -205,7 +207,7 @@ describe('Batch', () => {
       });
     });
 
-    describe('when contributor has exactly reached cap ex ante (addr3)', () => {
+    describe('when contributor has exactly reached CAP ex ante (addr3)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
         const { participants } = batchService.data;
         const {
@@ -222,7 +224,7 @@ describe('Batch', () => {
       });
     });
 
-    describe('when contributor has already exceeded cap ex ante (addr4)', () => {
+    describe('when contributor has already exceeded CAP ex ante (addr4)', () => {
       it('adds field `excessContribution` which equals `contribution`', () => {
         const { participants } = batchService.data;
         const {

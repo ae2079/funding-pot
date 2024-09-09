@@ -1,145 +1,223 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import '../../env.js';
 
-import { describe, it, beforeEach, afterEach } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
+
+import { getContract } from 'viem';
+
+import abis from '../../data/abis.js';
 import { Queries } from './Queries.js';
 
 describe('Queries', () => {
-  const indexerUrl =
-    'https://indexer.bigdevenergy.link/7612f58/v1/graphql';
-  const mockMulitSigAddress =
-    '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
+  describe('#setup', () => {
+    const orchestratorAddress =
+      '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3';
+
+    const querySevice = new Queries({
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+    });
+
+    it('sets relevant workflow addresses', async () => {
+      await querySevice.setup(orchestratorAddress);
+      assert.deepStrictEqual(querySevice.queries.addresses, {
+        bondingCurve: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
+        collateralToken: '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3',
+        issuanceToken: '0xD7b25E43A017795e98173820fE0AdBe20fE725Ad',
+        paymentRouter: '0xD5EDa923A101508a52F6Dc3C1A4975f536B8e4B2',
+        orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+      });
+      assert.doesNotThrow(async () => {
+        await querySevice.bondingCurve.read.identifier();
+      });
+    });
+  });
 
   describe('#getLastPurchaseBlock', () => {
+    const mockMulitSigAddress =
+      '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
+
     const querySevice = new Queries({
-      indexerUrl,
-      rpcUrl: 'https://sepolia.base.org',
-      chainId: 84532,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
     });
 
     it('should return the blocknumber of the BUY', async () => {
-      const startBlock = await querySevice.getLastPurchaseBlock(
+      const fromTimestamp = await querySevice.getLastPurchaseBlock(
         mockMulitSigAddress
       );
-      assert.equal(startBlock, 1725525774);
+      assert.equal(fromTimestamp, 1725525774);
     });
   });
 
   describe('#getCurrentBlockNumber', () => {
     const querySevice = new Queries({
-      rpcUrl:
-        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
     });
 
     it('should return the blocknumber of the BUY', async () => {
       const endBlock = await querySevice.getCurrentBlockNumber();
-      assert(endBlock > 124057756n);
+      assert(endBlock > 14903025n);
     });
   });
 
+  // NOTE: requires the secret ANKR API key to be set in .env.test
   describe('#getInflows', () => {
-    const startBlock = '124058551';
-    const endBlock = '124058578';
-    const token = '0xdC6fF44d5d932Cbd77B52E5612Ba0529DC6226F1';
-    const recipient = '0x253DD57300904225762960755B7662e6ae06492d';
+    const fromTimestamp = '1725654505';
+    const toTimestamp = '1725655119';
+    const token = '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3';
+    const recipient = '0x5e657719AEE21a6BB1BCaAd7781DcE222186Ca72';
 
     const querySevice = new Queries({
-      rpcUrl:
-        'https://rpc.ankr.com/optimism/' + process.env.ANKR_API_KEY,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: `https://rpc.ankr.com/${process.env.ANKR_NETWORK_ID}/${process.env.ANKR_API_KEY}`,
+      chainId: process.env.CHAIN_ID,
     });
 
     it('should return all inflows within the timeframe', async () => {
       const inflows = await querySevice.getInflows(
         token,
         recipient,
-        startBlock,
-        endBlock
+        fromTimestamp,
+        toTimestamp
       );
 
       assert.deepStrictEqual(inflows, {
-        '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb': {
-          contribution: 15560000000000000000n,
+        '0x6747772f37a4f7cfdea180d38e8ad372516c9548': {
+          contribution: 21300000000000000000000n,
         },
-        '0x932285a2e33b89981d25eb586a3893e0f5a1a9da': {
-          contribution: 11000000000000000000n,
+        '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b': {
+          contribution: 110000000000000000000n,
         },
-        '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff': {
-          contribution: 6000000000000000000n,
+        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': {
+          contribution: 15422100000000000000n,
         },
-        '0xf7c3128a43446621430530d6267d0eb21061fab6': {
-          contribution: 6020000000000000000n,
+        '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': {
+          contribution: 420690000000000000000n,
         },
       });
     });
   });
 
   describe('#getAmountOut', () => {
-    const bondingCurveAddress =
-      '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
     const querySevice = new Queries({
-      rpcUrl: 'https://sepolia.optimism.io',
-      bondingCurveAddress,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+    });
+    querySevice.bondingCurve = getContract({
+      address: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
+      client: querySevice.publicClient,
+      abi: abis.bondingCurveAbi,
     });
 
     it('should return the amount out', async () => {
       const amountOut = await querySevice.getAmountOut(
         1000000000000000000n
       );
-      assert.equal(amountOut, 411781969873082n);
+      assert.equal(amountOut, 5412936878032120963n);
     });
   });
 
   describe('#getIssuanceSupply', () => {
-    const bondingCurveAddress =
-      '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
     const querySevice = new Queries({
-      rpcUrl: 'https://sepolia.optimism.io',
-      bondingCurveAddress,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+    });
+    querySevice.bondingCurve = getContract({
+      address: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
+      client: querySevice.publicClient,
+      abi: abis.bondingCurveAbi,
     });
 
-    it('should return the amount out', async () => {
+    it('should return the issuance supply', async () => {
       const supply = await querySevice.getIssuanceSupply();
-      assert.equal(supply, 146359422682779172835548335n);
+      assert.equal(supply, 352019917143786833732572n);
     });
   });
 
   describe('#getSpotPrice', () => {
-    const bondingCurveAddress =
-      '0xcB18d34bCe932F39b645A0F06b8D9D0b981F6F87';
     const querySevice = new Queries({
-      rpcUrl: 'https://sepolia.optimism.io',
-      bondingCurveAddress,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+    });
+    querySevice.bondingCurve = getContract({
+      address: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
+      client: querySevice.publicClient,
+      abi: abis.bondingCurveAbi,
     });
 
     it('returns the spot price', async () => {
       const spotPrice = await querySevice.getSpotPrice();
-      assert.equal(spotPrice, 2380143065n);
+      assert.equal(spotPrice, 180144n);
     });
   });
 
   describe('#getBalances', () => {
-    const indexerUrl =
-      'https://indexer.bigdevenergy.link/3e4a36f/v1/graphql';
     const querySevice = new Queries({
-      indexerUrl,
-      rpcUrl: 'https://sepolia.base.org',
-      chainId: 84532,
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
     });
-    const orchestratorAddress =
-      '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3';
+    querySevice.queries.addresses = {
+      orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+    };
 
     it('gets aggregate vestings', async () => {
-      const vestings = await querySevice.getBalances(
-        orchestratorAddress
-      );
+      const vestings = await querySevice.getBalances();
 
       assert.deepStrictEqual(vestings, {
-        '0xa6e12EDe427516a56a5F6ab6e06dD335075eb04b': 420n,
-        '0xCb1eDf0E617c0FaB6408701d58b746451EE6cE2f': 28n,
-        '0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4': 82n,
-        '0x6747772f37a4F7CfDEA180D38e8ad372516c9548': 4n,
-        '0xCacC010EC451Cb33a7aE7cBa14de0a49293c2877': 7n,
+        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': 28n,
+        '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': 82n,
+        '0xcacc010ec451cb33a7ae7cba14de0a49293c2877': 7n,
+      });
+    });
+  });
+
+  describe('#getTimeframe', () => {
+    const querySevice = new Queries({
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+    });
+    querySevice.queries.addresses = {
+      orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+    };
+    const mockSafe = '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
+
+    describe('with no configuration', () => {
+      it('returns the timeframe from the last purchase block to the current block', async () => {
+        const timeframe = await querySevice.getTimeframe({
+          configuration: undefined,
+          safe: mockSafe,
+        });
+        assert.equal(timeframe.fromTimestamp, '1725525774');
+        assert.equal(
+          timeframe.toTimestamp > timeframe.fromTimestamp,
+          true
+        );
+      });
+    });
+
+    describe('with configuration', () => {
+      const configuration = {
+        FROM_TIMESTAMP: '1725654505',
+        TO_TIMESTAMP: '1725655119',
+      };
+
+      it('returns the timeframe from the last purchase block to the current block', async () => {
+        const timeframe = await querySevice.getTimeframe({
+          configuration: configuration,
+          safe: mockSafe,
+        });
+        assert.equal(timeframe.fromTimestamp, '1725654505');
+        assert.equal(timeframe.toTimestamp, '1725655119');
       });
     });
   });

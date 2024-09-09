@@ -19,10 +19,10 @@ export class Safe {
   }
 
   async addDelegate(delegateAddress) {
-    const wallet = new ethers.Wallet('0x' + process.env.PK);
+    const wallet = new ethers.Wallet(process.env.PK);
     const response = await this.apiKit.addSafeDelegate({
       delegateAddress,
-      delegatorAddress: account.address,
+      delegatorAddress: wallet.address,
       safeAddress: this.safeAddress,
       signer: wallet,
       label: 'round-proposer',
@@ -34,7 +34,7 @@ export class Safe {
   async proposeTxs(txs) {
     if (!this.protocolKit) {
       this.protocolKit = await ProtocolKit.default.init({
-        signer: '0x' + process.env.DELEGATE,
+        signer: process.env.DELEGATE,
         provider: this.rpcUrl,
         safeAddress: this.safeAddress,
       });
@@ -47,8 +47,6 @@ export class Safe {
           transactions: batchTxs,
           options: { nonce },
         });
-      console.log(69);
-      console.log(safeTransaction);
       const safeTxHash = await this.protocolKit.getTransactionHash(
         safeTransaction
       );
@@ -63,10 +61,12 @@ export class Safe {
         senderSignature: senderSignature.data,
         origin: '0',
       });
-      // TODO: add tx hashes to state
+
       this.safeTransactions.push({ safeTxHash });
     }
   }
+
+  async getProposedTransactions() {}
 
   // THIS IS A VALID REQUEST BODY FOR DEBUGGING SAFE API ISSUES
   // {
