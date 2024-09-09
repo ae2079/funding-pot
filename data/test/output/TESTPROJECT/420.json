@@ -1,0 +1,149 @@
+{
+    "projectName": "TESTPROJECT",
+    "batchNr": "420",
+    "batch": {
+        "totalValidContributions": "6458454635333148928",
+        "totalExcessContributions": "0",
+        "participants": {
+            "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
+                "contribution": "5144864771615767552",
+                "permitted": true,
+                "validContribution": "5144864771615767552",
+                "issuanceAllocation": "1110418000000000000000"
+            },
+            "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b": {
+                "contribution": "1313589863717381376",
+                "permitted": true,
+                "validContribution": "1313589863717381376",
+                "issuanceAllocation": "283512500000000000000"
+            }
+        },
+        "exAnteSupply": "200947747888706207113790",
+        "exAnteSpotPrice": "4486",
+        "issuanceTokenCap": "4018954957774124500000",
+        "additionalIssuance": "1393930641700479666152"
+    },
+    "safe": {
+        "proposedTransactions": [
+            {
+                "safeTxHash": "0xac6952a1cb2f10127978101c001930a8c01db75c46638246ca8905b15db978f8"
+            }
+        ]
+    },
+    "transactions": {
+        "readable": [
+            [
+                {
+                    "to": "0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80",
+                    "functionSignature": "approve(address,uint256)",
+                    "inputValues": [
+                        "0x600B602A0F6269Bdf9e57C29B1f7a4ef57f72A08",
+                        "6458454635333148928"
+                    ]
+                },
+                {
+                    "to": "0x600B602A0F6269Bdf9e57C29B1f7a4ef57f72A08",
+                    "functionSignature": "buy(uint256,uint256)",
+                    "inputValues": [
+                        "6458454635333148928",
+                        "1"
+                    ]
+                },
+                {
+                    "to": "0x084f7f3B661CD48d2274fF198e3aB84C4206f6A5",
+                    "functionSignature": "transfer(address,uint256)",
+                    "inputValues": [
+                        "0x09401432efeF554bb937685647D14a29E476D865",
+                        "1393930641700479666152"
+                    ]
+                },
+                {
+                    "to": "0x09401432efeF554bb937685647D14a29E476D865",
+                    "functionSignature": "pushPayment(address,address,uint256,uint256,uint256,uint256)",
+                    "inputValues": [
+                        "0x6747772f37a4f7cfdea180d38e8ad372516c9548",
+                        "0x084f7f3B661CD48d2274fF198e3aB84C4206f6A5",
+                        "1110418000000000000000",
+                        "1725914374",
+                        "60",
+                        "1725914434"
+                    ]
+                },
+                {
+                    "to": "0x09401432efeF554bb937685647D14a29E476D865",
+                    "functionSignature": "pushPayment(address,address,uint256,uint256,uint256,uint256)",
+                    "inputValues": [
+                        "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b",
+                        "0x084f7f3B661CD48d2274fF198e3aB84C4206f6A5",
+                        "283512500000000000000",
+                        "1725914374",
+                        "60",
+                        "1725914434"
+                    ]
+                }
+            ]
+        ],
+        "encoded": [
+            [
+                {
+                    "to": "0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80",
+                    "value": "0",
+                    "data": "0x095ea7b3000000000000000000000000600b602a0f6269bdf9e57c29b1f7a4ef57f72a0800000000000000000000000000000000000000000000000059a10a45c101e100"
+                },
+                {
+                    "to": "0x600B602A0F6269Bdf9e57C29B1f7a4ef57f72A08",
+                    "value": "0",
+                    "data": "0xd6febde800000000000000000000000000000000000000000000000059a10a45c101e1000000000000000000000000000000000000000000000000000000000000000001"
+                },
+                {
+                    "to": "0x084f7f3B661CD48d2274fF198e3aB84C4206f6A5",
+                    "value": "0",
+                    "data": "0xa9059cbb00000000000000000000000009401432efef554bb937685647d14a29e476d86500000000000000000000000000000000000000000000004b90ac7543f96587e8"
+                },
+                {
+                    "to": "0x09401432efeF554bb937685647D14a29E476D865",
+                    "value": "0",
+                    "data": "0x8028b82f0000000000000000000000006747772f37a4f7cfdea180d38e8ad372516c9548000000000000000000000000084f7f3b661cd48d2274ff198e3ab84c4206f6a500000000000000000000000000000000000000000000003c322537c0d7b500000000000000000000000000000000000000000000000000000000000066df5d06000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000066df5d42"
+                },
+                {
+                    "to": "0x09401432efeF554bb937685647D14a29E476D865",
+                    "value": "0",
+                    "data": "0x8028b82f000000000000000000000000a6e12ede427516a56a5f6ab6e06dd335075eb04b000000000000000000000000084f7f3b661cd48d2274ff198e3ab84c4206f6a500000000000000000000000000000000000000000000000f5e86bca2eaef40000000000000000000000000000000000000000000000000000000000066df5d06000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000066df5d42"
+                }
+            ]
+        ]
+    },
+    "queries": {
+        "addresses": {
+            "orchestrator": "0xa6CeCe447804CFe826C5f3f645Db8B20Ee3a870C",
+            "bondingCurve": "0x600B602A0F6269Bdf9e57C29B1f7a4ef57f72A08",
+            "collateralToken": "0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80",
+            "issuanceToken": "0x084f7f3B661CD48d2274fF198e3aB84C4206f6A5",
+            "paymentRouter": "0x09401432efeF554bb937685647D14a29E476D865"
+        },
+        "timeframe": {
+            "fromTimestamp": "1725914314",
+            "toTimestamp": "1725914446"
+        },
+        "inflows": {
+            "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
+                "contribution": "5144864771615767552",
+                "permitted": true,
+                "validContribution": "5144864771615767552",
+                "issuanceAllocation": "1110418000000000000000"
+            },
+            "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b": {
+                "contribution": "1313589863717381376",
+                "permitted": true,
+                "validContribution": "1313589863717381376",
+                "issuanceAllocation": "283512500000000000000"
+            }
+        },
+        "vestedBalances": {
+            "0x6747772f37a4f7cfdea180d38e8ad372516c9548": "935300400000000000000"
+        },
+        "issuanceSupply": "200947747888706207113790",
+        "spotPrice": "4486",
+        "amountOut": "1393930641700479666152"
+    }
+}

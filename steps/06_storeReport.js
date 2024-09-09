@@ -30,12 +30,16 @@ export const storeReport = async (
     queries: queryService.queries,
   };
 
-  const filePath = path.join(
+  const basePath = path.join(
     __dirname,
     `../data/${
       process.env.NODE_ENV === 'production' ? 'production' : 'test'
-    }/output/${projectName}/${batchNr}.json`
+    }/output/${projectName}`
   );
+
+  if (!fs.existsSync(basePath)) fs.mkdirSync(basePath);
+
+  const filePath = `${basePath}/${batchNr}.json`;
 
   fs.writeFileSync(filePath, serializeBigInt(report), 'utf8');
 

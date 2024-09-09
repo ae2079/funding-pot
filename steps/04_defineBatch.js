@@ -44,6 +44,9 @@ export const defineBatch = async ({
   // calculate aggregate contribution data
   batchService.calculateAggregateContributions();
 
+  if (batchService.data.totalValidContributions === 0n)
+    throw new Error('No valid contributions found');
+
   // get amountOut based on aggregate valid contributions
   const additionalIssuance = await queryService.getAmountOut(
     batchService.data.totalValidContributions

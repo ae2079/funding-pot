@@ -32,6 +32,8 @@ To just the end-to-end test use the following command:
 
 `npm run test steps/00_main.test.js`
 
+**NOTE:** Due to the number of real transactions and API calls included in this test, it can occasionally fail for wallet-related reasons (nonce issues). If this happens, you can try to run the test again.
+
 ### Cleanup
 
 Since the end-to-end test uses some randomness for determining the contribution sizes, it can happen that both test contributors hit the 2% cao and don't qualify for joining the funding pot. In this case you can clean up the test data and start from scratch by running:

@@ -8,6 +8,7 @@ import { keysToLowerCase } from '../utils/helpers.js';
 import {
   mintMockTokens,
   getProjectConfig,
+  signAndExecutePendingTxs,
 } from '../utils/testHelpers.js';
 import { getAddress } from 'viem';
 
@@ -67,6 +68,10 @@ describe('#proposeBatch', () => {
       batchService,
       transactionBuilderService,
       safeService,
+    });
+
+    assert.doesNotThrow(async () => {
+      await signAndExecutePendingTxs(projectConfig.SAFE);
     });
   });
 });
