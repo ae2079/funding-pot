@@ -74,8 +74,6 @@ export class Batch {
 
     const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
 
-    // TODO: iterate over contributions and check against CAP
-    // otherwise we might miss some contributions
     for (const address of Object.keys(this.data.participants)) {
       const { contribution, permitted } =
         this.data.participants[address];

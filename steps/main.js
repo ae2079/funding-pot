@@ -43,7 +43,7 @@ export const main = async (projectName, batchNr) => {
     safeService,
   });
 
-  // TODO: store comprehensive batch data in a JSON file
+  // store comprehensive report in a JSON file
   await storeReport(projectName, batchNr, {
     batchService,
     safeService,
