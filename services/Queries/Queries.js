@@ -68,18 +68,27 @@ export class Queries {
 
   // QUERIES
 
-  // TODO: test what happens with predefined timeframe
-  async getTimeframe({ fromTimestamp, toTimestamp, address }) {
-    if (!fromTimestamp && fromTimestamp !== 0) {
-      fromTimestamp = await this.getLastPurchaseBlock(address);
+  async getTimeframe({ configuration, safe }) {
+    const timeframe = {};
+
+    if (configuration && configuration.FROM_TIMESTAMP) {
+      timeframe.fromTimestamp = configuration.FROM_TIMESTAMP;
+    } else {
+      timeframe.fromTimestamp = (
+        await this.getLastPurchaseBlock(safe)
+      ).toString();
     }
-    if (!toTimestamp) {
-      toTimestamp = await this.getCurrentBlockNumber();
+
+    if (configuration && configuration.TO_TIMESTAMP) {
+      timeframe.toTimestamp = configuration.TO_TIMESTAMP;
+    } else {
+      timeframe.toTimestamp = (
+        await this.getCurrentBlockNumber()
+      ).toString();
     }
-    this.queries.timeframe = {
-      fromTimestamp: parseInt(fromTimestamp),
-      toTimestamp: parseInt(toTimestamp),
-    };
+
+    this.queries.timeframe = timeframe;
+
     return this.queries.timeframe;
   }
 
@@ -113,13 +122,6 @@ export class Queries {
   }
 
   async getInflows(token, recipient, fromTimestamp, toTimestamp) {
-    console.log({
-      address: recipient,
-      fromTimestamp,
-      toTimestamp,
-      blockchain: this.networkIdString,
-      pageSize: 10000,
-    });
     const transactions = await this.ankrProvider.getTokenTransfers({
       address: recipient,
       fromTimestamp,
@@ -127,8 +129,6 @@ export class Queries {
       blockchain: this.networkIdString,
       pageSize: 10000,
     });
-
-    console.log('transactions: ', transactions);
 
     const inflows = transactions.transfers
       .filter(
@@ -139,7 +139,6 @@ export class Queries {
           tx.contractAddress.toLowerCase() === token.toLowerCase()
       )
       .reduce((acc, tx) => {
-        console.log(acc);
         const { fromAddress, value, tokenDecimals } = tx;
         if (!acc[fromAddress]) {
           acc[fromAddress] = {

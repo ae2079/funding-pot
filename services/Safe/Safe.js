@@ -32,8 +32,6 @@ export class Safe {
   }
 
   async proposeTxs(txs) {
-    console.log(1);
-    console.log('txs: ', txs);
     if (!this.protocolKit) {
       this.protocolKit = await ProtocolKit.default.init({
         signer: process.env.DELEGATE,
@@ -41,28 +39,20 @@ export class Safe {
         safeAddress: this.safeAddress,
       });
     }
-    console.log(2);
+
     for (const batchTxs of txs) {
-      console.log('batchTxs: ', batchTxs);
-      console.log(3);
       const nonce = await this.apiKit.getNextNonce(this.safeAddress);
-      console.log('nonce: ', nonce);
-      console.log(4);
       const safeTransaction =
         await this.protocolKit.createTransaction({
           transactions: batchTxs,
           options: { nonce },
         });
-      console.log(5);
-      console.log(safeTransaction);
       const safeTxHash = await this.protocolKit.getTransactionHash(
         safeTransaction
       );
-      console.log(6);
       const senderSignature = await this.protocolKit.signHash(
         safeTxHash
       );
-      console.log(7);
       await this.apiKit.proposeTransaction({
         safeAddress: this.safeAddress,
         safeTransactionData: safeTransaction.data,
@@ -75,6 +65,8 @@ export class Safe {
       this.safeTransactions.push({ safeTxHash });
     }
   }
+
+  async getProposedTransactions() {}
 
   // THIS IS A VALID REQUEST BODY FOR DEBUGGING SAFE API ISSUES
   // {

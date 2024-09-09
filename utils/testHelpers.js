@@ -15,8 +15,13 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
 
+import abis from '../data/abis.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+const mockCollateralToken =
+  '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80';
 
 const getChain = (chainId) => {
   for (const chain of Object.values(chains)) {
@@ -30,41 +35,15 @@ const getChain = (chainId) => {
   throw new Error(`Chain with id ${chainId} not found`);
 };
 
-export const mintMockTokens = async (
-  token,
-  publicClient,
-  amount,
-  to
-) => {
-  const walletClient = createWalletClient({
-    chainId: process.env.CHAIN_ID,
-    transport: http(process.env.RPC_URL),
-    account: privateKeyToAccount(process.env.PK),
-  });
+export const mintMockTokens = async (token, amount, to) => {
+  const {
+    owner: { publicClient, walletClient },
+  } = getTestClients();
 
   const tokenInstance = getContract({
     address: token,
     client: walletClient,
-    abi: [
-      {
-        type: 'function',
-        name: 'mint',
-        inputs: [
-          {
-            name: 'to',
-            type: 'address',
-            internalType: 'address',
-          },
-          {
-            name: 'value',
-            type: 'uint256',
-            internalType: 'uint256',
-          },
-        ],
-        outputs: [],
-        stateMutability: 'nonpayable',
-      },
-    ],
+    abi: abis.erc20Abi,
   });
 
   const hash = await tokenInstance.write.mint([to, amount]);
@@ -120,19 +99,40 @@ export const deployTestSafe = async () => {
   return safeAddress;
 };
 
-export const deployWorkflow = async (safeAddress) => {
-  const mockCollateralToken =
-    '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80';
-  const publicClient = createPublicClient({
+const getTestClients = () => {
+  const baseConfig = {
     chain: getChain(process.env.CHAIN_ID),
     transport: http(process.env.RPC_URL),
-  });
+  };
 
-  const walletClient = createWalletClient({
-    chain: getChain(process.env.CHAIN_ID),
-    transport: http(process.env.RPC_URL),
-    account: privateKeyToAccount(process.env.PK),
-  });
+  return {
+    owner: {
+      publicClient: createPublicClient({
+        ...baseConfig,
+        account: privateKeyToAccount(process.env.PK),
+      }),
+      walletClient: createWalletClient({
+        ...baseConfig,
+        account: privateKeyToAccount(process.env.PK),
+      }),
+    },
+    delegate: {
+      publicClient: createPublicClient({
+        ...baseConfig,
+        account: privateKeyToAccount(process.env.DELEGATE),
+      }),
+      walletClient: createWalletClient({
+        ...baseConfig,
+        account: privateKeyToAccount(process.env.DELEGATE),
+      }),
+    },
+  };
+};
+
+export const deployWorkflow = async (safeAddress) => {
+  const {
+    owner: { publicClient, walletClient },
+  } = getTestClients();
 
   const inverterSdk = new Inverter({ publicClient, walletClient });
 
@@ -242,7 +242,7 @@ export const deployWorkflow = async (safeAddress) => {
   return orchestratorAddress;
 };
 
-export const setupForE2E = async () => {
+export const getProjectConfig = async () => {
   const filePath = path.join(
     __dirname,
     '../data/test/input/projects.json'
@@ -255,7 +255,7 @@ export const setupForE2E = async () => {
       )
     );
     if (projectsConfig && projectsConfig.TESTPROJECT) {
-      console.info('✅ Project config already exists');
+      console.info('🥳 Project config already exists');
       return projectsConfig.TESTPROJECT;
     } else {
       console.info(
@@ -275,22 +275,140 @@ export const setupForE2E = async () => {
         }),
         'utf8'
       );
+
+      console.info('✅ All contracts deployed');
+      console.info(
+        '💾 Project with name TESTPROJECT saved to data/test/input/projects.json'
+      );
     }
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
-
-  return getTestProjectConfig();
-};
-
-export const getTestProjectConfig = async () => {
-  const filePath = path.join(
-    __dirname,
-    '../data/test/input/projects.json'
-  );
 
   const projectsConfig = JSON.parse(fs.readFileSync(filePath));
 
   return projectsConfig.TESTPROJECT;
 };
+
+export const getBatchConfig = async (safe) => {
+  const batchConfig = {
+    VESTING_DETAILS: {},
+    TIMEFRAME: {},
+  };
+
+  const { owner, delegate } = getTestClients();
+
+  const fromBlock = await owner.publicClient.getBlock();
+  const fromTimestamp = fromBlock.timestamp - 60n;
+  batchConfig.TIMEFRAME.FROM_TIMESTAMP = fromTimestamp.toString();
+  batchConfig.VESTING_DETAILS.START = (
+    fromTimestamp + 60n
+  ).toString();
+  batchConfig.VESTING_DETAILS.CLIFF = '60';
+  batchConfig.VESTING_DETAILS.END = (fromTimestamp + 120n).toString();
+
+  console.info(
+    '> Minting collateral tokens to contributors (so that they can contribute)...'
+  );
+
+  const contributors = [owner, delegate];
+  const contributions = [];
+
+  for (let i = 0; i < contributors.length; i++) {
+    const contributor = contributors[i];
+    const { publicClient, walletClient } = contributor;
+    const contribution = randomIntFromInterval(
+      100_000_000_000_000,
+      10_000_000_000_000_000_000
+    );
+
+    console.info(
+      `🎲 Randomized contribution for ${walletClient.account.address}: ${contribution}`
+    );
+    contributions.push(contribution);
+
+    await mintMockTokens(
+      mockCollateralToken,
+      contribution,
+      walletClient.account.address
+    );
+
+    const tokenInstance = getContract({
+      address: mockCollateralToken,
+      client: contributor.walletClient,
+      abi: abis.erc20Abi,
+    });
+
+    console.info('Sending contribution to safe...');
+    const tx = await tokenInstance.write.transfer([
+      safe,
+      contributions[i],
+    ]);
+
+    const { blockNumber } =
+      await publicClient.waitForTransactionReceipt({
+        hash: tx,
+      });
+    const block = await publicClient.getBlock(blockNumber);
+
+    console.info(
+      '✅ Contribution sent at timestamp: ',
+      block.timestamp
+    );
+  }
+
+  const toBlock = await owner.publicClient.getBlock();
+  const toTimestamp = toBlock.timestamp + 60n;
+  batchConfig.TIMEFRAME.TO_TIMESTAMP = toTimestamp.toString();
+
+  const batchConfigFilePath = path.join(
+    __dirname,
+    '../data/test/input/batches/420.json'
+  );
+
+  fs.writeFileSync(
+    batchConfigFilePath,
+    JSON.stringify(batchConfig, null, 2),
+    'utf8'
+  );
+
+  console.info(
+    '💾 Batch config stored to data/test/input/batches/420.json'
+  );
+
+  const allowListFilePath = path.join(
+    __dirname,
+    '../data/test/input/allowlist.json'
+  );
+
+  fs.writeFileSync(
+    allowListFilePath,
+    JSON.stringify(
+      [
+        owner.walletClient.account.address,
+        delegate.walletClient.account.address,
+      ],
+      null,
+      2
+    ),
+    'utf8'
+  );
+
+  console.info(
+    '💾 Alllowlist stored to data/test/input/allowlist.json'
+  );
+
+  return { batchConfig, contributions, contributors };
+};
+
+function randomIntFromInterval(min, max) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+export const setupForE2E = async () => {
+  const { SAFE } = await getProjectConfig();
+  await getBatchConfig(SAFE);
+};
+
 // export const signAndExecuteSafeTx = async () => {};

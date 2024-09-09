@@ -6,16 +6,13 @@ export const defineBatch = async ({
   allowlist,
 }) => {
   // get project & batch specific config
-  const {
-    TIMEFRAME,
-    VESTING_DETAILS: { START, CLIFF, END },
-  } = batchConfig;
+  const { TIMEFRAME } = batchConfig;
   const { SAFE } = projectConfig;
 
   // get timeframe
   const { fromTimestamp, toTimestamp } =
     await queryService.getTimeframe({
-      ...TIMEFRAME,
+      configuration: TIMEFRAME,
       address: SAFE,
     });
 

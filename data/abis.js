@@ -2034,6 +2034,24 @@ export default {
   erc20Abi: [
     {
       type: 'function',
+      name: 'mint',
+      inputs: [
+        {
+          name: 'to',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'value',
+          type: 'uint256',
+          internalType: 'uint256',
+        },
+      ],
+      outputs: [],
+      stateMutability: 'nonpayable',
+    },
+    {
+      type: 'function',
       name: 'allowance',
       inputs: [
         {

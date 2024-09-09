@@ -73,16 +73,16 @@ export class Batch {
     );
 
     const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
-    // calculate excess contribution and store
-    for (const address of Object.keys(exAnteBalances)) {
-      if (!this.data.participants[address]) continue;
 
+    // TODO: iterate over contributions and check against CAP
+    // otherwise we might miss some contributions
+    for (const address of Object.keys(this.data.participants)) {
       const { contribution, permitted } =
         this.data.participants[address];
 
-      const exAnteBalance = exAnteBalances[address];
+      const exAnteBalance = exAnteBalances[address] || 0n;
       const issuanceTokenPotential =
-        this.data.issuanceTokenCap - exAnteBalance; // how many issuance token, the address may buy
+        this.data.issuanceTokenCap - exAnteBalance; // how many issuance tokens the address may buy
 
       // if no more issuance token potential, all contributions are excess contributions
       if (issuanceTokenPotential <= 0n) {

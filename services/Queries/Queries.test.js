@@ -66,7 +66,7 @@ describe('Queries', () => {
   });
 
   // NOTE: requires the secret ANKR API key to be set in .env.test
-  describe.skip('#getInflows', () => {
+  describe('#getInflows', () => {
     const fromTimestamp = '1725654505';
     const toTimestamp = '1725655119';
     const token = '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3';
@@ -173,11 +173,51 @@ describe('Queries', () => {
       const vestings = await querySevice.getBalances();
 
       assert.deepStrictEqual(vestings, {
-        '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b': 420n,
         '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': 28n,
         '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': 82n,
-        '0x6747772f37a4f7cfdea180d38e8ad372516c9548': 4n,
         '0xcacc010ec451cb33a7ae7cba14de0a49293c2877': 7n,
+      });
+    });
+  });
+
+  describe('#getTimeframe', () => {
+    const querySevice = new Queries({
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+    });
+    querySevice.queries.addresses = {
+      orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+    };
+    const mockSafe = '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
+
+    describe('with no configuration', () => {
+      it('returns the timeframe from the last purchase block to the current block', async () => {
+        const timeframe = await querySevice.getTimeframe({
+          configuration: undefined,
+          safe: mockSafe,
+        });
+        assert.equal(timeframe.fromTimestamp, '1725525774');
+        assert.equal(
+          timeframe.toTimestamp > timeframe.fromTimestamp,
+          true
+        );
+      });
+    });
+
+    describe('with configuration', () => {
+      const configuration = {
+        FROM_TIMESTAMP: '1725654505',
+        TO_TIMESTAMP: '1725655119',
+      };
+
+      it('returns the timeframe from the last purchase block to the current block', async () => {
+        const timeframe = await querySevice.getTimeframe({
+          configuration: configuration,
+          safe: mockSafe,
+        });
+        assert.equal(timeframe.fromTimestamp, '1725654505');
+        assert.equal(timeframe.toTimestamp, '1725655119');
       });
     });
   });

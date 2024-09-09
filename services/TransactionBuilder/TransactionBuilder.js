@@ -139,7 +139,6 @@ export class TransactionBuilder {
   }
 
   getTxBatches(txs) {
-    console.log(this.transactions);
     const txBatch = [];
     for (let i = 0; i < txs.length; i += BATCH_SIZE) {
       const chunk = txs.slice(i, i + BATCH_SIZE);

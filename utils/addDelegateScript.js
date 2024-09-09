@@ -17,8 +17,6 @@ async function main() {
   );
 
   const response = await safeService.addDelegate(DELEGATE);
-
-  console.log(response);
 }
 
 main();

@@ -1,5 +1,5 @@
 import '../env.js';
 
-import { setupForE2E } from './testHelpers.js';
+import { getBatchConfig } from './testHelpers.js';
 
-setupForE2E();
+getBatchConfig();

@@ -5,7 +5,10 @@ import assert from 'node:assert';
 import { proposeBatch } from './05_proposeBatch.js';
 import { instantiateServices } from './03_instantiateServices.js';
 import { keysToLowerCase } from '../utils/helpers.js';
-import { mintMockTokens, setupForE2E } from '../utils/testHelpers.js';
+import {
+  mintMockTokens,
+  getProjectConfig,
+} from '../utils/testHelpers.js';
 import { getAddress } from 'viem';
 
 describe('#proposeBatch', () => {
@@ -34,7 +37,7 @@ describe('#proposeBatch', () => {
 
   before(async () => {
     // get project config (create if not exists)
-    projectConfig = await setupForE2E();
+    projectConfig = await getProjectConfig();
 
     // instantiate services
     ({
@@ -47,7 +50,6 @@ describe('#proposeBatch', () => {
     // mint "collateralToken" to safe (so that it can buy from curve)
     await mintMockTokens(
       getAddress(queryService.queries.addresses.collateralToken),
-      queryService.publicClient,
       totalValidContributions,
       getAddress(projectConfig.SAFE)
     );
@@ -73,10 +75,5 @@ describe('#proposeBatch', () => {
       transactionBuilderService,
       safeService,
     });
-
-    console.warn(
-      '❗❗❗ You can find (and sign and execute) the proposed tx here: ',
-      `https://app.safe.global/transactions/queue?safe=basesep:${projectConfig.SAFE} ❗❗❗`
-    );
   });
 });
