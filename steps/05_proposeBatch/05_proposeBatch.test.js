@@ -1,16 +1,14 @@
-import '../env.js';
+import '../../env.js';
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
 import { proposeBatch } from './05_proposeBatch.js';
-import { instantiateServices } from './03_instantiateServices.js';
-import { keysToLowerCase } from '../utils/helpers.js';
+import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
+import { keysToLowerCase } from '../../utils/helpers.js';
 import {
-  mintMockTokens,
   getProjectConfig,
   signAndExecutePendingTxs,
-} from '../utils/testHelpers.js';
-import { getAddress } from 'viem';
+} from '../../utils/testHelpers.js';
 
 describe('#proposeBatch', () => {
   let projectConfig;

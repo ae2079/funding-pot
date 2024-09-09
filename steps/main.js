@@ -1,9 +1,9 @@
-import { getConfigs } from './01_getConfigs.js';
-import { validateInputs } from './02_validateInputs.js';
-import { instantiateServices } from './03_instantiateServices.js';
-import { defineBatch } from './04_defineBatch.js';
-import { proposeBatch } from './05_proposeBatch.js';
-import { storeReport } from './06_storeReport.js';
+import { getConfigs } from './01_getConfigs/01_getConfigs.js';
+import { validateInputs } from './02_validateInputs/02_validateInputs.js';
+import { instantiateServices } from './03_instantiateServices/03_instantiateServices.js';
+import { defineBatch } from './04_defineBatch/04_defineBatch.js';
+import { proposeBatch } from './05_proposeBatch/05_proposeBatch.js';
+import { storeReport } from './06_storeReport/06_storeReport.js';
 
 export const main = async (projectName, batchNr) => {
   // load configs

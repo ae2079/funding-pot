@@ -1,5 +1,5 @@
 import './env.js';
-import { main } from './steps/00_main.js';
+import { main } from './steps/main.js';
 
 const [, , PROJECT_NAME, BATCH] = process.argv;
 

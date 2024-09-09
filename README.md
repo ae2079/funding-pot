@@ -17,7 +17,7 @@ Copy `.env.example` to `.env.test` and fill in the values. In order to run all t
 
 ### End-to-end test
 
-The `00_main.test.js` file is an end-to-end test that tests the whole flow from safe creation to vesting creation. Specifically it does the following steps:
+The `main.e2e.test.js` file is an end-to-end test that tests the whole flow from safe creation to vesting creation. Specifically it does the following steps:
 
 - deploy a safe (via Safe's Protocol and API Kits)
 - add the delegate to the safe
@@ -30,7 +30,7 @@ The `00_main.test.js` file is an end-to-end test that tests the whole flow from 
 
 To just the end-to-end test use the following command:
 
-`npm run test steps/00_main.test.js`
+`npm run test steps/main.test.js`
 
 **NOTE:** Due to the number of real transactions and API calls included in this test, it can occasionally fail for wallet-related reasons (nonce issues). If this happens, you can try to run the test again.
 
@@ -75,3 +75,5 @@ To run the script use the following command:
 ### Checking the script's output
 
 When the script has executed a JSON report will be added under `data/production/output/<PROJECT_NAME>/<BATCH_NUMBER>.json`. You can use this file to better understand what has been proposed to the safe.
+
+## Implementation details

@@ -12,14 +12,20 @@ export const getConfigs = (batch) => {
   // load project config (= project-specific constants)
   const projectsConfig = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, `../data/${dataDir}/input/projects.json`)
+      path.join(
+        __dirname,
+        `../../data/${dataDir}/input/projects.json`
+      )
     )
   );
 
   // load allowlist
   const allowlist = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, `../data/${dataDir}/input/allowlist.json`)
+      path.join(
+        __dirname,
+        `../../data/${dataDir}/input/allowlist.json`
+      )
     )
   );
 
@@ -28,7 +34,7 @@ export const getConfigs = (batch) => {
     fs.readFileSync(
       path.join(
         __dirname,
-        `../data/${dataDir}/input/batches/${batch}.json`
+        `../../data/${dataDir}/input/batches/${batch}.json`
       )
     )
   );

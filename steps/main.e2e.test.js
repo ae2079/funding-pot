@@ -2,21 +2,15 @@ import '../env.js';
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
-import { proposeBatch } from './05_proposeBatch.js';
-import { instantiateServices } from './03_instantiateServices.js';
-import { keysToLowerCase } from '../utils/helpers.js';
 import {
   setupForE2E,
   signAndExecutePendingTxs,
   getVestings,
   getReport,
 } from '../utils/testHelpers.js';
-import { decodeEventLog } from 'viem';
-import abis from '../data/abis.js';
 
-import { main } from './00_main.js';
-import { getConfigs } from './01_getConfigs.js';
-import { get } from 'node:http';
+import { main } from './main.js';
+import { getConfigs } from './01_getConfigs/01_getConfigs.js';
 
 describe('#main', () => {
   const batchNr = '420';
@@ -50,21 +44,9 @@ describe('#main', () => {
     for (const address in participants) {
       const { issuanceAllocation } = participants[address];
       if (!issuanceAllocation) continue;
-      console.log('WTF');
-      console.log(vestings);
-      console.log(
-        vestings.find((vesting) => {
-          return vesting.amount.toString() === issuanceAllocation;
-        }).length
-      );
-      console.log(
-        !!vestings.find((vesting) => {
-          return vesting.amount.toString() === issuanceAllocation;
-        }).length
-      );
       const found = !!vestings.find((vesting) => {
         return vesting.amount.toString() === issuanceAllocation;
-      }).length;
+      });
 
       assert.ok(found);
     }

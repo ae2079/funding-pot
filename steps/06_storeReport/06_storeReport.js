@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { serializeBigInt } from '../utils/helpers.js';
+import { serializeBigInt } from '../../utils/helpers.js';
 
 export const storeReport = async (
   projectName,
@@ -32,7 +32,7 @@ export const storeReport = async (
 
   const basePath = path.join(
     __dirname,
-    `../data/${
+    `../../data/${
       process.env.NODE_ENV === 'production' ? 'production' : 'test'
     }/output/${projectName}`
   );
