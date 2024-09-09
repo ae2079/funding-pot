@@ -96,6 +96,7 @@ When the script has executed a JSON report will be added under `data/production/
 
 ### Structure
 
+```
 .
 ├── data
 │   ├── production
@@ -120,6 +121,7 @@ When the script has executed a JSON report will be added under `data/production/
 │   └── 06_storeReport
 └── utils
 └── scripts
+```
 
 #### Data
 
