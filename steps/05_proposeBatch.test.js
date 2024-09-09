@@ -47,13 +47,6 @@ describe('#proposeBatch', () => {
       batchService,
     } = await instantiateServices(projectConfig, batchConfig));
 
-    // mint "collateralToken" to safe (so that it can buy from curve)
-    await mintMockTokens(
-      getAddress(queryService.queries.addresses.collateralToken),
-      totalValidContributions,
-      getAddress(projectConfig.SAFE)
-    );
-
     // set numbers
     batchService.data.totalValidContributions =
       totalValidContributions;

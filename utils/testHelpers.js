@@ -248,46 +248,45 @@ export const getProjectConfig = async () => {
     '../data/test/input/projects.json'
   );
 
+  let projectsConfig;
+
   try {
-    const projectsConfig = JSON.parse(
+    projectsConfig = JSON.parse(
       fs.readFileSync(
         path.join(__dirname, `../data/test/input/projects.json`)
       )
     );
-    if (projectsConfig && projectsConfig.TESTPROJECT) {
-      console.info('🥳 Project config already exists');
-      return projectsConfig.TESTPROJECT;
-    } else {
-      console.info(
-        'No project config found, setting up new e2e environment...'
-      );
+  } catch (e) {}
 
-      const safeAddress = await deployTestSafe();
-      const orchestratorAddress = await deployWorkflow(safeAddress);
+  if (projectsConfig && projectsConfig.TESTPROJECT) {
+    console.info('🥳 Project config already exists');
+    return projectsConfig.TESTPROJECT;
+  } else {
+    console.info(
+      'No project config found, setting up new e2e environment...'
+    );
 
-      fs.writeFileSync(
-        filePath,
-        JSON.stringify({
-          TESTPROJECT: {
-            SAFE: safeAddress,
-            ORCHESTRATOR: orchestratorAddress,
-          },
-        }),
-        'utf8'
-      );
+    const safeAddress = await deployTestSafe();
+    const orchestratorAddress = await deployWorkflow(safeAddress);
 
-      console.info('✅ All contracts deployed');
-      console.info(
-        '💾 Project with name TESTPROJECT saved to data/test/input/projects.json'
-      );
-    }
-  } catch (e) {
-    console.error(e);
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify({
+        TESTPROJECT: {
+          SAFE: safeAddress,
+          ORCHESTRATOR: orchestratorAddress,
+        },
+      }),
+      'utf8'
+    );
+
+    console.info('✅ All contracts deployed');
+    console.info(
+      '💾 Project with name TESTPROJECT saved to data/test/input/projects.json'
+    );
   }
 
-  const projectsConfig = JSON.parse(fs.readFileSync(filePath));
-
-  return projectsConfig.TESTPROJECT;
+  return JSON.parse(fs.readFileSync(filePath)).TESTPROJECT;
 };
 
 export const getBatchConfig = async (safe) => {
