@@ -126,8 +126,8 @@ When the script has executed a JSON report will be added under `data/production/
 #### Data
 
 - subdivided into `production` and `test`
-- `input`: contains the input data for the scripts
-- `output`: when running the script per batch and project a report will be generated in this folder
+- `input`: contains the user input data for the scripts
+- `output`: per batch and project, a JSON report will be generated in this folder
 
 #### Services
 
