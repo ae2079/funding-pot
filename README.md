@@ -1,5 +1,16 @@
 # Funding Pot
 
+## Terminology
+
+Within the project the term `batch` refers to one instance of running a funding interval. That includes
+
+- users contributing within a given time interval (= transferring collateral tokens to the safe)
+- using these funds to buy from the bonding curve
+- calculating the amounts of issuance tokens that contributors receive
+- creating linear vestings for contributors
+
+Note: this script does not cover the claiming of tokens by contributors
+
 ## Run the tests
 
 ### Prerequisites
@@ -70,10 +81,70 @@ There are three types of inputs that the script executor can take. They can all 
 
 To run the script use the following command:
 
-`npm run start`
+`npm run start <PROJECT_NAME> <BATCH_NUMBER>`
+
+- `PROJECT_NAME`: the name of the project you want to run the script for; used to fetch project-specific configurations from `projects.json`
+- `BATCH_NUMBER`: the batch number you want to run the script for; used to fetch batch-specific configurations from `batches/<BATCH_NUMBER>.json`
 
 ### Checking the script's output
 
 When the script has executed a JSON report will be added under `data/production/output/<PROJECT_NAME>/<BATCH_NUMBER>.json`. You can use this file to better understand what has been proposed to the safe.
 
 ## Implementation details
+
+### Assumptions
+
+- all rewards paid out to contributors are fully vested
+
+### Structure
+
+.
+├── data
+│   ├── production
+│   │   ├── input
+│   │   └── output
+│   └── test
+│   ├── input
+│   │   └── batches
+│   └── output
+│   └── TESTPROJECT
+├── services
+│   ├── Batch
+│   ├── Queries
+│   ├── Safe
+│   └── TransactionBuilder
+├── steps
+│   ├── 01_getConfigs
+│   ├── 02_validateInputs
+│   ├── 03_instantiateServices
+│   ├── 04_defineBatch
+│   ├── 05_proposeBatch
+│   └── 06_storeReport
+└── utils
+└── scripts
+
+#### Data
+
+- subdivided into `production` and `test`
+- `input`: contains the input data for the scripts
+- `output`: when running the script per batch and project a report will be generated in this folder
+
+#### Services
+
+The services are where the most of the logic sits. All services are classes that store most of the outputs of their respective operations in state. This is then later used to generate the report.
+
+- `Batch`: contains the logic for calculating who gets how many tokens
+- `Queries`: contains the logic for querying external data sources
+- `Safe`: contains the logic for interacting with the safe
+- `TransactionBuilder`: contains the logic for generating transaction batches
+
+#### Steps
+
+The steps tie the services together and bring an order into the execution flow.
+
+1. `getConfigs`: loads input parameters provided by the user as JSON files
+2. `validateInputs`: validates the input parameters and environment variables
+3. `instantiateServices`: instantiates the services using the input parameters and environment variables
+4. `defineBatch`: defines the batch by calculating the contributions, eligibility, received allocations, vesting details etc.
+5. `proposeBatch`: bundles all transactions into multisend transactions of 100 transactions each that are then proposed to the safe via the delegation mechanism
+6. `storeReport`: services "log" their logic operations; this data is used to generate a json file that describes the batch
