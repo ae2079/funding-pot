@@ -4,6 +4,5 @@ node_modules
 
 
 # dynamically generated files (dependent on private keys set in .env.test)
-data/test/input/projects.json
 data/test/input/allowlist.json
 data/test/input/batches/420.json
