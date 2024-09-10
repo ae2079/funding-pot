@@ -3,7 +3,7 @@ import '../../env.js';
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
 import { defineBatch } from './04_defineBatch.js';
-import { instantiateServices } from './03_instantiateServices.js';
+import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
 
 describe('#defineBatch', () => {
   const projectConfig = {

@@ -11,10 +11,7 @@ import {
 } from 'viem';
 import * as chains from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
-import ProtocolKit, {
-  SafeFactory,
-  SigningMethod,
-} from '@safe-global/protocol-kit';
+import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
@@ -82,6 +79,11 @@ export const deployTestSafe = async () => {
 
   console.info('✅ Safe deployed at:', safeAddress);
 
+  console.info(
+    '🕒 Waiting for 5 seconds for SAFE API to index new safe...'
+  );
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
   const apiKit = new SafeApiKit.default({
     chainId: process.env.CHAIN_ID,
   });
@@ -103,34 +105,39 @@ export const deployTestSafe = async () => {
   return safeAddress;
 };
 
+let clients;
 export const getTestClients = () => {
-  const baseConfig = {
-    chain: getChain(process.env.CHAIN_ID),
-    transport: http(process.env.RPC_URL),
-  };
+  if (!clients) {
+    const baseConfig = {
+      chain: getChain(process.env.CHAIN_ID),
+      transport: http(process.env.RPC_URL),
+    };
 
-  return {
-    owner: {
-      publicClient: createPublicClient({
-        ...baseConfig,
-        account: privateKeyToAccount(process.env.PK),
-      }),
-      walletClient: createWalletClient({
-        ...baseConfig,
-        account: privateKeyToAccount(process.env.PK),
-      }),
-    },
-    delegate: {
-      publicClient: createPublicClient({
-        ...baseConfig,
-        account: privateKeyToAccount(process.env.DELEGATE),
-      }),
-      walletClient: createWalletClient({
-        ...baseConfig,
-        account: privateKeyToAccount(process.env.DELEGATE),
-      }),
-    },
-  };
+    clients = {
+      owner: {
+        publicClient: createPublicClient({
+          ...baseConfig,
+          account: privateKeyToAccount(process.env.PK),
+        }),
+        walletClient: createWalletClient({
+          ...baseConfig,
+          account: privateKeyToAccount(process.env.PK),
+        }),
+      },
+      delegate: {
+        publicClient: createPublicClient({
+          ...baseConfig,
+          account: privateKeyToAccount(process.env.DELEGATE),
+        }),
+        walletClient: createWalletClient({
+          ...baseConfig,
+          account: privateKeyToAccount(process.env.DELEGATE),
+        }),
+      },
+    };
+  }
+
+  return clients;
 };
 
 export const deployWorkflow = async (safeAddress) => {
@@ -384,21 +391,23 @@ export const getBatchConfig = async (safe) => {
     '💾 Batch config stored to data/test/input/batches/420.json'
   );
 
+  return { batchConfig, contributions, contributors };
+};
+
+export const createAndSaveAllowlist = async () => {
+  const ownerAccount = privateKeyToAccount(process.env.PK);
+  const delegateAccount = privateKeyToAccount(process.env.DELEGATE);
+
   const allowListFilePath = path.join(
     __dirname,
     '../data/test/input/allowlist.json'
   );
 
+  const allowlist = [ownerAccount.address, delegateAccount.address];
+
   fs.writeFileSync(
     allowListFilePath,
-    JSON.stringify(
-      [
-        owner.walletClient.account.address,
-        delegate.walletClient.account.address,
-      ],
-      null,
-      2
-    ),
+    JSON.stringify(allowlist, null, 2),
     'utf8'
   );
 
@@ -406,7 +415,7 @@ export const getBatchConfig = async (safe) => {
     '💾 Alllowlist stored to data/test/input/allowlist.json'
   );
 
-  return { batchConfig, contributions, contributors };
+  return allowlist;
 };
 
 function randomIntFromInterval(min, max) {

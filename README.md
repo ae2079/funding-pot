@@ -22,9 +22,9 @@ Note: this script does not cover the claiming of tokens by contributors
 
 Copy `.env.example` to `.env.test` and fill in the values. In order to run all tests, you need to have an **ANKR API key** and specify **two private keys**. One key is associated with the **single owner of a Safe** and the other the key is associated with the role of a **delegate** who can **propose transactions** to that safe. You will require a small amount of _testnet ETH_ on Base Sepolia for both accounts. When running the e2e tests, the private keys will be used to setup an safe and workflow for your personal accounts that is used to test against.
 
-### Running all tests
+### Unit tests
 
-`npm run test`
+`npm run test:unit`
 
 ### End-to-end test
 
@@ -41,7 +41,7 @@ The `main.e2e.test.js` file is an end-to-end test that tests the whole flow from
 
 To just the end-to-end test use the following command:
 
-`npm run test steps/main.test.js`
+`npm run test:e2e`
 
 **NOTE:** Due to the number of transactions and API calls involved with this test, it regularly fails for wallet-related reasons (nonce issues). If this happens, you can try to run the test again.
 

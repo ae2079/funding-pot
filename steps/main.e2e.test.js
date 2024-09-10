@@ -24,7 +24,6 @@ describe('#main', () => {
       '🕒 Waiting for 5 seconds for ANKR API to catch up...'
     );
     await new Promise((resolve) => setTimeout(resolve, 5000));
-    console.info('✅ Done waiting');
 
     const {
       projectsConfig: {
@@ -34,7 +33,7 @@ describe('#main', () => {
     safeAddress = SAFE;
   });
 
-  it('proposes the batch to the safe', async () => {
+  it('creates vestings for eligible contributors', async () => {
     await main(projectName, batchNr);
     const [txReceipt] = await signAndExecutePendingTxs(safeAddress);
     const vestings = await getVestings(txReceipt.hash);
