@@ -4,7 +4,6 @@ import { describe, it, before, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import { proposeBatch } from './05_proposeBatch.js';
 import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
-import { keysToLowerCase } from '../../utils/helpers.js';
 import {
   getProjectConfig,
   signAndExecutePendingTxs,
@@ -15,6 +14,8 @@ import {
   generatePrivateKey,
   privateKeyToAddress,
 } from 'viem/accounts';
+
+import { keysToLowerCase } from '../../utils/helpers.js';
 
 describe('#proposeBatch', () => {
   let projectConfig;
@@ -40,7 +41,6 @@ describe('#proposeBatch', () => {
   describe('with a small batch (2 vestings)', () => {
     const addr1 = '0xAeC9D8128a75Cb93B56D4dCf693a04251f8b9340';
     const addr2 = '0xce989336BdED425897Ac63d1359628E26E24f794';
-
     const issuance1 = 6_000_000_000_000_000n;
     const issuance2 = 4_000_000_000_000_000n;
     const additionalIssuance = issuance1 + issuance2;
@@ -89,58 +89,57 @@ describe('#proposeBatch', () => {
     });
   });
 
-  // TODO:
-  // describe('with huge batch (669 vestings)', () => {
-  //   const totalValidContributions = 1_800_000n;
-  //   const recipients = 669;
+  describe('with big batch (60 vestings)', () => {
+    const totalValidContributions = 1_800_000n;
+    const recipients = 50;
 
-  //   let participants, additionalIssuance;
+    let participants, additionalIssuance;
 
-  //   beforeEach(async () => {
-  //     ({
-  //       queryService,
-  //       safeService,
-  //       transactionBuilderService,
-  //       batchService,
-  //     } = await instantiateServices(projectConfig, batchConfig));
-  //     additionalIssuance = await queryService.getAmountOut(
-  //       totalValidContributions
-  //     );
-  //     participants = Object.fromEntries(
-  //       Array(recipients)
-  //         .fill(0)
-  //         .map((r, i) => [
-  //           privateKeyToAddress(generatePrivateKey()),
-  //           {
-  //             issuanceAllocation:
-  //               i < recipients - 1
-  //                 ? 1n
-  //                 : additionalIssuance - BigInt(recipients - 1),
-  //           },
-  //         ])
-  //     );
-  //     batchService.data.totalValidContributions =
-  //       totalValidContributions;
-  //     batchService.data.additionalIssuance = additionalIssuance;
-  //     batchService.data.participants = participants;
-  //     await mintMockTokens(
-  //       getAddress(queryService.queries.addresses.collateralToken),
-  //       totalValidContributions,
-  //       getAddress(projectConfig.SAFE)
-  //     );
-  //   });
+    beforeEach(async () => {
+      ({
+        queryService,
+        safeService,
+        transactionBuilderService,
+        batchService,
+      } = await instantiateServices(projectConfig, batchConfig));
+      additionalIssuance = await queryService.getAmountOut(
+        totalValidContributions
+      );
+      participants = Object.fromEntries(
+        Array(recipients)
+          .fill(0)
+          .map((r, i) => [
+            privateKeyToAddress(generatePrivateKey()),
+            {
+              issuanceAllocation:
+                i < recipients - 1
+                  ? 1n
+                  : additionalIssuance - BigInt(recipients - 1),
+            },
+          ])
+      );
+      batchService.data.totalValidContributions =
+        totalValidContributions;
+      batchService.data.additionalIssuance = additionalIssuance;
+      batchService.data.participants = participants;
+      await mintMockTokens(
+        getAddress(queryService.queries.addresses.collateralToken),
+        totalValidContributions,
+        getAddress(projectConfig.SAFE)
+      );
+    });
 
-  //   it('proposes the transactions', async () => {
-  //     console.log(batchService.data);
+    it('proposes the transactions', async () => {
+      await proposeBatch({
+        queryService,
+        batchService,
+        transactionBuilderService,
+        safeService,
+      });
 
-  //     await proposeBatch({
-  //       queryService,
-  //       batchService,
-  //       transactionBuilderService,
-  //       safeService,
-  //     });
-
-  //     await signAndExecutePendingTxs(projectConfig.SAFE);
-  //   });
-  // });
+      assert.doesNotThrow(async () => {
+        await signAndExecutePendingTxs(projectConfig.SAFE);
+      });
+    });
+  });
 });
