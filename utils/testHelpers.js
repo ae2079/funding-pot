@@ -80,8 +80,9 @@ export const deployTestSafe = async () => {
   console.info('✅ Safe deployed at:', safeAddress);
 
   console.info(
-    '🕒 Waiting for 3 seconds for SAFE API to index new safe...'
+    '🕒 Waiting for 5 seconds for SAFE API to index new safe...'
   );
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   const apiKit = new SafeApiKit.default({
     chainId: process.env.CHAIN_ID,

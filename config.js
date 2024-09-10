@@ -2,4 +2,4 @@
 export const CAP = 0.02;
 
 // TRANSACTION BATCH SIZE FOR SAFE
-export const BATCH_SIZE = 100;
+export const BATCH_SIZE = 10;

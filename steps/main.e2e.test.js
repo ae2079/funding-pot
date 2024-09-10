@@ -24,7 +24,6 @@ describe('#main', () => {
       '🕒 Waiting for 5 seconds for ANKR API to catch up...'
     );
     await new Promise((resolve) => setTimeout(resolve, 5000));
-    console.info('✅ Done waiting');
 
     const {
       projectsConfig: {
