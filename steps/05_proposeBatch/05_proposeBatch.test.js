@@ -1,6 +1,6 @@
 import '../../env.js';
 
-import { describe, it, before } from 'node:test';
+import { describe, it, before, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import { proposeBatch } from './05_proposeBatch.js';
 import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
@@ -8,7 +8,9 @@ import { keysToLowerCase } from '../../utils/helpers.js';
 import {
   getProjectConfig,
   signAndExecutePendingTxs,
+  mintMockTokens,
 } from '../../utils/testHelpers.js';
+import { getAddress } from 'viem';
 
 describe('#proposeBatch', () => {
   let projectConfig;
@@ -37,39 +39,51 @@ describe('#proposeBatch', () => {
   before(async () => {
     // get project config (create if not exists)
     projectConfig = await getProjectConfig();
+  });
 
-    // instantiate services
-    ({
-      queryService,
-      safeService,
-      transactionBuilderService,
-      batchService,
-    } = await instantiateServices(projectConfig, batchConfig));
+  describe('with a small batch (2 vestings)', () => {
+    beforeEach(async () => {
+      // instantiate services
+      ({
+        queryService,
+        safeService,
+        transactionBuilderService,
+        batchService,
+      } = await instantiateServices(projectConfig, batchConfig));
 
-    // set numbers
-    batchService.data.totalValidContributions =
-      totalValidContributions;
-    batchService.data.additionalIssuance = additionalIssuance;
-    batchService.data.participants = keysToLowerCase({
-      [addr1]: {
-        issuanceAllocation: issuance1,
-      },
-      [addr2]: {
-        issuanceAllocation: issuance2,
-      },
+      // set numbers
+      batchService.data.totalValidContributions =
+        totalValidContributions;
+      batchService.data.additionalIssuance = additionalIssuance;
+      batchService.data.participants = keysToLowerCase({
+        [addr1]: {
+          issuanceAllocation: issuance1,
+        },
+        [addr2]: {
+          issuanceAllocation: issuance2,
+        },
+      });
+    });
+
+    it('proposes the batch', async () => {
+      await proposeBatch({
+        queryService,
+        batchService,
+        transactionBuilderService,
+        safeService,
+      });
+
+      await mintMockTokens(
+        getAddress(queryService.queries.addresses.collateralToken),
+        totalValidContributions,
+        getAddress(projectConfig.SAFE)
+      );
+
+      assert.doesNotThrow(async () => {
+        await signAndExecutePendingTxs(projectConfig.SAFE);
+      });
     });
   });
 
-  it('proposes the batch', async () => {
-    await proposeBatch({
-      queryService,
-      batchService,
-      transactionBuilderService,
-      safeService,
-    });
-
-    assert.doesNotThrow(async () => {
-      await signAndExecutePendingTxs(projectConfig.SAFE);
-    });
-  });
+  describe('', () => {});
 });

@@ -34,7 +34,7 @@ describe('#main', () => {
     safeAddress = SAFE;
   });
 
-  it('proposes the batch to the safe', async () => {
+  it('creates vestings for eligible contributors', async () => {
     await main(projectName, batchNr);
     const [txReceipt] = await signAndExecutePendingTxs(safeAddress);
     const vestings = await getVestings(txReceipt.hash);
