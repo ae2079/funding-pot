@@ -6,12 +6,18 @@ import { proposeBatch } from './05_proposeBatch/05_proposeBatch.js';
 import { storeReport } from './06_storeReport/06_storeReport.js';
 
 export const main = async (projectName, batchNr) => {
+  console.info(
+    `🚀 Starting batch execution for project ${projectName} with batch number ${batchNr}`
+  );
+
   // load configs
+  console.info(`1️⃣ Loading configs...`);
   const { projectsConfig, batchConfig, allowlist } =
     getConfigs(batchNr);
   const projectConfig = projectsConfig[projectName];
 
   // checks if all required inputs are set in configs
+  console.info(`2️⃣ Validating inputs...`);
   validateInputs({
     projectConfig,
     batchConfig,
@@ -19,6 +25,7 @@ export const main = async (projectName, batchNr) => {
   });
 
   // instantiate services
+  console.info(`3️⃣ Instantiating services...`);
   const {
     safeService,
     transactionBuilderService,
@@ -27,6 +34,7 @@ export const main = async (projectName, batchNr) => {
   } = await instantiateServices(projectConfig, batchConfig);
 
   // define batch (= contributions, eligibility, received allocations, vesting details etc.)
+  console.info(`4️⃣ Defining batch...`);
   await defineBatch({
     queryService,
     batchService,
@@ -36,6 +44,7 @@ export const main = async (projectName, batchNr) => {
   });
 
   // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
+  console.info(`5️⃣ Proposing batch...`);
   await proposeBatch({
     batchService,
     queryService,
@@ -44,10 +53,13 @@ export const main = async (projectName, batchNr) => {
   });
 
   // store comprehensive report in a JSON file
+  console.info(`6️⃣ Storing report...`);
   await storeReport(projectName, batchNr, {
     batchService,
     safeService,
     transactionBuilderService,
     queryService,
   });
+
+  console.info(`🏁 Batch execution complete!`);
 };
