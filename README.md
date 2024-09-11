@@ -88,11 +88,40 @@ To run the script use the following command:
 
 When the script has executed a JSON report will be added under `data/production/output/<PROJECT_NAME>/<BATCH_NUMBER>.json`. You can use this file to better understand what has been proposed to the safe.
 
+## Specification
+
+In summary this project does three things:
+
+1. Contributions: it records transfers of the funding token to a safe that occur within a given timeframe (= contributions)
+2. Calculations: filters these transfers by eligibility (specified by KYC allowlist) and calculates the amount of reward tokens that will be vested to each contributor in return for contribution
+3. Execution: assembles and proposes (via a delegate flow) multisend transactions to the safe to use contributions for buying reward tokens from the bonding curve and stream them to contributors
+
+### Details on the calculation logic
+
+- contributions per user per batch are capped
+- how much a user can contribute is calculated as follows:
+  1. calculate the token cap applicable to all contributors (cap = 2% of the total supply **before the new batch**)
+  2. per contributor, check how many reward tokens the contributor already has (locked in vestings) **before the new batch**
+  3. calculate difference between the token cap and the amount of reward tokens the contributor already has
+  4. multiply the difference by the current spot price to get the amount of collateral tokens that the contributor can contribute
+  5. excess contributions are not used for buying reward tokens from the curve but retained by the safe
+- example:
+  - during last batch Alice contributed some amount
+  - now the current total supply is 100, of which Alice owns 1 token (=1%)
+  - the current spot price is 5 (collateral tokens per issuance token)
+  - to calculate how much she can contribute in the ongoing batch the following approach is used
+  - the max amount is defined by the 2% cap and the current total supply (100), resulting in an absolute cap per contributor of 2 tokens in this scenario
+  - the basis for further calculations is the difference between what she currently owns (= 1 token) and the absolute cap (= 2 tokens)
+  - this means in the ongoing batch Alice could buy up to one additional token to reach the cap
+  - since we don't know how much total contributions we'll receive in the ongoing batch we don't know the effective price that Alice will pay per token (aka how much will this additional token cost her)
+  - therefore we make a simplification for our calculation: we assume she will pay the current spot price
+  - so for this example we tell her that she can contribute up to 5 collateral tokens
+
 ## Implementation details
 
 ### Assumptions
 
-- all rewards paid out to contributors are fully vested
+- all rewards paid out to contributors remain fully vested over the lifetime where this script is run
 
 ### Structure
 
