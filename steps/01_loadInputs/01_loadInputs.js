@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const getConfigs = (batch) => {
+export const loadInputs = (batch) => {
   const dataDir =
     process.env.NODE_ENV === 'production' ? 'production' : 'test';
 

@@ -1,4 +1,4 @@
-import { getConfigs } from './01_getConfigs/01_getConfigs.js';
+import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 import { validateInputs } from './02_validateInputs/02_validateInputs.js';
 import { instantiateServices } from './03_instantiateServices/03_instantiateServices.js';
 import { defineBatch } from './04_defineBatch/04_defineBatch.js';
@@ -13,7 +13,7 @@ export const main = async (projectName, batchNr) => {
   // load configs
   console.info(`1️⃣ Loading configs...`);
   const { projectsConfig, batchConfig, allowlist } =
-    getConfigs(batchNr);
+    loadInputs(batchNr);
   const projectConfig = projectsConfig[projectName];
 
   // checks if all required inputs are set in configs
@@ -23,6 +23,8 @@ export const main = async (projectName, batchNr) => {
     batchConfig,
     allowlist,
   });
+
+  // TODO: loads previous batch reports
 
   // instantiate services
   console.info(`3️⃣ Instantiating services...`);

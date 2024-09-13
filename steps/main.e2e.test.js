@@ -10,7 +10,7 @@ import {
 } from '../utils/testHelpers.js';
 
 import { main } from './main.js';
-import { getConfigs } from './01_getConfigs/01_getConfigs.js';
+import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 
 describe('#main', () => {
   const batchNr = '420';
@@ -29,7 +29,7 @@ describe('#main', () => {
       projectsConfig: {
         [projectName]: { SAFE },
       },
-    } = getConfigs(batchNr);
+    } = loadInputs(batchNr);
     safeAddress = SAFE;
   });
 

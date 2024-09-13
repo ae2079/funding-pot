@@ -2,10 +2,10 @@ import '../../env.js';
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
-import { getConfigs } from './01_getConfigs.js';
+import { loadInputs } from './01_loadInputs.js';
 import { createAndSaveAllowlist } from '../../utils/testHelpers.js';
 
-describe('#getConfigs', () => {
+describe('#loadInputs', () => {
   before(async () => {
     await createAndSaveAllowlist();
   });
@@ -13,7 +13,7 @@ describe('#getConfigs', () => {
   describe('with existing batch number', () => {
     const batchNumber = 1;
     it('returns the config', () => {
-      const batchConfig = getConfigs(batchNumber);
+      const batchConfig = loadInputs(batchNumber);
       assert.deepEqual(Object.keys(batchConfig), [
         'projectsConfig',
         'allowlist',
@@ -27,7 +27,7 @@ describe('#getConfigs', () => {
 
     it('throws an error', () => {
       assert.throws(() => {
-        getConfigs(batchNumber);
+        loadInputs(batchNumber);
       });
     });
   });

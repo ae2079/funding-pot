@@ -142,7 +142,7 @@ In summary this project does three things:
 │   ├── Safe
 │   └── TransactionBuilder
 ├── steps
-│   ├── 01_getConfigs
+│   ├── 01_loadInputs
 │   ├── 02_validateInputs
 │   ├── 03_instantiateServices
 │   ├── 04_defineBatch
@@ -171,7 +171,7 @@ The services are where the most of the logic sits. All services are classes that
 
 The steps tie the services together and bring an order into the execution flow.
 
-1. `getConfigs`: loads input parameters provided by the user as JSON files
+1. `loadInputs`: loads input parameters provided by the user as JSON files
 2. `validateInputs`: validates the input parameters and environment variables
 3. `instantiateServices`: instantiates the services using the input parameters and environment variables
 4. `defineBatch`: defines the batch by calculating the contributions, eligibility, received allocations, vesting details etc.
