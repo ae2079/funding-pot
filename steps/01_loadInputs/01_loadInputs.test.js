@@ -11,14 +11,35 @@ describe('#loadInputs', () => {
   });
 
   describe('with existing batch number', () => {
-    const batchNumber = 1;
-    it('returns the config', () => {
-      const batchConfig = loadInputs(batchNumber);
-      assert.deepEqual(Object.keys(batchConfig), [
-        'projectsConfig',
-        'allowlist',
-        'batchConfig',
-      ]);
+    describe('without previous batch reports', () => {
+      const projectName = 'EXAMPLEPROJECT_1';
+      const batchNumber = 1;
+
+      it('returns the configs: projectsConfig, allowlist, batchConfig', () => {
+        const inputs = loadInputs(projectName, batchNumber);
+
+        assert.deepEqual(Object.keys(inputs), [
+          'projectConfig',
+          'allowlist',
+          'batchConfig',
+        ]);
+      });
+    });
+
+    describe('with previous batch reports', () => {
+      const projectName = 'EXAMPLEPROJECT_2';
+      const batchNumber = 3;
+
+      it('returns the configs: projectsConfig, allowlist, batchConfig, reports', () => {
+        const inputs = loadInputs(projectName, batchNumber);
+
+        assert.deepEqual(Object.keys(inputs), [
+          'projectConfig',
+          'allowlist',
+          'batchConfig',
+          'reports',
+        ]);
+      });
     });
   });
 

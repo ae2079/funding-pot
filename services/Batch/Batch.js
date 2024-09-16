@@ -3,9 +3,11 @@ import { CAP } from '../../config.js';
 
 export class Batch {
   data;
+  previousBatchReports;
 
   constructor() {
     this.data = {};
+    this.previousBatchReports = {};
   }
 
   // STATE-MODIFYING METHODS
@@ -57,6 +59,7 @@ export class Batch {
     };
   }
 
+  // TODO: CHANGE CAP LOGIC
   calculateValidContributions(
     exAnteSupply,
     exAnteSpotPrice,

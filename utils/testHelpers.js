@@ -426,6 +426,7 @@ function randomIntFromInterval(min, max) {
 export const setupForE2E = async () => {
   const { SAFE } = await getProjectConfig();
   await getBatchConfig(SAFE);
+  await createAndSaveAllowlist();
 };
 
 export const signAndExecutePendingTxs = async (safeAddress) => {

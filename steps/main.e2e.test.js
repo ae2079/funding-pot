@@ -26,10 +26,8 @@ describe('#main', () => {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const {
-      projectsConfig: {
-        [projectName]: { SAFE },
-      },
-    } = loadInputs(batchNr);
+      projectConfig: { SAFE },
+    } = loadInputs(projectName, batchNr);
     safeAddress = SAFE;
   });
 
