@@ -13,8 +13,6 @@ export const loadInputs = (projectName, batch) => {
 };
 
 const loadConfigs = (projectName, batch) => {
-  console.log('loadConfigs');
-  console.log('batch: ', batch);
   const basePath = getBasePath('input');
 
   // load project config (= project-specific constants)

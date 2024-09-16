@@ -23,9 +23,9 @@ describe('#validateInputs', () => {
     2: {},
   };
 
-  describe('with first batch', () => {
-    const batchNr = 1;
+  const batchNr = 1;
 
+  describe('with first batch', () => {
     describe('without reports', () => {
       it('does not throw', () => {
         assert.doesNotThrow(() => {
@@ -41,17 +41,31 @@ describe('#validateInputs', () => {
   });
 
   describe('with third batch', () => {
-    const batchNr = 3;
+    const thirdBatch = 3;
 
-    describe('without reports', () => {
-      it('does not throw', () => {
+    describe('with missing reports', () => {
+      it('throws', () => {
         assert.throws(() => {
           validateInputs({
             projectConfig,
             batchConfig,
             allowlist,
+            batchNr: thirdBatch,
+            reports: { 1: {} },
+          });
+        });
+      });
+    });
+
+    describe('with reports', () => {
+      it('does not throw', () => {
+        assert.doesNotThrow(() => {
+          validateInputs({
+            projectConfig,
+            batchConfig,
+            allowlist,
+            batchNr: thirdBatch,
             reports,
-            batchNr,
           });
         });
       });
@@ -65,6 +79,7 @@ describe('#validateInputs', () => {
           projectConfig: {},
           batchConfig: {},
           allowlist: [],
+          reports: {},
         });
       });
     });
@@ -80,6 +95,7 @@ describe('#validateInputs', () => {
           },
           batchConfig,
           allowlist,
+          reports,
         });
       });
     });
@@ -96,6 +112,7 @@ describe('#validateInputs', () => {
           },
           batchConfig,
           allowlist,
+          reports,
         });
       });
     });
@@ -114,6 +131,7 @@ describe('#validateInputs', () => {
             },
           },
           allowlist,
+          reports,
         });
       });
     });
@@ -132,6 +150,7 @@ describe('#validateInputs', () => {
             },
           },
           allowlist,
+          reports,
         });
       });
     });
@@ -150,6 +169,7 @@ describe('#validateInputs', () => {
             },
           },
           allowlist,
+          reports,
         });
       });
     });
@@ -169,6 +189,7 @@ describe('#validateInputs', () => {
             },
           },
           allowlist,
+          reports,
         });
       });
     });
@@ -189,6 +210,7 @@ describe('#validateInputs', () => {
             },
           },
           allowlist,
+          reports,
         });
       });
     });
@@ -201,6 +223,7 @@ describe('#validateInputs', () => {
           projectConfig,
           batchConfig,
           allowlist: [],
+          reports,
         });
       });
     });

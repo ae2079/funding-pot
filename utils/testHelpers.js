@@ -378,7 +378,7 @@ export const getBatchConfig = async (safe) => {
 
   const batchConfigFilePath = path.join(
     __dirname,
-    '../data/test/input/batches/420.json'
+    '../data/test/input/batches/3.json'
   );
 
   fs.writeFileSync(
@@ -388,7 +388,7 @@ export const getBatchConfig = async (safe) => {
   );
 
   console.info(
-    '💾 Batch config stored to data/test/input/batches/420.json'
+    '💾 Batch config stored to data/test/input/batches/3.json'
   );
 
   return { batchConfig, contributions, contributors };

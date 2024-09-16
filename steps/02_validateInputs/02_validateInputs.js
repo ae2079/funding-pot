@@ -54,9 +54,18 @@ const validateConfigs = ({
 const validateReports = ({ reports, batchNr }) => {
   if (batchNr == 1) return;
 
+  if (!reports) throw new Error('Reports missing');
+
   const reportNumbers = Object.keys(reports);
-  for (let i = 1; i <= reportNumbers.length; i++) {
-    if (!reportNumbers.includes(batchNr))
-      throw new Error(`Report missing: ${batchNr}`);
+  console.log(reportNumbers);
+
+  if (batchNr - reportNumbers.length > 1)
+    throw new Error(
+      `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous reports`
+    );
+
+  for (let i = 1; i < reportNumbers.length; i++) {
+    if (!reportNumbers.includes(reportNumbers[i]))
+      throw new Error(`Report missing: ${reportNumbers[i]}`);
   }
 };

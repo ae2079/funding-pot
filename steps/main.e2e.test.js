@@ -13,7 +13,7 @@ import { main } from './main.js';
 import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 
 describe('#main', () => {
-  const batchNr = '420';
+  const batchNr = '3';
   const projectName = 'TESTPROJECT';
 
   let safeAddress;

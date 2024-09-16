@@ -28,7 +28,7 @@ describe('#loadInputs', () => {
 
     describe('with previous batch reports', () => {
       const projectName = 'EXAMPLEPROJECT_2';
-      const batchNumber = 3;
+      const batchNumber = 2;
 
       it('returns the configs: projectsConfig, allowlist, batchConfig, reports', () => {
         const inputs = loadInputs(projectName, batchNumber);

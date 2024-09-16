@@ -1,11 +1,11 @@
 {
-  "TIMEFRAME": {
-    "FROM_TIMESTAMP": 200,
-    "TO_TIMESTAMP": 300
-  },
   "VESTING_DETAILS": {
-    "START": 0,
-    "CLIFF": 0,
-    "END": 0
+    "START": "1726516912",
+    "CLIFF": "60",
+    "END": "1726516972"
+  },
+  "TIMEFRAME": {
+    "FROM_TIMESTAMP": "1726516852",
+    "TO_TIMESTAMP": "1726516986"
   }
 }

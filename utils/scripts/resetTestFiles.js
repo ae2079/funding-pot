@@ -13,18 +13,14 @@ async function main() {
     fs.unlinkSync(
       path.join(__dirname, '../../data/test/input/allowlist.json')
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
-  // remove batch config 420.json
+  // remove batch config 3.json
   try {
     fs.unlinkSync(
-      path.join(__dirname, '../../data/test/input/batches/420.json')
+      path.join(__dirname, '../../data/test/input/batches/3.json')
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
   // remove TESTPROJECT from projects.json
   try {
@@ -41,21 +37,17 @@ async function main() {
       JSON.stringify(projects, null, 2),
       'utf8'
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
-  // remove test output file 420.json
+  // remove test output file 3.json
   try {
     fs.unlinkSync(
       path.join(
         __dirname,
-        '../../data/test/output/TESTPROJECT/420.json'
+        '../../data/test/output/TESTPROJECT/3.json'
       )
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 }
 
 main();
