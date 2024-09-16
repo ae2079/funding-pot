@@ -1,9 +1,11 @@
 import { isAddress } from 'viem';
 
 export const validateInputs = ({
+  batchNr,
   projectConfig,
   batchConfig,
   allowlist,
+  reports,
 }) => {
   validateEnvVars();
   validateConfigs({
@@ -11,6 +13,7 @@ export const validateInputs = ({
     batchConfig,
     allowlist,
   });
+  validateReports({ batchNr, reports });
 };
 
 const validateEnvVars = () => {
@@ -46,4 +49,14 @@ const validateConfigs = ({
     throw new Error('Vesting: START > END');
   if (parseInt(START) + parseInt(CLIFF) > parseInt(END))
     throw new Error('Vesting: START > END');
+};
+
+const validateReports = ({ reports, batchNr }) => {
+  if (batchNr == 1) return;
+
+  const reportNumbers = Object.keys(reports);
+  for (let i = 1; i <= reportNumbers.length; i++) {
+    if (!reportNumbers.includes(batchNr))
+      throw new Error(`Report missing: ${batchNr}`);
+  }
 };

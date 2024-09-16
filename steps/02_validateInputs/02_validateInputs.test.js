@@ -18,11 +18,42 @@ describe('#validateInputs', () => {
     },
   };
   const allowlist = ['0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb'];
+  const reports = {
+    1: {},
+    2: {},
+  };
 
-  describe('with all params set', () => {
-    it('does not throw an error', () => {
-      assert.doesNotThrow(() => {
-        validateInputs({ projectConfig, batchConfig, allowlist });
+  describe('with first batch', () => {
+    const batchNr = 1;
+
+    describe('without reports', () => {
+      it('does not throw', () => {
+        assert.doesNotThrow(() => {
+          validateInputs({
+            projectConfig,
+            batchConfig,
+            allowlist,
+            batchNr,
+          });
+        });
+      });
+    });
+  });
+
+  describe('with third batch', () => {
+    const batchNr = 3;
+
+    describe('without reports', () => {
+      it('does not throw', () => {
+        assert.throws(() => {
+          validateInputs({
+            projectConfig,
+            batchConfig,
+            allowlist,
+            reports,
+            batchNr,
+          });
+        });
       });
     });
   });

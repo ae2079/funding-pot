@@ -10,20 +10,19 @@ export const main = async (projectName, batchNr) => {
     `🚀 Starting batch execution for project ${projectName} with batch number ${batchNr}`
   );
 
-  // TODO: loads previous batch reports
-  // load configs
+  // load configs & reports
   console.info(`1️⃣ Loading configs...`);
-  const { projectConfig, batchConfig, allowlist } = loadInputs(
-    projectName,
-    batchNr
-  );
+  const { projectConfig, batchConfig, allowlist, reports } =
+    loadInputs(projectName, batchNr);
 
   // checks if all required inputs are set in configs
   console.info(`2️⃣ Validating inputs...`);
   validateInputs({
+    batchNr,
     projectConfig,
     batchConfig,
     allowlist,
+    reports,
   });
 
   // instantiate services
