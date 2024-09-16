@@ -3,11 +3,9 @@ import { CAP } from '../../config.js';
 
 export class Batch {
   data;
-  previousBatchReports;
 
   constructor() {
     this.data = {};
-    this.previousBatchReports = {};
   }
 
   // STATE-MODIFYING METHODS
