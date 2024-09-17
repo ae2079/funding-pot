@@ -7,5 +7,9 @@
     "START": 0,
     "CLIFF": 0,
     "END": 0
+  },
+  "CAPS": {
+    "TOTAL": "500000",
+    "INDIVIDUAL": "5000"
   }
 }

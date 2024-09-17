@@ -7,5 +7,9 @@
   "TIMEFRAME": {
     "FROM_TIMESTAMP": "1726516852",
     "TO_TIMESTAMP": "1726516986"
+  },
+  "CAPS": {
+    "TOTAL": "500000",
+    "INDIVIDUAL": "5000"
   }
 }
