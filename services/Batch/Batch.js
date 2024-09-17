@@ -159,6 +159,7 @@ export class Batch {
     const reportNumbers = Object.keys(reports);
     const exAnteContributions = {};
 
+    // get aggregate historic contributions from reports
     for (const reportNumber of reportNumbers) {
       const report = reports[reportNumber];
       const { participants } = report.batch;
@@ -174,8 +175,14 @@ export class Batch {
           participants[address].validContribution;
       }
     }
-
-    this.data.exAnteContributions = exAnteContributions;
+    console.log(this.data);
+    // iterate over participants of current batch and add their aggregate contribution (if they contributed before)
+    Object.keys(this.data.participants).forEach((address) => {
+      if (exAnteContributions[address]) {
+        this.data.participants[address].exAnteContribution =
+          exAnteContributions[address];
+      }
+    });
   }
 
   // GETTERS

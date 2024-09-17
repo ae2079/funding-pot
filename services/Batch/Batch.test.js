@@ -111,6 +111,7 @@ describe('Batch', () => {
     });
   });
 
+  // TODO
   describe('#calcValidContributions', () => {
     const exAnteSupply = 100_000_000_000_000_000_000n;
     const exAnteBalances = {
@@ -163,7 +164,7 @@ describe('Batch', () => {
       );
     });
 
-    it('adds fields `exAnteSupply`, `exAnteSpotPrice`, `CAP`', () => {
+    it('adds fields `totalContributionCap`, `individualContributionCap`', () => {
       const {
         exAnteSupply: receivedExAnteSupply,
         exAnteSpotPrice: receivedExAnteSpotPrice,
@@ -395,17 +396,33 @@ describe('Batch', () => {
     };
 
     const batchService = new Batch();
+    batchService.data = data;
 
     it('returns the aggregated historical contributions per address', () => {
       batchService.calcValidExAnteContributions(reports);
 
-      assert.deepStrictEqual(batchService.data.exAnteContributions, {
-        [addr1]: 2n,
-        [addr2]: 4n,
-        [addr3]: 6n,
-        [addr4]: 8n,
-        [addr6]: 6n,
-      });
+      console.log(batchService.data.participants);
+
+      assert.equal(
+        batchService.data.participants[addr1].exAnteContribution,
+        2n
+      );
+      assert.equal(
+        batchService.data.participants[addr2].exAnteContribution,
+        4n
+      );
+      assert.equal(
+        batchService.data.participants[addr3].exAnteContribution,
+        6n
+      );
+      assert.equal(
+        batchService.data.participants[addr4].exAnteContribution,
+        8n
+      );
+      assert.deepEqual(
+        batchService.data.participants[addr5].exAnteContribution,
+        undefined
+      );
     });
   });
 });
