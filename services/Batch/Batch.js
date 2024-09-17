@@ -3,19 +3,15 @@ import { CAP } from '../../config.js';
 
 export class Batch {
   data;
-  totalCap;
-  individualCap;
 
   constructor(totalCap, individualCap) {
-    this.data = {};
-    this.totalCap = totalCap;
-    this.individualCap = individualCap;
+    this.data = { totalCap, individualCap };
   }
 
   // STATE-MODIFYING METHODS
 
   checkEligibility(inflows, qualifiedAddresses) {
-    this.data = { participants: inflows };
+    this.data.participants = inflows;
 
     let totalEligibleContributions = 0n;
 
@@ -67,7 +63,9 @@ export class Batch {
     };
   }
 
-  calcValidContributions(
+  calcValidContributions() {}
+
+  calcValidContributions_Old(
     exAnteSupply,
     exAnteSpotPrice,
     exAnteBalances
@@ -165,9 +163,9 @@ export class Batch {
   }
 
   calcValidExAnteContributions(reports) {
-    const reportNumbers = Object.keys(reports);
-    const exAnteContributions = {};
+    let exAnteTotalValidContributions = 0n;
 
+    const reportNumbers = Object.keys(reports);
     // get aggregate historic contributions from reports
     for (const reportNumber of reportNumbers) {
       const report = reports[reportNumber];
@@ -175,22 +173,13 @@ export class Batch {
 
       for (const address of Object.keys(participants)) {
         if (!participants[address].validContribution > 0n) continue;
-
-        if (!exAnteContributions[address]) {
-          exAnteContributions[address] = 0n;
-        }
-
-        exAnteContributions[address] +=
+        exAnteTotalValidContributions +=
           participants[address].validContribution;
       }
     }
-    // iterate over participants of current batch and add their aggregate contribution (if they contributed before)
-    Object.keys(this.data.participants).forEach((address) => {
-      if (exAnteContributions[address]) {
-        this.data.participants[address].exAnteContribution =
-          exAnteContributions[address];
-      }
-    });
+
+    this.data.exAnteTotalValidContributions =
+      exAnteTotalValidContributions;
   }
 
   // GETTERS

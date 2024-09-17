@@ -84,9 +84,13 @@ describe('#instantiateServices', () => {
 
   it('instantiates the batch service', () => {
     assert.deepStrictEqual(Object.entries(batchService), [
-      ['data', {}],
-      ['totalCap', 500000000000000000000000n],
-      ['individualCap', 5000000000000000000000n],
+      [
+        'data',
+        {
+          totalCap: 500000000000000000000000n,
+          individualCap: 5000000000000000000000n,
+        },
+      ],
     ]);
   });
 });
