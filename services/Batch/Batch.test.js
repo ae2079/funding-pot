@@ -15,7 +15,7 @@ describe('Batch', () => {
   const contr4 = 6000000000000000000n;
   const contr5 = 7000000000000000000n;
 
-  describe('#calculateAggregateContribution', () => {
+  describe('#aggregateContributions', () => {
     const dataWithEligibility = {
       [addr1]: {
         validContribution: contr1,
@@ -35,9 +35,7 @@ describe('Batch', () => {
     batchService.data.participants = dataWithEligibility;
 
     it('adds aggregate contribution data', () => {
-      batchService.calculateAggregateContribution(
-        dataWithEligibility
-      );
+      batchService.aggregateContributions(dataWithEligibility);
 
       assert.deepStrictEqual(batchService.data, {
         totalValidContribution: contr1 + contr2 + contr3,
@@ -113,7 +111,7 @@ describe('Batch', () => {
     });
   });
 
-  describe('#calculateValidContributions', () => {
+  describe('#calcValidContributions', () => {
     const exAnteSupply = 100_000_000_000_000_000_000n;
     const exAnteBalances = {
       [addr1]: 1_000_000_000_000_000_000n, // can still buy one more token (= 1_000_000_000_000_000_000n)
@@ -158,7 +156,7 @@ describe('Batch', () => {
     batchService.data = data;
 
     beforeEach(() => {
-      batchService.calculateValidContributions(
+      batchService.calcValidContributions(
         exAnteSupply,
         exAnteSpotPrice,
         exAnteBalances
@@ -276,7 +274,7 @@ describe('Batch', () => {
     });
   });
 
-  describe('#calculateAllocations', () => {
+  describe('#calcAllocations', () => {
     const additionalIssuance = 100_000_000_000_000_000_000n;
     const totalValidContribution = contr1 + contr2 + contr3;
 
@@ -303,7 +301,7 @@ describe('Batch', () => {
     batchService.data = data;
 
     it('adds an `issuanceAllocation` field containing the allocation for each contributor', () => {
-      batchService.calculateAllocations(additionalIssuance);
+      batchService.calcAllocations(additionalIssuance);
 
       const { participants, totalValidContribution } =
         batchService.data;
@@ -355,7 +353,7 @@ describe('Batch', () => {
     });
   });
 
-  describe.only('#calculateExAnteContributions', () => {
+  describe('#calcValidExAnteContributions', () => {
     const data = {
       participants: {
         [addr1]: {
@@ -399,7 +397,7 @@ describe('Batch', () => {
     const batchService = new Batch();
 
     it('returns the aggregated historical contributions per address', () => {
-      batchService.calculateExAnteContributions(reports);
+      batchService.calcValidExAnteContributions(reports);
 
       assert.deepStrictEqual(batchService.data.exAnteContributions, {
         [addr1]: 2n,

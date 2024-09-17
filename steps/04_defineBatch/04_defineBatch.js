@@ -35,14 +35,14 @@ export const defineBatch = async ({
   );
   const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
   const exAnteSpotPrice = await queryService.getSpotPrice();
-  batchService.calculateValidContributions(
+  batchService.calcValidContributions(
     exAnteIssuanceSupply,
     exAnteSpotPrice,
     exAnteBalances
   );
 
   // calculate aggregate contribution data
-  batchService.calculateAggregateContribution();
+  batchService.aggregateContributions();
 
   if (batchService.data.totalValidContribution === 0n)
     throw new Error('No valid contributions found');
@@ -53,5 +53,5 @@ export const defineBatch = async ({
   );
 
   // calculate allocations
-  batchService.calculateAllocations(additionalIssuance);
+  batchService.calcAllocations(additionalIssuance);
 };

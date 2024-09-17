@@ -33,7 +33,7 @@ export class Batch {
     }
   }
 
-  calculateAggregateContribution() {
+  aggregateContributions() {
     const { participants } = this.data;
 
     const totalValidContribution = Object.entries(
@@ -58,7 +58,7 @@ export class Batch {
   }
 
   // TODO: CHANGE CAP LOGIC
-  calculateValidContributions(
+  calcValidContributions(
     exAnteSupply,
     exAnteSpotPrice,
     exAnteBalances
@@ -121,7 +121,7 @@ export class Batch {
     }
   }
 
-  calculateAllocations(amountOut) {
+  calcAllocations(amountOut) {
     this.data.additionalIssuance = amountOut;
 
     const {
@@ -155,7 +155,7 @@ export class Batch {
     }
   }
 
-  calculateExAnteContributions(reports) {
+  calcValidExAnteContributions(reports) {
     const reportNumbers = Object.keys(reports);
     const exAnteContributions = {};
 
