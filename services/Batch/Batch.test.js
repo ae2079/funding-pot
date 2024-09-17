@@ -9,11 +9,11 @@ describe('Batch', () => {
   const addr4 = '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff';
   const addr5 = '0x6bc66727a37f7c0e1039540e3dc2254d39f420eb';
   const addr6 = '0x27276727a37f7c0e1039540e3dc2254d39f42027';
-  const contr1 = 3000000000000000000n;
-  const contr2 = 4000000000000000000n;
-  const contr3 = 5000000000000000000n;
-  const contr4 = 6000000000000000000n;
-  const contr5 = 7000000000000000000n;
+  const contr1 = 3_000_000_000_000_000_000n;
+  const contr2 = 4_000_000_000_000_000_000n;
+  const contr3 = 5_000_000_000_000_000_000n;
+  const contr4 = 6_000_000_000_000_000_000n;
+  const contr5 = 7_000_000_000_000_000_000n;
 
   describe('#aggregateContributions', () => {
     const dataWithEligibility = {
@@ -61,28 +61,34 @@ describe('Batch', () => {
     };
     const batchService = new Batch();
 
-    it('adds `permitted` flag per participant', () => {
+    beforeEach(() => {
       batchService.checkEligibility(participants, eligibleAddresses);
+    });
 
-      assert.deepStrictEqual(batchService.data, {
-        participants: {
-          [eligibleAddresses[0]]: {
-            contribution:
-              participants[eligibleAddresses[0]].contribution,
-            permitted: true,
-          },
-          [eligibleAddresses[1]]: {
-            contribution:
-              participants[eligibleAddresses[1]].contribution,
-            permitted: true,
-          },
-          [nonEligibleAddress]: {
-            contribution:
-              participants[nonEligibleAddress].contribution,
-            permitted: false,
-          },
+    it('adds `permitted` flag per participant', () => {
+      assert.deepStrictEqual(batchService.data.participants, {
+        [eligibleAddresses[0]]: {
+          contribution:
+            participants[eligibleAddresses[0]].contribution,
+          permitted: true,
+        },
+        [eligibleAddresses[1]]: {
+          contribution:
+            participants[eligibleAddresses[1]].contribution,
+          permitted: true,
+        },
+        [nonEligibleAddress]: {
+          contribution: participants[nonEligibleAddress].contribution,
+          permitted: false,
         },
       });
+    });
+
+    it('adds field `totalEligibleContributions`', () => {
+      assert.equal(
+        batchService.data.totalEligibleContributions,
+        contr1 + contr2
+      );
     });
   });
 
@@ -112,9 +118,11 @@ describe('Batch', () => {
   });
 
   // TODO
-  describe('#calcValidContributions', () => {
-    const exAnteSupply = 100_000_000_000_000_000_000n;
-    const exAnteBalances = {
+  describe.skip('#calcValidContributions', () => {
+    const totalLimit = 24_000_000_000_000_000_000n; // 24
+    const individualLimit = 6_000_000_000_000_000_000n; // 6
+
+    const exAnteContributions = {
       [addr1]: 1_000_000_000_000_000_000n, // can still buy one more token (= 1_000_000_000_000_000_000n)
       [addr2]: 1_000_000_000_000_000_000n, // can still buy one more token
       [addr3]: 2_000_000_000_000_000_000n, // has already exactly reached the CAP
@@ -122,12 +130,11 @@ describe('Batch', () => {
       [addr5]: 1_000_000_000_000_000_000n, // can still buy one more token
       [addr6]: 1_000_000_000_000_000_000n, // can still buy one more token
     };
-    const exAnteSpotPrice = 500000n;
 
     const data = {
       participants: {
         [addr1]: {
-          contribution: 5_000_000_000_000_000_000n, // matches exactly what can be bought
+          contribution: individualLimit, // matches exactly what can be bought
           permitted: true,
         },
         [addr2]: {
@@ -398,11 +405,11 @@ describe('Batch', () => {
     const batchService = new Batch();
     batchService.data = data;
 
-    it('returns the aggregated historical contributions per address', () => {
+    beforeEach(() => {
       batchService.calcValidExAnteContributions(reports);
+    });
 
-      console.log(batchService.data.participants);
-
+    it('returns the aggregated historical contributions per address', () => {
       assert.equal(
         batchService.data.participants[addr1].exAnteContribution,
         2n

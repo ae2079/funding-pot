@@ -88,7 +88,7 @@ describe('#validateInputs', () => {
       });
     });
 
-    describe.only('with reports', () => {
+    describe('with reports', () => {
       it('does not throw', () => {
         assert.doesNotThrow(() => {
           validateInputs({

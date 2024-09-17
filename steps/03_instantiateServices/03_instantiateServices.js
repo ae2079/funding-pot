@@ -13,6 +13,7 @@ export const instantiateServices = async (
   const { SAFE, ORCHESTRATOR } = projectConfig;
   const {
     VESTING_DETAILS: { START, CLIFF, END },
+    LIMITS: { TOTAL, INDIVIDUAL },
   } = batchConfig;
 
   // instantiate services
@@ -41,7 +42,10 @@ export const instantiateServices = async (
     `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`
   );
 
-  const batchService = new Batch();
+  const batchService = new Batch(
+    parseUnits(TOTAL, 18),
+    parseUnits(INDIVIDUAL, 18)
+  );
 
   return {
     safeService,

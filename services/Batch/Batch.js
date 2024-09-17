@@ -3,15 +3,21 @@ import { CAP } from '../../config.js';
 
 export class Batch {
   data;
+  totalCap;
+  individualCap;
 
-  constructor() {
+  constructor(totalCap, individualCap) {
     this.data = {};
+    this.totalCap = totalCap;
+    this.individualCap = individualCap;
   }
 
   // STATE-MODIFYING METHODS
 
   checkEligibility(inflows, qualifiedAddresses) {
     this.data = { participants: inflows };
+
+    let totalEligibleContributions = 0n;
 
     const { participants } = this.data;
     for (const address of Object.keys(participants)) {
@@ -29,8 +35,12 @@ export class Batch {
           ...participants[address],
           permitted: true,
         };
+        totalEligibleContributions +=
+          participants[address].contribution;
       }
     }
+
+    this.data.totalEligibleContributions = totalEligibleContributions;
   }
 
   aggregateContributions() {
@@ -57,7 +67,6 @@ export class Batch {
     };
   }
 
-  // TODO: CHANGE CAP LOGIC
   calcValidContributions(
     exAnteSupply,
     exAnteSpotPrice,
@@ -175,7 +184,6 @@ export class Batch {
           participants[address].validContribution;
       }
     }
-    console.log(this.data);
     // iterate over participants of current batch and add their aggregate contribution (if they contributed before)
     Object.keys(this.data.participants).forEach((address) => {
       if (exAnteContributions[address]) {

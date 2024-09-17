@@ -15,6 +15,10 @@ describe('#instantiateServices', () => {
       CLIFF: 2,
       END: 10,
     },
+    LIMITS: {
+      TOTAL: '500000',
+      INDIVIDUAL: '5000',
+    },
   };
 
   let queryService,
@@ -81,6 +85,8 @@ describe('#instantiateServices', () => {
   it('instantiates the batch service', () => {
     assert.deepStrictEqual(Object.entries(batchService), [
       ['data', {}],
+      ['totalCap', 500000000000000000000000n],
+      ['individualCap', 5000000000000000000000n],
     ]);
   });
 });
