@@ -33,17 +33,17 @@ export class Batch {
     }
   }
 
-  calculateAggregateContributions() {
+  calculateAggregateContribution() {
     const { participants } = this.data;
 
-    const totalValidContributions = Object.entries(
+    const totalValidContribution = Object.entries(
       participants
     ).reduce((acc, [, data]) => {
       return data.validContribution
         ? acc + data.validContribution
         : acc;
     }, 0n);
-    const totalExcessContributions = Object.entries(
+    const totalExcessContribution = Object.entries(
       participants
     ).reduce((acc, [, data]) => {
       return data.excessContribution
@@ -51,8 +51,8 @@ export class Batch {
         : acc;
     }, 0n);
     this.data = {
-      totalValidContributions,
-      totalExcessContributions,
+      totalValidContribution,
+      totalExcessContribution,
       ...this.data,
     };
   }
@@ -125,13 +125,13 @@ export class Batch {
     this.data.additionalIssuance = amountOut;
 
     const {
-      totalValidContributions,
+      totalValidContribution,
       additionalIssuance,
       participants,
     } = this.data;
 
     const totalValidContributionFloat = this.bigIntToFloat(
-      totalValidContributions
+      totalValidContribution
     );
     const additionalIssuanceFloat = this.bigIntToFloat(
       additionalIssuance
@@ -155,8 +155,27 @@ export class Batch {
     }
   }
 
-  addVestingDetails({ start, cliff, end }) {
-    this.data.vestingDetails = { start, cliff, end };
+  calculateExAnteContributions(reports) {
+    const reportNumbers = Object.keys(reports);
+    const exAnteContributions = {};
+
+    for (const reportNumber of reportNumbers) {
+      const report = reports[reportNumber];
+      const { participants } = report.batch;
+
+      for (const address of Object.keys(participants)) {
+        if (!participants[address].validContribution > 0n) continue;
+
+        if (!exAnteContributions[address]) {
+          exAnteContributions[address] = 0n;
+        }
+
+        exAnteContributions[address] +=
+          participants[address].validContribution;
+      }
+    }
+
+    this.data.exAnteContributions = exAnteContributions;
   }
 
   // GETTERS
@@ -179,7 +198,7 @@ export class Batch {
       });
   }
 
-  // UTILS
+  // STATIC
 
   bigIntToFloat(bigInt) {
     return parseFloat(formatUnits(bigInt, 18));

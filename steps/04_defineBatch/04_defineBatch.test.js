@@ -54,8 +54,8 @@ describe('#defineBatch', () => {
     });
 
     assert.deepStrictEqual(batchService.data, {
-      totalValidContributions: 13185855190790067000000n,
-      totalExcessContributions: 999940149144809209933000000n,
+      totalValidContribution: 13185855190790067000000n,
+      totalExcessContribution: 999940149144809209933000000n,
       participants: {
         '0x6747772f37a4f7cfdea180d38e8ad372516c9548': {
           contribution: 999951190000000000000000000n,

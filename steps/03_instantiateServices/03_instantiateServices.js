@@ -41,7 +41,6 @@ export const instantiateServices = async (
     `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`
   );
 
-  // TODO: pass previous batch reports
   const batchService = new Batch();
 
   return {

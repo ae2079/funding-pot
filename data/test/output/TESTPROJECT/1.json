@@ -2,8 +2,8 @@
   "projectName": "EXAMPLEPROJECT_2",
   "batchNr": "1",
   "batch": {
-    "totalValidContributions": "14741262490730560512",
-    "totalExcessContributions": "0",
+    "totalValidContribution": "14741262490730560512",
+    "totalExcessContribution": "0",
     "participants": {
       "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
         "contribution": "5593079733874059264",

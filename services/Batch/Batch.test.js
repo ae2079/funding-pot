@@ -15,7 +15,7 @@ describe('Batch', () => {
   const contr4 = 6000000000000000000n;
   const contr5 = 7000000000000000000n;
 
-  describe('#calculateAggregateContributions', () => {
+  describe('#calculateAggregateContribution', () => {
     const dataWithEligibility = {
       [addr1]: {
         validContribution: contr1,
@@ -35,13 +35,13 @@ describe('Batch', () => {
     batchService.data.participants = dataWithEligibility;
 
     it('adds aggregate contribution data', () => {
-      batchService.calculateAggregateContributions(
+      batchService.calculateAggregateContribution(
         dataWithEligibility
       );
 
       assert.deepStrictEqual(batchService.data, {
-        totalValidContributions: contr1 + contr2 + contr3,
-        totalExcessContributions: contr4 + contr5,
+        totalValidContribution: contr1 + contr2 + contr3,
+        totalExcessContribution: contr4 + contr5,
         participants: dataWithEligibility,
       });
     });
@@ -278,10 +278,10 @@ describe('Batch', () => {
 
   describe('#calculateAllocations', () => {
     const additionalIssuance = 100_000_000_000_000_000_000n;
-    const totalValidContributions = contr1 + contr2 + contr3;
+    const totalValidContribution = contr1 + contr2 + contr3;
 
     const data = {
-      totalValidContributions,
+      totalValidContribution,
       additionalIssuance,
       participants: {
         [addr1]: {
@@ -305,7 +305,7 @@ describe('Batch', () => {
     it('adds an `issuanceAllocation` field containing the allocation for each contributor', () => {
       batchService.calculateAllocations(additionalIssuance);
 
-      const { participants, totalValidContributions } =
+      const { participants, totalValidContribution } =
         batchService.data;
 
       assert.equal(
@@ -322,8 +322,6 @@ describe('Batch', () => {
       );
     });
   });
-
-  describe('#addVestingSpecs', () => {});
 
   describe('#getAllocations', () => {
     const data = {
@@ -354,6 +352,62 @@ describe('Batch', () => {
           amount: contr2,
         },
       ]);
+    });
+  });
+
+  describe.only('#calculateExAnteContributions', () => {
+    const data = {
+      participants: {
+        [addr1]: {
+          validContribution: 1n,
+          permitted: true,
+        },
+        [addr2]: {
+          validContribution: 2n,
+          permitted: true,
+        },
+        [addr3]: {
+          validContribution: 3n,
+          permitted: true,
+        },
+        [addr4]: {
+          validContribution: 4n,
+          permitted: true,
+        },
+        [addr5]: {
+          contribution: 5n,
+          permitted: false,
+        },
+      },
+    };
+
+    const reports = {
+      1: { batch: data },
+      2: {
+        batch: {
+          participants: {
+            ...data.participants,
+            [addr6]: {
+              validContribution: 6n,
+              permitted: true,
+            },
+          },
+        },
+      },
+    };
+
+    const batchService = new Batch();
+
+    it('returns the aggregated historical contributions per address', () => {
+      batchService.calculateExAnteContributions(reports);
+
+      assert.deepStrictEqual(batchService.data.exAnteContributions, {
+        [addr1]: 2n,
+        [addr2]: 4n,
+        [addr3]: 6n,
+        [addr4]: 8n,
+        [addr6]: 6n,
+      });
     });
   });
 });

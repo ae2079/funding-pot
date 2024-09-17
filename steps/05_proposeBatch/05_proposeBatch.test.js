@@ -44,7 +44,7 @@ describe('#proposeBatch', () => {
     const issuance1 = 6_000_000_000_000_000n;
     const issuance2 = 4_000_000_000_000_000n;
     const additionalIssuance = issuance1 + issuance2;
-    const totalValidContributions = 10_000_000_000_000_000n;
+    const totalValidContribution = 10_000_000_000_000_000n;
 
     beforeEach(async () => {
       // instantiate services
@@ -56,8 +56,8 @@ describe('#proposeBatch', () => {
       } = await instantiateServices(projectConfig, batchConfig));
 
       // set numbers
-      batchService.data.totalValidContributions =
-        totalValidContributions;
+      batchService.data.totalValidContribution =
+        totalValidContribution;
       batchService.data.additionalIssuance = additionalIssuance;
       batchService.data.participants = keysToLowerCase({
         [addr1]: {
@@ -79,7 +79,7 @@ describe('#proposeBatch', () => {
 
       await mintMockTokens(
         getAddress(queryService.queries.addresses.collateralToken),
-        totalValidContributions,
+        totalValidContribution,
         getAddress(projectConfig.SAFE)
       );
 
@@ -90,7 +90,7 @@ describe('#proposeBatch', () => {
   });
 
   describe('with big batch (60 vestings)', () => {
-    const totalValidContributions = 1_800_000n;
+    const totalValidContribution = 1_800_000n;
     const recipients = 50;
 
     let participants, additionalIssuance;
@@ -103,7 +103,7 @@ describe('#proposeBatch', () => {
         batchService,
       } = await instantiateServices(projectConfig, batchConfig));
       additionalIssuance = await queryService.getAmountOut(
-        totalValidContributions
+        totalValidContribution
       );
       participants = Object.fromEntries(
         Array(recipients)
@@ -118,13 +118,13 @@ describe('#proposeBatch', () => {
             },
           ])
       );
-      batchService.data.totalValidContributions =
-        totalValidContributions;
+      batchService.data.totalValidContribution =
+        totalValidContribution;
       batchService.data.additionalIssuance = additionalIssuance;
       batchService.data.participants = participants;
       await mintMockTokens(
         getAddress(queryService.queries.addresses.collateralToken),
-        totalValidContributions,
+        totalValidContribution,
         getAddress(projectConfig.SAFE)
       );
     });
