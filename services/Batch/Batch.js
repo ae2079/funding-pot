@@ -73,18 +73,8 @@ export class Batch {
     for (const inflow of inflows) {
       const { participant, contribution } = inflow;
 
-      // add contribution to total contribution (regardless whether valid or not)
-      this.data.totalContribution += contribution;
-
-      // if participant doesn't exist yet add to participants
-      if (!this.data.participants[participant]) {
-        this.data.participants[participant] = {
-          contribution,
-        };
-      } else {
-        this.data.participants[participant].contribution +=
-          contribution;
-      }
+      // adds contribution to participants
+      this.createOrAddContribution(participant, contribution);
 
       // if the inflow is not on the allowlis, everything is excess contribution
       if (!allowlist.includes(participant)) {
@@ -97,63 +87,50 @@ export class Batch {
       const p = this.data.participants[participant];
       const prevValid = p ? p.validContribution || 0n : 0n;
 
-      const isBelowIndividualCap =
-        prevValid + contribution <= this.data.individualCap;
-      const isBelowTotalCap =
-        prevValid + contribution <= this.data.totalCap;
+      // optimistic assumption to be challenged in the next steps
+      let validContribution = contribution,
+        excessContribution = 0n;
 
-      // if contribution is below any cap everything is valid
-      if (isBelowIndividualCap && isBelowTotalCap) {
-        this.manageContribution(participant, {
-          validContribution: contribution,
-          contribution,
-        });
-        continue;
+      // difference between individual cap and own contribution
+      // if negative, means that the individual cap has been exceeded
+      const individualDiff =
+        this.data.individualCap - (prevValid + contribution);
+
+      // means that the individual cap has been exceeded
+      if (individualDiff < 0n) {
+        // set valid contribution to difference between individual cap and own contributions
+        validContribution = validContribution + individualDiff;
+        // set excess contribution to the difference between the individual cap and own contribution
+        excessContribution = individualDiff * -1n; //
       }
 
-      // now we check for caps
-      // first check what would be the valid contribution honoring just the individual cap
-      // then check what would be the valid contribution honoring just the total cap
-      // then choose the one that is smaller
-      let v1, e1, v2, e2;
-      // case 1: contributor exceeds individual cap
-      if (!isBelowIndividualCap) {
-        // max possible contribution is difference between cap and previous contribution
-        v1 = this.data.individualCap - prevValid;
-        // excess is the diff between what would have been valit contribution without any cap and the cap
-        e1 = prevValid + contribution - this.data.individualCap;
+      // difference between total cap and own contribution
+      // if negative, means that the total cap has been exceeded
+      const totalDiff =
+        this.data.totalCap -
+        this.data.totalValidContribution -
+        (prevValid + contribution);
+
+      // means that the total cap has been exceeded
+      if (totalDiff < 0n) {
+        // what is the excess amount with respect to the total cap
+        const e = totalDiff * -1n;
+        // what is the valid amount with respect to the total cap
+        const v = prevValid + contribution - e;
+        // check which is more restrictive: the individual cap or the total cap
+        const isMoreRestrictive = v < validContribution;
+        // if total cap is more restrictive, overwrite valid contribution according to the total cap limit
+        validContribution = isMoreRestrictive ? v : validContribution;
+        // if total cap is more restrictive, overwrite excess contribution according to the total cap limit
+        excessContribution = isMoreRestrictive
+          ? e
+          : excessContribution;
       }
 
-      // case 2: contributor exceeds total cap
-      if (!isBelowTotalCap) {
-        // max possible contribution is difference between total cap and previous contribution
-        v2 = this.data.totalCap - prevValid;
-        // excess is the diff between what would have been valid contribution without any cap and the cap
-        e2 = prevValid + contribution - this.data.totalCap;
-      }
-
-      // case1 and case2 are not mutually exclusive
-      // if only one applies choose that case
-      // if both apply choose the one that leads to the smaller contribution
-      let validContribution, excessContribution;
-      if (v1 !== undefined && v2 === undefined) {
-        validContribution = v1;
-        excessContribution = e1;
-      } else if (v1 === undefined && v2 !== undefined) {
-        validContribution = v2;
-        excessContribution = e2;
-      } else if (v1 < v2) {
-        validContribution = v1;
-        excessContribution = e1;
-      } else {
-        validContribution = v2;
-        excessContribution = e2;
-      }
-
+      // add valid and excess contribution to participant
       this.manageContribution(participant, {
         validContribution,
         excessContribution,
-        contribution,
       });
     }
   }
@@ -255,6 +232,15 @@ export class Batch {
 
     this.data.totalExcessContribution += excessContribution || 0n;
     this.data.totalValidContribution += validContribution || 0n;
+  }
+
+  createOrAddContribution(addr, contribution) {
+    if (!this.data.participants[addr]) {
+      this.data.participants[addr] = { contribution };
+    } else {
+      this.data.participants[addr].contribution += contribution;
+    }
+    this.data.totalContribution += contribution;
   }
 
   // STATIC

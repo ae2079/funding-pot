@@ -138,7 +138,8 @@ describe('Batch', () => {
   describe('#assessInflows', () => {
     const totalCap = 24_000_000_000_000_000_000n; // 24
     const individualCap = 6_000_000_000_000_000_000n; // 6
-    const allowlist = [addr1, addr2, addr4];
+    const allowlist = [addr1, addr2, addr4, addr5, addr6];
+
     const inflows = [
       {
         participant: addr1,
@@ -162,17 +163,22 @@ describe('Batch', () => {
       },
       {
         participant: addr4,
-        contribution: totalCap, // contribution exceeds round limit
+        contribution: totalCap, // exceeds both individual and total cap (individual cap is more restrictive here)
         timestamp: 1725654795,
       },
       {
         participant: addr5,
-        contribution: 1n, // would be ok, but total cap is already reached
+        contribution: contr2, // valid contribution
         timestamp: 1725654796,
       },
       {
         participant: addr3, // still not on allowlist
         contribution: 1n,
+        timestamp: 1725654797,
+      },
+      {
+        participant: addr6,
+        contribution: contr5, // exceeds both individual and total cap (total cap is more restrictive here)
         timestamp: 1725654797,
       },
     ];
@@ -187,15 +193,37 @@ describe('Batch', () => {
       batchService.assessInflows(inflows, allowlist);
     });
 
-    it.skip('adds fields `totalContribution`', () => {
-      const {
-        exAnteSupply: receivedExAnteSupply,
-        exAnteSpotPrice: receivedExAnteSpotPrice,
-        issuanceTokenCap,
-      } = batchService.data;
-      assert.equal(receivedExAnteSupply, exAnteSupply);
-      assert.equal(receivedExAnteSpotPrice, exAnteSpotPrice);
-      assert.equal(issuanceTokenCap, 2_000_000_000_000_000_000n); // equals 2 tokens
+    it('adds fields `totalContribution`, `totalValidContribution`, `totalExcessContribution` and `participants`', () => {
+      assert.deepStrictEqual(Object.keys(batchService.data), [
+        'totalCap',
+        'individualCap',
+        'totalContribution',
+        'totalValidContribution',
+        'totalExcessContribution',
+        'participants',
+      ]);
+    });
+
+    it('calculates the correct `totalValidContribution`', () => {
+      assert.equal(
+        batchService.data.totalValidContribution,
+        totalCap
+      );
+    });
+
+    it('calculates the correct `totalContribution`', () => {
+      assert.equal(
+        batchService.data.totalContribution,
+        inflows.reduce((acc, curr) => acc + curr.contribution, 0n)
+      );
+    });
+
+    it('calculates the correct `excessContribution`', () => {
+      assert.equal(
+        batchService.data.totalExcessContribution,
+        inflows.reduce((acc, curr) => acc + curr.contribution, 0n) -
+          totalCap
+      );
     });
 
     describe('with two contributions (addr1)', () => {
@@ -259,10 +287,10 @@ describe('Batch', () => {
       });
     });
 
-    describe('when contributor contributes beyond total cap', () => {
-      const contributor = addr4;
+    describe('without any applicable restrictions (addr5)', () => {
+      const contributor = addr5;
 
-      it("only considers the contribution that doesn't exceed the total cap as valid", () => {
+      it('counts the contribution as valid', () => {
         const { participants } = batchService.data;
         const {
           contribution,
@@ -270,26 +298,45 @@ describe('Batch', () => {
           validContribution,
         } = participants[contributor];
 
-        assert.equal(contribution, totalCap);
-        assert.equal(excessContribution, totalCap - individualCap);
-        assert.equal(validContribution, individualCap);
+        assert.equal(contribution, contr2);
+        assert.equal(excessContribution, 0n);
+        assert.equal(validContribution, contr2);
       });
     });
 
-    describe('when batch mint total cap is already reached and someone contributes (addr5)', () => {
-      const contributor = addr5;
+    describe('when contribution exceeds both individual and total cap', () => {
+      describe('where the total cap is more restrictive (addr6)', () => {
+        const contributor = addr6;
 
-      it('counts the contribution as excess', () => {
-        const { participants } = batchService.data;
-        const {
-          contribution,
-          excessContribution,
-          validContribution,
-        } = participants[contributor];
+        it('counts the contribution as valid', () => {
+          const { participants } = batchService.data;
+          const {
+            contribution,
+            excessContribution,
+            validContribution,
+          } = participants[contributor];
 
-        assert.equal(contribution, 1n);
-        assert.equal(excessContribution, 1n);
-        assert.equal(validContribution, 0n);
+          assert.equal(contribution, 7000000000000000000n);
+          assert.equal(excessContribution, 5000000000000000000n);
+          assert.equal(validContribution, 2000000000000000000n);
+        });
+      });
+
+      describe('where the individual cap is more restrictive (addr4)', () => {
+        const contributor = addr4;
+
+        it("only considers the contribution that doesn't exceed the total cap as valid", () => {
+          const { participants } = batchService.data;
+          const {
+            contribution,
+            excessContribution,
+            validContribution,
+          } = participants[contributor];
+
+          assert.equal(contribution, totalCap);
+          assert.equal(excessContribution, totalCap - individualCap);
+          assert.equal(validContribution, individualCap);
+        });
       });
     });
   });
