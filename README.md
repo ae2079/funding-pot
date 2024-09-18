@@ -104,7 +104,7 @@ In summary this project does three things:
   2. per contributor, check how many reward tokens the contributor already has (locked in vestings) **before the new batch**
   3. calculate difference between the token cap and the amount of reward tokens the contributor already has
   4. multiply the difference by the current spot price to get the amount of collateral tokens that the contributor can contribute
-  5. excess contributions are not used for buying reward tokens from the curve but retained by the safe
+  5. invalid contributions are not used for buying reward tokens from the curve but retained by the safe
 - example:
   - during last batch Alice contributed some amount
   - now the current total supply is 100, of which Alice owns 1 token (=1%)

@@ -44,7 +44,7 @@ export class Batch {
   assessInflows(inflows, allowlist) {
     this.data.totalContribution = 0n;
     this.data.totalValidContribution = 0n;
-    this.data.totalExcessContribution = 0n;
+    this.data.totalInvalidContribution = 0n;
     this.data.participants = {};
 
     // iterate over the inflows
@@ -54,10 +54,10 @@ export class Batch {
       // adds contribution to participants
       this.createOrAddContribution(participant, contribution);
 
-      // if the inflow is not on the allowlis, everything is excess contribution
+      // if the inflow is not on the allowlis, everything is invalid contribution
       if (!allowlist.includes(participant)) {
         this.manageContribution(participant, {
-          excessContribution: contribution,
+          invalidContribution: contribution,
         });
         continue;
       }
@@ -67,7 +67,7 @@ export class Batch {
 
       // optimistic assumption to be challenged in the next steps
       let validContribution = contribution,
-        excessContribution = 0n;
+        invalidContribution = 0n;
 
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
@@ -78,8 +78,8 @@ export class Batch {
       if (individualDiff < 0n) {
         // set valid contribution to difference between individual cap and own contributions
         validContribution = validContribution + individualDiff;
-        // set excess contribution to the difference between the individual cap and own contribution
-        excessContribution = individualDiff * -1n; //
+        // set invalid contribution to the difference between the individual cap and own contribution
+        invalidContribution = individualDiff * -1n; //
       }
 
       // difference between total cap and own contribution
@@ -91,7 +91,7 @@ export class Batch {
 
       // means that the total cap has been exceeded
       if (totalDiff < 0n) {
-        // what is the excess amount with respect to the total cap
+        // what is the invalid amount with respect to the total cap
         const e = totalDiff * -1n;
         // what is the valid amount with respect to the total cap
         const v = prevValid + contribution - e;
@@ -99,16 +99,16 @@ export class Batch {
         const isMoreRestrictive = v < validContribution;
         // if total cap is more restrictive, overwrite valid contribution according to the total cap limit
         validContribution = isMoreRestrictive ? v : validContribution;
-        // if total cap is more restrictive, overwrite excess contribution according to the total cap limit
-        excessContribution = isMoreRestrictive
+        // if total cap is more restrictive, overwrite invalid contribution according to the total cap limit
+        invalidContribution = isMoreRestrictive
           ? e
-          : excessContribution;
+          : invalidContribution;
       }
 
-      // add valid and excess contribution to participant
+      // add valid and invalid contribution to participant
       this.manageContribution(participant, {
         validContribution,
-        excessContribution,
+        invalidContribution,
       });
     }
   }
@@ -170,14 +170,15 @@ export class Batch {
   // INTERNAL HELPER FUNCTIONS
 
   manageContribution(addr, contributionObj) {
-    const { excessContribution, validContribution } = contributionObj;
+    const { invalidContribution, validContribution } =
+      contributionObj;
 
-    if (!this.data.participants[addr].excessContribution) {
-      this.data.participants[addr].excessContribution =
-        excessContribution || 0n;
+    if (!this.data.participants[addr].invalidContribution) {
+      this.data.participants[addr].invalidContribution =
+        invalidContribution || 0n;
     } else {
-      this.data.participants[addr].excessContribution +=
-        excessContribution;
+      this.data.participants[addr].invalidContribution +=
+        invalidContribution;
     }
 
     if (!this.data.participants[addr].validContribution) {
@@ -187,7 +188,7 @@ export class Batch {
       this.data.participants[addr].validContribution +=
         validContribution;
     }
-    this.data.totalExcessContribution += excessContribution || 0n;
+    this.data.totalInvalidContribution += invalidContribution || 0n;
     this.data.totalValidContribution += validContribution || 0n;
   }
 

@@ -126,13 +126,13 @@ describe('Batch', () => {
       batchService.assessInflows(inflows, allowlist);
     });
 
-    it('adds fields `totalContribution`, `totalValidContribution`, `totalExcessContribution` and `participants`', () => {
+    it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
       assert.deepStrictEqual(Object.keys(batchService.data), [
         'totalCap',
         'individualCap',
         'totalContribution',
         'totalValidContribution',
-        'totalExcessContribution',
+        'totalInvalidContribution',
         'participants',
       ]);
     });
@@ -151,9 +151,9 @@ describe('Batch', () => {
       );
     });
 
-    it('calculates the correct `excessContribution`', () => {
+    it('calculates the correct `invalidContribution`', () => {
       assert.equal(
-        batchService.data.totalExcessContribution,
+        batchService.data.totalInvalidContribution,
         inflows.reduce((acc, curr) => acc + curr.contribution, 0n) -
           totalCap
       );
@@ -163,11 +163,11 @@ describe('Batch', () => {
       const contributor = addr1;
 
       describe('when when the second contribution exceeds the individual cap', () => {
-        it('splits between `validContribution` and `excessContribution`', () => {
+        it('splits between `validContribution` and `invalidContribution`', () => {
           const { participants } = batchService.data;
           const {
             contribution,
-            excessContribution,
+            invalidContribution,
             validContribution,
           } = participants[contributor];
 
@@ -175,7 +175,7 @@ describe('Batch', () => {
             contribution,
             inflows[0].contribution + inflows[2].contribution
           );
-          assert.equal(excessContribution, inflows[2].contribution);
+          assert.equal(invalidContribution, inflows[2].contribution);
           assert.equal(validContribution, inflows[0].contribution);
         });
       });
@@ -185,17 +185,17 @@ describe('Batch', () => {
       const contributor = addr2;
 
       describe('when contributor contributes above individual limit', () => {
-        it('splits between `validContribution` and `excessContribution`', () => {
+        it('splits between `validContribution` and `invalidContribution`', () => {
           const { participants } = batchService.data;
           const {
             contribution,
-            excessContribution,
+            invalidContribution,
             validContribution,
           } = participants[contributor];
 
           assert.equal(contribution, inflows[1].contribution);
           assert.equal(
-            excessContribution,
+            invalidContribution,
             inflows[1].contribution - individualCap
           );
           assert.equal(validContribution, individualCap);
@@ -206,16 +206,16 @@ describe('Batch', () => {
     describe('without being on the allowlist (addr3)', () => {
       const contributor = addr3;
 
-      it('considers all contributions as `excessContribution`', () => {
+      it('considers all contributions as `invalidContribution`', () => {
         const { participants } = batchService.data;
         const {
           contribution,
-          excessContribution,
+          invalidContribution,
           validContribution,
         } = participants[contributor];
 
         assert.equal(contribution, 100000000000000000n);
-        assert.equal(excessContribution, 100000000000000000n);
+        assert.equal(invalidContribution, 100000000000000000n);
         assert.equal(validContribution, 0n);
       });
     });
@@ -227,12 +227,12 @@ describe('Batch', () => {
         const { participants } = batchService.data;
         const {
           contribution,
-          excessContribution,
+          invalidContribution,
           validContribution,
         } = participants[contributor];
 
         assert.equal(contribution, 1700000000000000000n);
-        assert.equal(excessContribution, 0n);
+        assert.equal(invalidContribution, 0n);
         assert.equal(validContribution, 1700000000000000000n);
       });
     });
@@ -245,12 +245,12 @@ describe('Batch', () => {
           const { participants } = batchService.data;
           const {
             contribution,
-            excessContribution,
+            invalidContribution,
             validContribution,
           } = participants[contributor];
 
           assert.equal(contribution, 3000000000000000000n);
-          assert.equal(excessContribution, 1700000000000000000n);
+          assert.equal(invalidContribution, 1700000000000000000n);
           assert.equal(validContribution, 1300000000000000000n);
         });
       });
@@ -262,12 +262,12 @@ describe('Batch', () => {
           const { participants } = batchService.data;
           const {
             contribution,
-            excessContribution,
+            invalidContribution,
             validContribution,
           } = participants[contributor];
 
           assert.equal(contribution, totalCap);
-          assert.equal(excessContribution, totalCap - individualCap);
+          assert.equal(invalidContribution, totalCap - individualCap);
           assert.equal(validContribution, individualCap);
         });
       });
@@ -292,7 +292,7 @@ describe('Batch', () => {
           validContribution: contr3,
         },
         [addr4]: {
-          excessContribution: contr4,
+          invalidContribution: contr4,
         },
       },
     };
@@ -331,7 +331,7 @@ describe('Batch', () => {
           issuanceAllocation: contr2,
         },
         [addr3]: {
-          excessContribution: contr3,
+          invalidContribution: contr3,
         },
       },
     };

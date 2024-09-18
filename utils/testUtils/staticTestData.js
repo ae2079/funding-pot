@@ -90,43 +90,43 @@ export const inflows = [
 
 export const batchData = {
   totalValidContribution: 9000000000000000000n,
-  totalExcessContribution: 9000000000000000000n,
+  totalInvalidContribution: 9000000000000000000n,
   totalCap: 9000000000000000000n,
   individualCap: 2000000000000000000n,
   totalContribution: 18000000000000000000n,
   participants: {
     [addresses.addr1]: {
       contribution: 2100000000000000000n,
-      excessContribution: 100000000000000000n,
+      invalidContribution: 100000000000000000n,
       validContribution: 2000000000000000000n,
       issuanceAllocation: 10822300000000000000n,
     },
     [addresses.addr2]: {
       contribution: 2100000000000000000n,
-      excessContribution: 100000000000000000n,
+      invalidContribution: 100000000000000000n,
       validContribution: 2000000000000000000n,
       issuanceAllocation: 10822300000000000000n,
     },
     [addresses.addr3]: {
       contribution: 100000000000000000n,
-      excessContribution: 100000000000000000n,
+      invalidContribution: 100000000000000000n,
       validContribution: 0n,
     },
     [addresses.addr4]: {
       contribution: 9000000000000000000n,
-      excessContribution: 7000000000000000000n,
+      invalidContribution: 7000000000000000000n,
       validContribution: 2000000000000000000n,
       issuanceAllocation: 10822300000000000000n,
     },
     [addresses.addr5]: {
       contribution: 1700000000000000000n,
-      excessContribution: 0n,
+      invalidContribution: 0n,
       validContribution: 1700000000000000000n,
       issuanceAllocation: 9198900000000000000n,
     },
     [addresses.addr6]: {
       contribution: 3000000000000000000n,
-      excessContribution: 1700000000000000000n,
+      invalidContribution: 1700000000000000000n,
       validContribution: 1300000000000000000n,
       issuanceAllocation: 7034500000000000000n,
     },
