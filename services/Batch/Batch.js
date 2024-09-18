@@ -63,68 +63,98 @@ export class Batch {
     };
   }
 
-  calcValidContributions() {}
+  assessInflows(inflows, allowlist) {
+    this.data.totalContribution = 0n;
+    this.data.totalValidContribution = 0n;
+    this.data.totalExcessContribution = 0n;
+    this.data.participants = {};
 
-  calcValidContributions_Old(
-    exAnteSupply,
-    exAnteSpotPrice,
-    exAnteBalances
-  ) {
-    // store exAnteSupply and exAnteSpotPrice
-    this.data.exAnteSupply = exAnteSupply;
-    this.data.exAnteSpotPrice = exAnteSpotPrice;
+    // iterate over the inflows
+    for (const inflow of inflows) {
+      const { participant, contribution } = inflow;
 
-    // calculate individual and store individual CAP
-    this.data.issuanceTokenCap = parseUnits(
-      (CAP * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
-      18
-    );
+      // add contribution to total contribution (regardless whether valid or not)
+      this.data.totalContribution += contribution;
 
-    const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
-
-    for (const address of Object.keys(this.data.participants)) {
-      const { contribution, permitted } =
-        this.data.participants[address];
-
-      const exAnteBalance = exAnteBalances[address] || 0n;
-      const issuanceTokenPotential =
-        this.data.issuanceTokenCap - exAnteBalance; // how many issuance tokens the address may buy
-
-      // if no more issuance token potential, all contributions are excess contributions
-      if (issuanceTokenPotential <= 0n) {
-        this.data.participants[address].excessContribution =
-          contribution;
-        continue;
-      }
-
-      // if user is not permitted, all contributions are excess contributions
-      if (!permitted) {
-        this.data.participants[address].excessContribution =
-          contribution;
-        continue;
-      }
-
-      // based on ex ante spot price, ex ante balance, and issuance token potential, calculate contribution potential
-      // store per address
-      const contributionPotentialFloat =
-        this.bigIntToFloat(issuanceTokenPotential) * relSpotPrice;
-      const contributionPotential = this.floatToBigInt(
-        contributionPotentialFloat
-      );
-
-      // if contribution is larger than contribution potential
-      // note excess contribution and actual contribution
-      // if contribution is below contribution potential
-      // all contributions are actual contributions
-      if (contribution > contributionPotential) {
-        const excess = contribution - contributionPotential;
-        this.data.participants[address].excessContribution = excess;
-        this.data.participants[address].validContribution =
-          contributionPotential;
+      // if participant doesn't exist yet add to participants
+      if (!this.data.participants[participant]) {
+        this.data.participants[participant] = {
+          contribution,
+        };
       } else {
-        this.data.participants[address].validContribution =
+        this.data.participants[participant].contribution +=
           contribution;
       }
+
+      // if the inflow is not on the allowlis, everything is excess contribution
+      if (!allowlist.includes(participant)) {
+        this.manageContribution(participant, {
+          excessContribution: contribution,
+        });
+        continue;
+      }
+
+      const p = this.data.participants[participant];
+      const prevValid = p ? p.validContribution || 0n : 0n;
+
+      const isBelowIndividualCap =
+        prevValid + contribution <= this.data.individualCap;
+      const isBelowTotalCap =
+        prevValid + contribution <= this.data.totalCap;
+
+      // if contribution is below any cap everything is valid
+      if (isBelowIndividualCap && isBelowTotalCap) {
+        this.manageContribution(participant, {
+          validContribution: contribution,
+          contribution,
+        });
+        continue;
+      }
+
+      // now we check for caps
+      // first check what would be the valid contribution honoring just the individual cap
+      // then check what would be the valid contribution honoring just the total cap
+      // then choose the one that is smaller
+      let v1, e1, v2, e2;
+      // case 1: contributor exceeds individual cap
+      if (!isBelowIndividualCap) {
+        // max possible contribution is difference between cap and previous contribution
+        v1 = this.data.individualCap - prevValid;
+        // excess is the diff between what would have been valit contribution without any cap and the cap
+        e1 = prevValid + contribution - this.data.individualCap;
+      }
+
+      // case 2: contributor exceeds total cap
+      if (!isBelowTotalCap) {
+        // max possible contribution is difference between total cap and previous contribution
+        v2 = this.data.totalCap - prevValid;
+        // excess is the diff between what would have been valid contribution without any cap and the cap
+        e2 = prevValid + contribution - this.data.totalCap;
+      }
+
+      // case1 and case2 are not mutually exclusive
+      // if only one applies choose that case
+      // if both apply choose the one that leads to the smaller contribution
+      let validContribution, excessContribution;
+      if (v1 !== undefined && v2 === undefined) {
+        validContribution = v1;
+        excessContribution = e1;
+      } else if (v1 === undefined && v2 !== undefined) {
+        validContribution = v2;
+        excessContribution = e2;
+      } else if (v1 < v2) {
+        validContribution = v1;
+        excessContribution = e1;
+      } else {
+        validContribution = v2;
+        excessContribution = e2;
+      }
+
+      this.manageContribution(participant, {
+        validContribution,
+        excessContribution,
+        contribution,
+      });
     }
   }
 
@@ -202,6 +232,31 @@ export class Batch {
       });
   }
 
+  // HELPER FUNCTIONS
+
+  manageContribution(addr, contributionObj) {
+    const { excessContribution, validContribution } = contributionObj;
+
+    if (!this.data.participants[addr].excessContribution) {
+      this.data.participants[addr].excessContribution =
+        excessContribution || 0n;
+    } else {
+      this.data.participants[addr].excessContribution +=
+        excessContribution;
+    }
+
+    if (!this.data.participants[addr].validContribution) {
+      this.data.participants[addr].validContribution =
+        validContribution || 0n;
+    } else {
+      this.data.participants[addr].validContribution +=
+        validContribution;
+    }
+
+    this.data.totalExcessContribution += excessContribution || 0n;
+    this.data.totalValidContribution += validContribution || 0n;
+  }
+
   // STATIC
 
   bigIntToFloat(bigInt) {
@@ -210,5 +265,9 @@ export class Batch {
 
   floatToBigInt(float) {
     return parseUnits(float.toString(), 18);
+  }
+
+  diffOrZero(a, b) {
+    return a - b > 0n ? a - b : 0n;
   }
 }

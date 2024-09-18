@@ -35,7 +35,8 @@ export const defineBatch = async ({
   );
   const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
   const exAnteSpotPrice = await queryService.getSpotPrice();
-  batchService.calcValidContributions(
+
+  batchService.assessInflows(
     exAnteIssuanceSupply,
     exAnteSpotPrice,
     exAnteBalances

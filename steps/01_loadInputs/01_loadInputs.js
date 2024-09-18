@@ -36,7 +36,7 @@ const loadConfigs = (projectName, batch) => {
 
   return {
     projectConfig: projectsConfig[projectName],
-    allowlist,
+    allowlist: allowlist.map((addr) => addr.toLowerCase()),
     batchConfig,
   };
 };

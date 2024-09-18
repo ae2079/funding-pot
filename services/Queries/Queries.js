@@ -138,22 +138,24 @@ export class Queries {
         (tx) =>
           tx.contractAddress.toLowerCase() === token.toLowerCase()
       )
-      .reduce((acc, tx) => {
-        const { fromAddress, value, tokenDecimals } = tx;
-        if (!acc[fromAddress]) {
-          acc[fromAddress] = {
-            contribution: parseUnits(value, tokenDecimals),
-          };
-        } else {
-          acc[fromAddress].contribution += parseUnits(
-            value,
-            tokenDecimals
-          );
-        }
-        return acc;
-      }, {});
+      .map((tx) => {
+        const {
+          fromAddress,
+          value,
+          tokenDecimals,
+          timestamp,
+          transactionHash,
+        } = tx;
+        return {
+          participant: fromAddress,
+          contribution: parseUnits(value, tokenDecimals),
+          timestamp,
+          transactionHash,
+        };
+      })
+      .sort((a, b) => a.timestamp - b.timestamp);
 
-    this.queries.inflows = keysToLowerCase(inflows);
+    this.queries.inflows = inflows;
     return this.queries.inflows;
   }
 
