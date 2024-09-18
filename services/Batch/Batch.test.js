@@ -1,12 +1,21 @@
-import { describe, it, beforeEach } from 'node:test';
+import { describe, it, beforeEach, before } from 'node:test';
 import assert from 'node:assert';
+import { parseUnits, formatUnits } from 'viem';
+
 import { Batch } from './Batch.js';
+import {
+  inflows,
+  addresses,
+  allowlist,
+  batchConfig,
+  batchData,
+} from '../../utils/testUtils/staticTestData.js';
 
 describe('Batch', () => {
-  const addr1 = '0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb';
-  const addr2 = '0x932285a2e33b89981d25eb586a3893e0f5a1a9da';
-  const addr3 = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
-  const addr4 = '0x3bc66727a37f7c0e1039540e3dc2254d39f420ff';
+  const addr1 = '0x6747772f37a4f7cfdea180d38e8ad372516c9548';
+  const addr2 = '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b';
+  const addr3 = '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f';
+  const addr4 = '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4';
   const addr5 = '0x6bc66727a37f7c0e1039540e3dc2254d39f420eb';
   const addr6 = '0x27276727a37f7c0e1039540e3dc2254d39f42027';
   const contr1 = 3_000_000_000_000_000_000n;
@@ -27,38 +36,6 @@ describe('Batch', () => {
           },
         ],
       ]);
-    });
-  });
-
-  describe('#aggregateContributions', () => {
-    const dataWithEligibility = {
-      [addr1]: {
-        validContribution: contr1,
-      },
-      [addr2]: {
-        validContribution: contr2,
-      },
-      [addr3]: {
-        validContribution: contr3,
-        excessContribution: contr4,
-      },
-      [addr4]: {
-        excessContribution: contr5,
-      },
-    };
-    const batchService = new Batch();
-    batchService.data.participants = dataWithEligibility;
-
-    it('adds aggregate contribution data', () => {
-      batchService.aggregateContributions(dataWithEligibility);
-
-      assert.deepStrictEqual(batchService.data, {
-        totalCap: undefined,
-        individualCap: undefined,
-        totalValidContribution: contr1 + contr2 + contr3,
-        totalExcessContribution: contr4 + contr5,
-        participants: dataWithEligibility,
-      });
     });
   });
 
@@ -134,54 +111,10 @@ describe('Batch', () => {
     });
   });
 
-  // TODO
   describe('#assessInflows', () => {
-    const totalCap = 24_000_000_000_000_000_000n; // 24
-    const individualCap = 6_000_000_000_000_000_000n; // 6
-    const allowlist = [addr1, addr2, addr4, addr5, addr6];
-
-    const inflows = [
-      {
-        participant: addr1,
-        contribution: individualCap, // matches exactly what can be bought
-        timestamp: 1725654698,
-      },
-      {
-        participant: addr2,
-        contribution: individualCap + 1n, // exceeds individual limit
-        timestamp: 1725654766,
-      },
-      {
-        participant: addr1,
-        contribution: 1n, // exceeds limit for addr1 (cause it's second contribution)
-        timestamp: 1725654780,
-      },
-      {
-        participant: addr3, // not on allowlist
-        contribution: 1n,
-        timestamp: 1725654794,
-      },
-      {
-        participant: addr4,
-        contribution: totalCap, // exceeds both individual and total cap (individual cap is more restrictive here)
-        timestamp: 1725654795,
-      },
-      {
-        participant: addr5,
-        contribution: contr2, // valid contribution
-        timestamp: 1725654796,
-      },
-      {
-        participant: addr3, // still not on allowlist
-        contribution: 1n,
-        timestamp: 1725654797,
-      },
-      {
-        participant: addr6,
-        contribution: contr5, // exceeds both individual and total cap (total cap is more restrictive here)
-        timestamp: 1725654797,
-      },
-    ];
+    const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
+    const totalCap = parseUnits(batchConfig.CAPS.TOTAL, 18);
+    const individualCap = parseUnits(batchConfig.CAPS.INDIVIDUAL, 18);
 
     const batchService = new Batch();
     batchService.data = {
@@ -189,7 +122,7 @@ describe('Batch', () => {
       individualCap,
     };
 
-    beforeEach(() => {
+    before(() => {
       batchService.assessInflows(inflows, allowlist);
     });
 
@@ -281,8 +214,8 @@ describe('Batch', () => {
           validContribution,
         } = participants[contributor];
 
-        assert.equal(contribution, 2n);
-        assert.equal(excessContribution, 2n);
+        assert.equal(contribution, 100000000000000000n);
+        assert.equal(excessContribution, 100000000000000000n);
         assert.equal(validContribution, 0n);
       });
     });
@@ -298,9 +231,9 @@ describe('Batch', () => {
           validContribution,
         } = participants[contributor];
 
-        assert.equal(contribution, contr2);
+        assert.equal(contribution, 1700000000000000000n);
         assert.equal(excessContribution, 0n);
-        assert.equal(validContribution, contr2);
+        assert.equal(validContribution, 1700000000000000000n);
       });
     });
 
@@ -316,9 +249,9 @@ describe('Batch', () => {
             validContribution,
           } = participants[contributor];
 
-          assert.equal(contribution, 7000000000000000000n);
-          assert.equal(excessContribution, 5000000000000000000n);
-          assert.equal(validContribution, 2000000000000000000n);
+          assert.equal(contribution, 3000000000000000000n);
+          assert.equal(excessContribution, 1700000000000000000n);
+          assert.equal(validContribution, 1300000000000000000n);
         });
       });
 

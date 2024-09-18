@@ -66,7 +66,6 @@ const validateReports = ({ reports, batchNr }) => {
   if (!reports) throw new Error('Reports missing');
 
   const reportNumbers = Object.keys(reports);
-  console.log(reportNumbers);
 
   if (batchNr - reportNumbers.length > 1)
     throw new Error(

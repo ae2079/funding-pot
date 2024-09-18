@@ -24,26 +24,7 @@ export const defineBatch = async ({
     toTimestamp
   );
 
-  // earmark eligible addresses
-  batchService.checkEligibility(inflows, allowlist);
-
-  // calculate actual contributions taking into account the individual contribution CAP
-  const contributors = batchService.getContributors();
-  const exAnteBalances = await queryService.getBalances(
-    queryService.queries.addresses.issuanceToken,
-    contributors
-  );
-  const exAnteIssuanceSupply = await queryService.getIssuanceSupply();
-  const exAnteSpotPrice = await queryService.getSpotPrice();
-
-  batchService.assessInflows(
-    exAnteIssuanceSupply,
-    exAnteSpotPrice,
-    exAnteBalances
-  );
-
-  // calculate aggregate contribution data
-  batchService.aggregateContributions();
+  batchService.assessInflows(inflows, allowlist);
 
   if (batchService.data.totalValidContribution === 0n)
     throw new Error('No valid contributions found');

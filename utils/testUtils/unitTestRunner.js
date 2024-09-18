@@ -15,7 +15,7 @@ glob(pattern, { ignore: excludePattern }, (err, files) => {
   }
 
   if (files.length === 0) {
-    console.log('No test files found.');
+    console.error('No test files found.');
     return;
   }
 
@@ -25,6 +25,6 @@ glob(pattern, { ignore: excludePattern }, (err, files) => {
   });
 
   testProcess.on('exit', (code) => {
-    console.log(`Test process exited with code ${code}`);
+    console.error(`Test process exited with code ${code}`);
   });
 });

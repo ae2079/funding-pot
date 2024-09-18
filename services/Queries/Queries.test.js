@@ -6,6 +6,7 @@ import assert from 'node:assert';
 import { getContract } from 'viem';
 
 import abis from '../../data/abis.js';
+import { inflows } from '../../utils/testUtils/staticTestData.js';
 import { Queries } from './Queries.js';
 
 describe('Queries', () => {
@@ -67,10 +68,10 @@ describe('Queries', () => {
 
   // NOTE: requires the secret ANKR API key to be set in .env.test
   describe('#getInflows', () => {
-    const fromTimestamp = '1725654505';
-    const toTimestamp = '1725655119';
+    const fromTimestamp = '1726684518';
+    const toTimestamp = '1726692378';
     const token = '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3';
-    const recipient = '0x5e657719AEE21a6BB1BCaAd7781DcE222186Ca72';
+    const recipient = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
 
     const querySevice = new Queries({
       indexerUrl: process.env.INDEXER_URL,
@@ -79,57 +80,14 @@ describe('Queries', () => {
     });
 
     it('should return all inflows within the timeframe', async () => {
-      const inflows = await querySevice.getInflows(
+      const receivedInflows = await querySevice.getInflows(
         token,
         recipient,
         fromTimestamp,
         toTimestamp
       );
 
-      assert.deepStrictEqual(inflows, [
-        {
-          participant: '0x6747772f37a4f7cfdea180d38e8ad372516c9548',
-          contribution: 20000000000000000000000n,
-          timestamp: 1725654698,
-          transactionHash:
-            '0x5993cacd7a961e2ac6476de2248220c928b54e8096040f8034fc7dbdf54691f7',
-        },
-        {
-          participant: '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
-          contribution: 44000000000000000000n,
-          timestamp: 1725654766,
-          transactionHash:
-            '0x442123847273b3dce1d04d7420d10268f7192f2369354241958c78fa5785a57c',
-        },
-        {
-          participant: '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
-          contribution: 66000000000000000000n,
-          timestamp: 1725654780,
-          transactionHash:
-            '0x4ad05dc90c36d5b0106c679d111585dcf5fc3dc22ce297fa97e7739dbe02cf73',
-        },
-        {
-          participant: '0x6747772f37a4f7cfdea180d38e8ad372516c9548',
-          contribution: 1300000000000000000000n,
-          timestamp: 1725654794,
-          transactionHash:
-            '0x844462e0ce5beccfbcadb886ea1f068d79a506f2a42b9267dbcd1df28b1df7c2',
-        },
-        {
-          participant: '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f',
-          contribution: 15422100000000000000n,
-          timestamp: 1725654812,
-          transactionHash:
-            '0x20316fdc1d2e9afa11523c2cc39008b8c5609a1cb33bb5704320acbe21512323',
-        },
-        {
-          participant: '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4',
-          contribution: 420690000000000000000n,
-          timestamp: 1725654830,
-          transactionHash:
-            '0xae2b12f19d597a56836338d3816017037221cc5d025358f8459b9e60cf794450',
-        },
-      ]);
+      assert.deepStrictEqual(receivedInflows, inflows);
     });
   });
 

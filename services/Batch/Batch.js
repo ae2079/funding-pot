@@ -41,30 +41,6 @@ export class Batch {
     this.data.totalEligibleContributions = totalEligibleContributions;
   }
 
-  aggregateContributions() {
-    const { participants } = this.data;
-
-    const totalValidContribution = Object.entries(
-      participants
-    ).reduce((acc, [, data]) => {
-      return data.validContribution
-        ? acc + data.validContribution
-        : acc;
-    }, 0n);
-    const totalExcessContribution = Object.entries(
-      participants
-    ).reduce((acc, [, data]) => {
-      return data.excessContribution
-        ? acc + data.excessContribution
-        : acc;
-    }, 0n);
-    this.data = {
-      totalValidContribution,
-      totalExcessContribution,
-      ...this.data,
-    };
-  }
-
   assessInflows(inflows, allowlist) {
     this.data.totalContribution = 0n;
     this.data.totalValidContribution = 0n;
@@ -211,7 +187,6 @@ export class Batch {
       this.data.participants[addr].validContribution +=
         validContribution;
     }
-
     this.data.totalExcessContribution += excessContribution || 0n;
     this.data.totalValidContribution += validContribution || 0n;
   }
