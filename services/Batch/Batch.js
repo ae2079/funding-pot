@@ -6,6 +6,8 @@ export class Batch {
 
   constructor(totalCap, individualCap) {
     this.data = { totalCap, individualCap };
+
+    // TODO: dynamic total cap based on previous batches
   }
 
   // STATE-MODIFYING METHODS
@@ -189,27 +191,7 @@ export class Batch {
       exAnteTotalValidContributions;
   }
 
-  // GETTERS
-
-  getContributors() {
-    return Object.keys(this.data.participants).filter(
-      (address) => this.data.participants[address].permitted
-    );
-  }
-
-  getAllocations() {
-    const { participants } = this.data;
-    return Object.entries(participants)
-      .filter(([, data]) => data.issuanceAllocation)
-      .map(([address, data]) => {
-        return {
-          recipient: address,
-          amount: data.issuanceAllocation,
-        };
-      });
-  }
-
-  // HELPER FUNCTIONS
+  // INTERNAL HELPER FUNCTIONS
 
   manageContribution(addr, contributionObj) {
     const { excessContribution, validContribution } = contributionObj;
@@ -241,6 +223,26 @@ export class Batch {
       this.data.participants[addr].contribution += contribution;
     }
     this.data.totalContribution += contribution;
+  }
+
+  // GETTERS
+
+  getContributors() {
+    return Object.keys(this.data.participants).filter(
+      (address) => this.data.participants[address].permitted
+    );
+  }
+
+  getAllocations() {
+    const { participants } = this.data;
+    return Object.entries(participants)
+      .filter(([, data]) => data.issuanceAllocation)
+      .map(([address, data]) => {
+        return {
+          recipient: address,
+          amount: data.issuanceAllocation,
+        };
+      });
   }
 
   // STATIC

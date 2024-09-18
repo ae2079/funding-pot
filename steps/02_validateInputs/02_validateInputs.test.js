@@ -70,6 +70,7 @@ describe('#validateInputs', () => {
 
     describe('when there is a gap between report numbers', () => {
       it('throws', () => {
+        console.log('DOOOO IT');
         assert.throws(
           () => {
             validateInputs({

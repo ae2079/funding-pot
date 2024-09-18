@@ -73,8 +73,9 @@ const validateReports = ({ reports, batchNr }) => {
       `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous reports`
     );
 
-  for (let i = 1; i < reportNumbers.length; i++) {
-    if (!reportNumbers.includes(reportNumbers[i - 1]))
+  for (let i = 1; i <= reportNumbers.length; i++) {
+    if (!reportNumbers.includes(i.toString())) {
       throw new Error(`Report missing for batchNr ${i}`);
+    }
   }
 };
