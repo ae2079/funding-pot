@@ -71,7 +71,7 @@ Copy `.env.example` to `.env` and fill in the values. If the delegate has alread
 
 There are three types of inputs that the script executor can take. They can all be found under `/data/production/input`.
 
-1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("TESTPROJECT") will be added to `/data/test/input/projects.json`.
+1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("GENERATED_TEST_PROJECT") will be added to `/data/test/input/projects.json`.
 2. `allowlist.json`: Contains an array of addresses that are allowed to contribute to the safe. This file should be updated whenever a new address is added or an existing one is removed. If you run the tests for the first time, an example test file is generated in `/data/test/input/allowlist.json`.
 3. `batches/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory. The file contains the vesting timelines (start, cliff, end) for that batch and optionally the timeframe (fromTimestamp, toTimestamp) where contributions will be considered. If the timeframe is not specified, contributions will be considered from the start of
 
@@ -135,7 +135,7 @@ In summary this project does three things:
 │   ├── input
 │   │   └── batches
 │   └── output
-│   └── TESTPROJECT
+│   └── GENERATED_TEST_PROJECT
 ├── services
 │   ├── Batch
 │   ├── Queries

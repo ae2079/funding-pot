@@ -269,9 +269,9 @@ export const getProjectConfig = async () => {
     );
   } catch (e) {}
 
-  if (projectsConfig && projectsConfig.TESTPROJECT) {
+  if (projectsConfig && projectsConfig.GENERATED_TEST_PROJECT) {
     console.info('🥳 Project config already exists');
-    return projectsConfig.TESTPROJECT;
+    return projectsConfig.GENERATED_TEST_PROJECT;
   } else {
     console.info(
       'No project config found, setting up new e2e environment...'
@@ -285,7 +285,7 @@ export const getProjectConfig = async () => {
       JSON.stringify(
         {
           ...projectsConfig,
-          TESTPROJECT: {
+          GENERATED_TEST_PROJECT: {
             SAFE: safeAddress,
             ORCHESTRATOR: orchestratorAddress,
           },
@@ -298,18 +298,24 @@ export const getProjectConfig = async () => {
 
     console.info('✅ All contracts deployed');
     console.info(
-      '💾 Project with name TESTPROJECT saved to data/test/input/projects.json'
+      '💾 Project with name GENERATED_TEST_PROJECT saved to data/test/input/projects.json'
     );
   }
 
-  return JSON.parse(fs.readFileSync(filePath)).TESTPROJECT;
+  return JSON.parse(fs.readFileSync(filePath)).GENERATED_TEST_PROJECT;
 };
 
 export const getBatchConfig = async (safe) => {
   const batchConfig = {
     VESTING_DETAILS: {},
     TIMEFRAME: {},
+    LIMITS: {},
   };
+
+  const minContribution = 1_000_000_000_000_000_000;
+  const maxContribution = 1000_000_000_000_000_000_000;
+  const individualCap = '500';
+  const totalCap = '1500';
 
   const { owner, delegate } = getTestClients();
 
@@ -321,6 +327,8 @@ export const getBatchConfig = async (safe) => {
   ).toString();
   batchConfig.VESTING_DETAILS.CLIFF = '60';
   batchConfig.VESTING_DETAILS.END = (fromTimestamp + 120n).toString();
+  batchConfig.LIMITS.INDIVIDUAL = individualCap;
+  batchConfig.LIMITS.TOTAL = totalCap;
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
@@ -333,8 +341,8 @@ export const getBatchConfig = async (safe) => {
     const contributor = contributors[i];
     const { publicClient, walletClient } = contributor;
     const contribution = randomIntFromInterval(
-      100_000_000_000_000,
-      10_000_000_000_000_000_000
+      minContribution,
+      maxContribution
     );
 
     console.info(

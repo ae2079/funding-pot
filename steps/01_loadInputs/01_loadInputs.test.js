@@ -12,7 +12,7 @@ describe('#loadInputs', () => {
 
   describe('with existing batch number', () => {
     describe('without previous batch reports', () => {
-      const projectName = 'EXAMPLEPROJECT_1';
+      const projectName = 'STATIC_TEST_PROJECT_1';
       const batchNumber = 1;
 
       it('returns the configs: projectsConfig, allowlist, batchConfig', () => {
@@ -27,7 +27,7 @@ describe('#loadInputs', () => {
     });
 
     describe('with previous batch reports', () => {
-      const projectName = 'EXAMPLEPROJECT_2';
+      const projectName = 'STATIC_TEST_PROJECT_2';
       const batchNumber = 2;
 
       it('returns the configs: projectsConfig, allowlist, batchConfig, reports', () => {

@@ -7,14 +7,14 @@ import {
   signAndExecutePendingTxs,
   getVestings,
   getReport,
-} from '../utils/testHelpers.js';
+} from '../utils/testUtils/testHelpers.js';
 
 import { main } from './main.js';
 import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 
 describe('#main', () => {
   const batchNr = '3';
-  const projectName = 'TESTPROJECT';
+  const projectName = 'GENERATED_TEST_PROJECT';
 
   let safeAddress;
 

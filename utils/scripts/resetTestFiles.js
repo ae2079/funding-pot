@@ -22,7 +22,7 @@ async function main() {
     );
   } catch (e) {}
 
-  // remove TESTPROJECT from projects.json
+  // remove GENERATED_TEST_PROJECT from projects.json
   try {
     const projects = JSON.parse(
       fs.readFileSync(
@@ -30,7 +30,8 @@ async function main() {
         'utf8'
       )
     );
-    if (projects && projects.TESTPROJECT) delete projects.TESTPROJECT;
+    if (projects && projects.GENERATED_TEST_PROJECT)
+      delete projects.GENERATED_TEST_PROJECT;
 
     fs.writeFileSync(
       path.join(__dirname, '../../data/test/input/projects.json'),
@@ -44,7 +45,7 @@ async function main() {
     fs.unlinkSync(
       path.join(
         __dirname,
-        '../../data/test/output/TESTPROJECT/3.json'
+        '../../data/test/output/GENERATED_TEST_PROJECT/3.json'
       )
     );
   } catch (e) {}

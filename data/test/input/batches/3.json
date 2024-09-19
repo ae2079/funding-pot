@@ -1,15 +1,15 @@
 {
   "VESTING_DETAILS": {
-    "START": "1726516912",
+    "START": "1726747850",
     "CLIFF": "60",
-    "END": "1726516972"
+    "END": "1726747910"
   },
   "TIMEFRAME": {
-    "FROM_TIMESTAMP": "1726516852",
-    "TO_TIMESTAMP": "1726516986"
+    "FROM_TIMESTAMP": "1726747790",
+    "TO_TIMESTAMP": "1726747920"
   },
-  "CAPS": {
-    "TOTAL": "500000",
-    "INDIVIDUAL": "5000"
+  "LIMITS": {
+    "INDIVIDUAL": "500",
+    "TOTAL": "1500"
   }
 }
