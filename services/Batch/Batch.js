@@ -147,26 +147,6 @@ export class Batch {
     }
   }
 
-  calcValidExAnteContributions(reports) {
-    let exAnteTotalValidContributions = 0n;
-
-    const reportNumbers = Object.keys(reports);
-    // get aggregate historic contributions from reports
-    for (const reportNumber of reportNumbers) {
-      const report = reports[reportNumber];
-      const { participants } = report.batch;
-
-      for (const address of Object.keys(participants)) {
-        if (!participants[address].validContribution > 0n) continue;
-        exAnteTotalValidContributions +=
-          participants[address].validContribution;
-      }
-    }
-
-    this.data.exAnteTotalValidContributions =
-      exAnteTotalValidContributions;
-  }
-
   // INTERNAL HELPER FUNCTIONS
 
   manageContribution(addr, contributionObj) {
