@@ -20,7 +20,7 @@ export const proposeBatch = async ({
   // add batch buy tx
   transactionBuilderService.buy(totalValidContribution);
 
-  // send issuance tokens to payment router
+  // send issuance tokens to payment router˚
   transactionBuilderService.transferTokens(
     queryService.queries.addresses.issuanceToken,
     queryService.queries.addresses.paymentRouter,

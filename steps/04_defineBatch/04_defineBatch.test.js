@@ -8,12 +8,11 @@ import {
   batchConfig,
   batchData,
   projectConfig,
-  inflows,
-  addresses,
   allowlist,
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { parseUnits } from 'viem';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
   process.env;
@@ -23,7 +22,7 @@ describe('#defineBatch', () => {
 
   before(async () => {
     queryService = new Queries({
-      rpcUrl: `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`,
+      rpcUrl: getAnkrRpcUrl(),
       indexerUrl: INDEXER_URL,
       chainId: CHAIN_ID,
     });

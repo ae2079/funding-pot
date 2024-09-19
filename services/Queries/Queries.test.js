@@ -8,6 +8,7 @@ import { getContract } from 'viem';
 import abis from '../../data/abis.js';
 import { inflows } from '../../utils/testUtils/staticTestData.js';
 import { Queries } from './Queries.js';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 describe('Queries', () => {
   describe('#setup', () => {
@@ -75,7 +76,7 @@ describe('Queries', () => {
 
     const querySevice = new Queries({
       indexerUrl: process.env.INDEXER_URL,
-      rpcUrl: `https://rpc.ankr.com/${process.env.ANKR_NETWORK_ID}/${process.env.ANKR_API_KEY}`,
+      rpcUrl: getAnkrRpcUrl(),
       chainId: process.env.CHAIN_ID,
     });
 

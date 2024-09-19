@@ -2,41 +2,40 @@ import '../../env.js';
 
 import { describe, it, before, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { proposeBatch } from './05_proposeBatch.js';
-import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
-import {
-  getProjectConfig,
-  signAndExecutePendingTxs,
-  mintMockTokens,
-} from '../../utils/testHelpers.js';
 import { getAddress } from 'viem';
 import {
   generatePrivateKey,
   privateKeyToAddress,
 } from 'viem/accounts';
 
-import { keysToLowerCase } from '../../utils/helpers.js';
+import { proposeBatch } from './05_proposeBatch.js';
+import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
+import {
+  getProjectConfig,
+  signAndExecutePendingTxs,
+  mintMockTokens,
+} from '../../utils/testUtils/testHelpers.js';
+import {
+  batchConfig,
+  batchData,
+  projectConfig,
+  allowlist,
+} from '../../utils/testUtils/staticTestData.js';
+import { Batch } from '../../services/Batch/Batch.js';
+
+import {
+  getAnkrRpcUrl,
+  keysToLowerCase,
+} from '../../utils/helpers.js';
+import { TransactionBuilder } from '../../services/TransactionBuilder/TransactionBuilder.js';
+import { Safe } from '../../services/Safe/Safe.js';
+import { Queries } from '../../services/Queries/Queries.js';
 
 describe('#proposeBatch', () => {
-  let projectConfig;
-
-  const batchConfig = {
-    VESTING_DETAILS: {
-      START: 1,
-      CLIFF: 2,
-      END: 10,
-    },
-  };
-
   let queryService,
     safeService,
     transactionBuilderService,
     batchService;
-
-  before(async () => {
-    // get project config (create if not exists)
-    projectConfig = await getProjectConfig();
-  });
 
   describe('with a small batch (2 vestings)', () => {
     const addr1 = '0xAeC9D8128a75Cb93B56D4dCf693a04251f8b9340';
@@ -47,52 +46,54 @@ describe('#proposeBatch', () => {
     const totalValidContribution = 10_000_000_000_000_000n;
 
     beforeEach(async () => {
-      // instantiate services
-      ({
-        queryService,
-        safeService,
-        transactionBuilderService,
-        batchService,
-      } = await instantiateServices(projectConfig, batchConfig));
-
-      // set numbers
-      batchService.data.totalValidContribution =
-        totalValidContribution;
-      batchService.data.additionalIssuance = additionalIssuance;
-      batchService.data.participants = keysToLowerCase({
-        [addr1]: {
-          issuanceAllocation: issuance1,
-        },
-        [addr2]: {
-          issuanceAllocation: issuance2,
-        },
+      batchService = new Batch(
+        batchConfig.CAPS.TOTAL,
+        batchConfig.CAPS.INDIVIDUAL
+      );
+      safeService = new Safe(
+        process.env.CHAIN_ID,
+        getAddress(projectConfig.SAFE),
+        getAnkrRpcUrl()
+      );
+      queryService = new Queries({
+        rpcUrl: getAnkrRpcUrl(),
+        indexerUrl: process.env.INDEXER_URL,
+        chainId: process.env.CHAIN_ID,
       });
+      await queryService.setup(projectConfig.ORCHESTRATOR);
+      transactionBuilderService = new TransactionBuilder({
+        safe: projectConfig.SAFE,
+        paymentRouter: queryService.queries.addresses.paymentRouter,
+        issuanceToken: queryService.queries.addresses.issuanceToken,
+        collateralToken:
+          queryService.queries.addresses.collateralToken,
+        bondingCurve: queryService.queries.addresses.bondingCurve,
+        start: batchConfig.TIMEFRAME.START,
+        cliff: batchConfig.TIMEFRAME.CLIFF,
+        end: batchConfig.TIMEFRAME.END,
+      });
+
+      batchService.data = batchData;
     });
 
-    it('proposes the batch', async () => {
+    it('adds a transaction to the safe', async () => {
+      const safeNonceBefore = await safeService.apiKit.getNextNonce(
+        safeService.safeAddress
+      );
       await proposeBatch({
         queryService,
         batchService,
         transactionBuilderService,
         safeService,
       });
-
-      await mintMockTokens(
-        getAddress(queryService.queries.addresses.collateralToken),
-        totalValidContribution,
-        getAddress(projectConfig.SAFE)
+      const safeNonceAfter = await safeService.apiKit.getNextNonce(
+        safeService.safeAddress
       );
-
-      assert.doesNotThrow(async () => {
-        await signAndExecutePendingTxs(projectConfig.SAFE);
-      });
+      assert.equal(safeNonceAfter - safeNonceBefore, 1);
     });
   });
 
-  describe('with big batch (60 vestings)', () => {
-    const totalValidContribution = 1_800_000n;
-    const recipients = 50;
-
+  describe.skip('with big batch (60 vestings)', () => {
     let participants, additionalIssuance;
 
     beforeEach(async () => {

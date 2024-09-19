@@ -256,7 +256,7 @@ export const deployWorkflow = async (safeAddress) => {
 export const getProjectConfig = async () => {
   const filePath = path.join(
     __dirname,
-    '../data/test/input/projects.json'
+    '../../data/test/input/projects.json'
   );
 
   let projectsConfig;
@@ -264,7 +264,7 @@ export const getProjectConfig = async () => {
   try {
     projectsConfig = JSON.parse(
       fs.readFileSync(
-        path.join(__dirname, `../data/test/input/projects.json`)
+        path.join(__dirname, `../../data/test/input/projects.json`)
       )
     );
   } catch (e) {}
@@ -378,7 +378,7 @@ export const getBatchConfig = async (safe) => {
 
   const batchConfigFilePath = path.join(
     __dirname,
-    '../data/test/input/batches/3.json'
+    '../../data/test/input/batches/3.json'
   );
 
   fs.writeFileSync(
@@ -400,7 +400,7 @@ export const createAndSaveAllowlist = async () => {
 
   const allowListFilePath = path.join(
     __dirname,
-    '../data/test/input/allowlist.json'
+    '../../data/test/input/allowlist.json'
   );
 
   const allowlist = [ownerAccount.address, delegateAccount.address];
@@ -497,7 +497,7 @@ export const getVestings = async (txHash) => {
 export const getReport = (projectName, batchNr) => {
   const filePath = path.join(
     __dirname,
-    `../data/test/output/${projectName}/${batchNr}.json`
+    `../../data/test/output/${projectName}/${batchNr}.json`
   );
 
   const report = JSON.parse(fs.readFileSync(path.join(filePath)));

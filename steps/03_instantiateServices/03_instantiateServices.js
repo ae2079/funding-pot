@@ -4,13 +4,13 @@ import { Queries } from '../../services/Queries/Queries.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { Safe } from '../../services/Safe/Safe.js';
 import { TransactionBuilder } from '../../services/TransactionBuilder/TransactionBuilder.js';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 export const instantiateServices = async (
   projectConfig,
   batchConfig
 ) => {
-  const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
-    process.env;
+  const { CHAIN_ID, INDEXER_URL } = process.env;
 
   const { SAFE, ORCHESTRATOR } = projectConfig;
   const {
@@ -20,7 +20,7 @@ export const instantiateServices = async (
 
   // instantiate services
   const queryService = new Queries({
-    rpcUrl: `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`,
+    rpcUrl: getAnkrRpcUrl(),
     indexerUrl: INDEXER_URL,
     chainId: CHAIN_ID,
   });
@@ -38,11 +38,7 @@ export const instantiateServices = async (
     end: END,
   });
 
-  const safeService = new Safe(
-    CHAIN_ID,
-    SAFE,
-    `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`
-  );
+  const safeService = new Safe(CHAIN_ID, SAFE, getAnkrRpcUrl());
 
   const batchService = new Batch(
     parseUnits(TOTAL, 18),
