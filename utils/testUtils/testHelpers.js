@@ -15,8 +15,8 @@ import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
-import { projectConfig } from './staticTestData.js';
 
+import { projectConfig } from './staticTestData.js';
 import abis from '../../data/abis.js';
 
 const __filename = fileURLToPath(import.meta.url);

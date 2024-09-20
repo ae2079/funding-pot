@@ -11,11 +11,9 @@ import {
   allowlist,
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
-import { parseUnits } from 'viem';
 import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
-const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
-  process.env;
+const { CHAIN_ID, INDEXER_URL } = process.env;
 
 describe('#defineBatch', () => {
   let queryService, batchService;
