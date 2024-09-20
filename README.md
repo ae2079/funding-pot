@@ -136,6 +136,12 @@ To run the script use the following command:
 - `PROJECT_NAME`: the name of the project you want to run the script for; used to fetch project-specific configurations from `projects.json`
 - `BATCH_NUMBER`: the batch number you want to run the script for; used to fetch batch-specific configurations from `batches/<BATCH_NUMBER>.json`
 
+**Example:**
+
+The following command will run the script for the 3rd batch of the project `FUNKY_FOXES`:
+
+`npm run start "FUNKY_FOXES" 3`
+
 ### Checking the script's output
 
 When the script has executed a JSON report will be added under `data/production/output/<PROJECT_NAME>/<BATCH_NUMBER>.json`. You can use this file to better understand what has been proposed to the safe.
