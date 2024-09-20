@@ -15,6 +15,7 @@ import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
+import { projectConfig } from './staticTestData.js';
 
 import abis from '../../data/abis.js';
 
@@ -274,7 +275,7 @@ export const getProjectConfig = async () => {
     return projectsConfig.GENERATED_TEST_PROJECT;
   } else {
     console.info(
-      'No project config found, setting up new e2e environment...'
+      '❗ No project config found, setting up new e2e environment...'
     );
 
     const safeAddress = await deployTestSafe();
@@ -288,6 +289,7 @@ export const getProjectConfig = async () => {
           GENERATED_TEST_PROJECT: {
             SAFE: safeAddress,
             ORCHESTRATOR: orchestratorAddress,
+            NFT: projectConfig.NFT,
           },
         },
         null,
@@ -329,6 +331,7 @@ export const getBatchConfig = async (safe) => {
   batchConfig.VESTING_DETAILS.END = (fromTimestamp + 120n).toString();
   batchConfig.LIMITS.INDIVIDUAL = individualLimit;
   batchConfig.LIMITS.TOTAL = totalLimit;
+  batchConfig.IS_EARLY_ACCESS = false;
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
