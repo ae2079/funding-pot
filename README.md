@@ -15,7 +15,7 @@ Note: this script does not cover the claiming of tokens by contributors
 
 ### Prerequisites
 
-- you have an ANKR API key
+- you have an ANKR API key for their "advanced API" (get one [here](https://www.ankr.com/rpc/advanced-api/))
 - you have two private keys whose addresses are funded with small amounts of testnet ETH on Base Sepolia
 
 ### Instructions
