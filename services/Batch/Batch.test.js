@@ -21,17 +21,47 @@ describe('Batch', () => {
   const contr4 = 6_000_000_000_000_000_000n;
 
   describe('#constructor', () => {
-    it('sets `totalLimit` and `individualLimit` in `data`', () => {
+    describe('without previous batchReports', () => {
       const batchService = new Batch({ batchConfig });
-      assert.deepStrictEqual(Object.entries(batchService), [
-        [
-          'data',
-          {
-            totalLimit: 9000000000000000000n,
-            individualLimit: 2000000000000000000n,
-          },
-        ],
-      ]);
+
+      it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
+        assert.deepStrictEqual(Object.entries(batchService), [
+          [
+            'data',
+            {
+              totalLimit: parseUnits(batchConfig.LIMITS.TOTAL, 18),
+              individualLimit: parseUnits(
+                batchConfig.LIMITS.INDIVIDUAL,
+                18
+              ),
+            },
+          ],
+        ]);
+      });
+    });
+
+    describe('with previous batchReports', () => {
+      const mockBatchReports = {
+        1: { totalValidContribution: '3000000000000000000' },
+        2: { totalValidContribution: '2000000000000000000' },
+      };
+
+      const batchService = new Batch({
+        batchConfig,
+        batchReports: mockBatchReports,
+      });
+
+      it('accounts for previous batchReports', () => {
+        assert.deepStrictEqual(Object.entries(batchService), [
+          [
+            'data',
+            {
+              totalLimit: 4000000000000000000n,
+              individualLimit: 2000000000000000000n,
+            },
+          ],
+        ]);
+      });
     });
   });
 

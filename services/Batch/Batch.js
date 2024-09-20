@@ -1,18 +1,23 @@
 import { formatUnits, parseUnits } from 'viem';
-import { CAP } from '../../config.js';
 
 export class Batch {
   data;
 
-  constructor({ batchConfig }) {
-    const totalLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
+  constructor({ batchConfig, batchReports }) {
     const individualLimit = parseUnits(
       batchConfig.LIMITS.INDIVIDUAL,
       18
     );
-    this.data = { totalLimit, individualLimit };
+    // since batch caps are accumulative, if it is not the very first batch
+    // we need to consider how much was already contributed in previous batches
+    let totalBatchLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
+    for (const reportNr in batchReports) {
+      const report = batchReports[reportNr];
+      totalBatchLimit -= BigInt(report.totalValidContribution);
+    }
+    const totalLimit = totalBatchLimit;
 
-    // TODO: dynamic total cap based on previous batches
+    this.data = { totalLimit, individualLimit };
   }
 
   assessInflows(inflows, allowlist) {
