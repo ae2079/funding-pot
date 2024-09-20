@@ -1,5 +1,3 @@
-import { parseUnits } from 'viem';
-
 import { Queries } from '../../services/Queries/Queries.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { Safe } from '../../services/Safe/Safe.js';
@@ -8,15 +6,11 @@ import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 export const instantiateServices = async (
   projectConfig,
-  batchConfig
+  batchConfig,
+  reports
 ) => {
   const { CHAIN_ID, INDEXER_URL } = process.env;
-
-  const { SAFE, ORCHESTRATOR } = projectConfig;
-  const {
-    VESTING_DETAILS: { START, CLIFF, END },
-    LIMITS: { TOTAL, INDIVIDUAL },
-  } = batchConfig;
+  const { ORCHESTRATOR } = projectConfig;
 
   // instantiate services
   const queryService = new Queries({
@@ -28,22 +22,20 @@ export const instantiateServices = async (
   await queryService.setup(ORCHESTRATOR);
 
   const transactionBuilderService = new TransactionBuilder({
-    safe: SAFE,
-    paymentRouter: queryService.queries.addresses.paymentRouter,
-    issuanceToken: queryService.queries.addresses.issuanceToken,
-    collateralToken: queryService.queries.addresses.collateralToken,
-    bondingCurve: queryService.queries.addresses.bondingCurve,
-    start: START,
-    cliff: CLIFF,
-    end: END,
+    batchConfig,
+    projectConfig,
+    workflowAddresses: queryService.queries.addresses,
   });
 
-  const safeService = new Safe(CHAIN_ID, SAFE, getAnkrRpcUrl());
-
-  const batchService = new Batch(
-    parseUnits(TOTAL, 18),
-    parseUnits(INDIVIDUAL, 18)
+  const safeService = new Safe(
+    CHAIN_ID,
+    projectConfig,
+    getAnkrRpcUrl()
   );
+
+  const batchService = new Batch({
+    batchConfig,
+  });
 
   return {
     safeService,

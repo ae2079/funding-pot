@@ -314,8 +314,8 @@ export const getBatchConfig = async (safe) => {
 
   const minContribution = 1_000_000_000_000_000_000;
   const maxContribution = 1000_000_000_000_000_000_000;
-  const individualCap = '500';
-  const totalCap = '1500';
+  const individualLimit = '500';
+  const totalLimit = '1500';
 
   const { owner, delegate } = getTestClients();
 
@@ -327,8 +327,8 @@ export const getBatchConfig = async (safe) => {
   ).toString();
   batchConfig.VESTING_DETAILS.CLIFF = '60';
   batchConfig.VESTING_DETAILS.END = (fromTimestamp + 120n).toString();
-  batchConfig.LIMITS.INDIVIDUAL = individualCap;
-  batchConfig.LIMITS.TOTAL = totalCap;
+  batchConfig.LIMITS.INDIVIDUAL = individualLimit;
+  batchConfig.LIMITS.TOTAL = totalLimit;
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'

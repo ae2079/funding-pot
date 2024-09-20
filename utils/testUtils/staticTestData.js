@@ -91,8 +91,8 @@ export const inflows = [
 export const batchData = {
   totalValidContribution: 9000000000000000000n,
   totalInvalidContribution: 9000000000000000000n,
-  totalCap: 9000000000000000000n,
-  individualCap: 2000000000000000000n,
+  totalLimit: 9000000000000000000n,
+  individualLimit: 2000000000000000000n,
   totalContribution: 18000000000000000000n,
   participants: {
     [addresses.addr1]: {

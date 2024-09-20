@@ -46,13 +46,12 @@ describe('#proposeBatch', () => {
     const totalValidContribution = 10_000_000_000_000_000n;
 
     beforeEach(async () => {
-      batchService = new Batch(
-        batchConfig.CAPS.TOTAL,
-        batchConfig.CAPS.INDIVIDUAL
-      );
+      batchService = new Batch({
+        batchConfig,
+      });
       safeService = new Safe(
         process.env.CHAIN_ID,
-        getAddress(projectConfig.SAFE),
+        projectConfig,
         getAnkrRpcUrl()
       );
       queryService = new Queries({
@@ -62,15 +61,9 @@ describe('#proposeBatch', () => {
       });
       await queryService.setup(projectConfig.ORCHESTRATOR);
       transactionBuilderService = new TransactionBuilder({
-        safe: projectConfig.SAFE,
-        paymentRouter: queryService.queries.addresses.paymentRouter,
-        issuanceToken: queryService.queries.addresses.issuanceToken,
-        collateralToken:
-          queryService.queries.addresses.collateralToken,
-        bondingCurve: queryService.queries.addresses.bondingCurve,
-        start: batchConfig.TIMEFRAME.START,
-        cliff: batchConfig.TIMEFRAME.CLIFF,
-        end: batchConfig.TIMEFRAME.END,
+        projectConfig,
+        workflowAddresses: queryService.queries.addresses,
+        batchConfig,
       });
 
       batchService.data = batchData;

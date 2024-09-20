@@ -3,24 +3,12 @@ import '../../env.js';
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
 import { instantiateServices } from './03_instantiateServices.js';
+import {
+  batchConfig,
+  projectConfig,
+} from '../../utils/testUtils/staticTestData.js';
 
 describe('#instantiateServices', () => {
-  const projectConfig = {
-    ORCHESTRATOR: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
-    SAFE: '0x4ffe42c1666e50104e997DD07E43c673FD39C81d',
-  };
-  const batchConfig = {
-    VESTING_DETAILS: {
-      START: 1,
-      CLIFF: 2,
-      END: 10,
-    },
-    LIMITS: {
-      TOTAL: '500000',
-      INDIVIDUAL: '5000',
-    },
-  };
-
   let queryService,
     safeService,
     transactionBuilderService,
@@ -87,8 +75,8 @@ describe('#instantiateServices', () => {
       [
         'data',
         {
-          totalCap: 500000000000000000000000n,
-          individualCap: 5000000000000000000000n,
+          individualLimit: 2000000000000000000n,
+          totalLimit: 9000000000000000000n,
         },
       ],
     ]);

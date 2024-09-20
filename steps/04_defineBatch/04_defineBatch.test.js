@@ -28,10 +28,9 @@ describe('#defineBatch', () => {
     });
     await queryService.setup(projectConfig.ORCHESTRATOR);
 
-    batchService = new Batch(
-      parseUnits(batchConfig.CAPS.TOTAL, 18),
-      parseUnits(batchConfig.CAPS.INDIVIDUAL, 18)
-    );
+    batchService = new Batch({
+      batchConfig,
+    });
   });
 
   it('defines the batch', async () => {

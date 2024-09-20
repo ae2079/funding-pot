@@ -16,25 +16,16 @@ export class TransactionBuilder {
   cliff;
   end;
 
-  constructor({
-    safe,
-    paymentRouter,
-    issuanceToken,
-    collateralToken,
-    bondingCurve,
-    start,
-    cliff,
-    end,
-  }) {
+  constructor({ projectConfig, workflowAddresses, batchConfig }) {
     this.transactions = [];
-    this.safe = safe;
-    this.paymentRouter = paymentRouter;
-    this.issuanceToken = issuanceToken;
-    this.collateralToken = collateralToken;
-    this.bondingCurve = bondingCurve;
-    this.start = start;
-    this.cliff = cliff;
-    this.end = end;
+    this.safe = projectConfig.SAFE;
+    this.paymentRouter = workflowAddresses.paymentRouter;
+    this.issuanceToken = workflowAddresses.issuanceToken;
+    this.collateralToken = workflowAddresses.collateralToken;
+    this.bondingCurve = workflowAddresses.bondingCurve;
+    this.start = batchConfig.VESTING_DETAILS.START;
+    this.cliff = batchConfig.VESTING_DETAILS.CLIFF;
+    this.end = batchConfig.VESTING_DETAILS.END;
   }
 
   buy(depositAmount) {

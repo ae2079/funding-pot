@@ -19,16 +19,31 @@ describe('Safe', () => {
   const safeAddress = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
   const rpc = getAnkrRpcUrl();
 
+  const projectConfig = {
+    SAFE: safeAddress,
+  };
+
+  const batchConfig = {
+    VESTING_DETAILS: {
+      START: 10n,
+      CLIFF: 11n,
+      END: 12n,
+    },
+  };
+
   let transactionBuilder, safe;
 
   beforeEach(() => {
-    safe = new Safe(baseSepoliaChainId, safeAddress, rpc);
+    safe = new Safe(baseSepoliaChainId, projectConfig, rpc);
     transactionBuilder = new TransactionBuilder({
-      safe: safeAddress,
-      paymentRouter: mockAddress2,
-      issuanceToken: mockAddress3,
-      collateralToken: mockAddress4,
-      bondingCurve: mockAddress5,
+      projectConfig,
+      workflowAddresses: {
+        paymentRouter: mockAddress2,
+        issuanceToken: mockAddress3,
+        collateralToken: mockAddress4,
+        bondingCurve: mockAddress5,
+      },
+      batchConfig,
     });
   });
 

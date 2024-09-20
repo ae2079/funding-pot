@@ -4,41 +4,15 @@ import { CAP } from '../../config.js';
 export class Batch {
   data;
 
-  constructor(totalCap, individualCap) {
-    this.data = { totalCap, individualCap };
+  constructor({ batchConfig }) {
+    const totalLimit = parseUnits(batchConfig.CAPS.TOTAL, 18);
+    const individualLimit = parseUnits(
+      batchConfig.CAPS.INDIVIDUAL,
+      18
+    );
+    this.data = { totalLimit, individualLimit };
 
     // TODO: dynamic total cap based on previous batches
-  }
-
-  // STATE-MODIFYING METHODS
-
-  checkEligibility(inflows, qualifiedAddresses) {
-    this.data.participants = inflows;
-
-    let totalEligibleContributions = 0n;
-
-    const { participants } = this.data;
-    for (const address of Object.keys(participants)) {
-      if (
-        !qualifiedAddresses
-          .map((addr) => addr.toLowerCase())
-          .includes(address.toLowerCase())
-      ) {
-        this.data.participants[address] = {
-          ...participants[address],
-          permitted: false,
-        };
-      } else {
-        this.data.participants[address] = {
-          ...participants[address],
-          permitted: true,
-        };
-        totalEligibleContributions +=
-          participants[address].contribution;
-      }
-    }
-
-    this.data.totalEligibleContributions = totalEligibleContributions;
   }
 
   assessInflows(inflows, allowlist) {
@@ -72,7 +46,7 @@ export class Batch {
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
       const individualDiff =
-        this.data.individualCap - (prevValid + contribution);
+        this.data.individualLimit - (prevValid + contribution);
 
       // means that the individual cap has been exceeded
       if (individualDiff < 0n) {
@@ -85,7 +59,7 @@ export class Batch {
       // difference between total cap and own contribution
       // if negative, means that the total cap has been exceeded
       const totalDiff =
-        this.data.totalCap -
+        this.data.totalLimit -
         this.data.totalValidContribution -
         (prevValid + contribution);
 
@@ -182,12 +156,6 @@ export class Batch {
   }
 
   // GETTERS
-
-  getContributors() {
-    return Object.keys(this.data.participants).filter(
-      (address) => this.data.participants[address].permitted
-    );
-  }
 
   getAllocations() {
     const { participants } = this.data;

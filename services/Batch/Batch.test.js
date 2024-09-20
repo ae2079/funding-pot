@@ -8,7 +8,6 @@ import {
   addresses,
   allowlist,
   batchConfig,
-  batchData,
 } from '../../utils/testUtils/staticTestData.js';
 
 describe('Batch', () => {
@@ -16,111 +15,37 @@ describe('Batch', () => {
   const addr2 = '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b';
   const addr3 = '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f';
   const addr4 = '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4';
-  const addr5 = '0x6bc66727a37f7c0e1039540e3dc2254d39f420eb';
-  const addr6 = '0x27276727a37f7c0e1039540e3dc2254d39f42027';
   const contr1 = 3_000_000_000_000_000_000n;
   const contr2 = 4_000_000_000_000_000_000n;
   const contr3 = 5_000_000_000_000_000_000n;
   const contr4 = 6_000_000_000_000_000_000n;
-  const contr5 = 7_000_000_000_000_000_000n;
 
   describe('#constructor', () => {
-    it('sets `totalCap` and `individualCap` in `data`', () => {
-      const batchService = new Batch(1n, 2n);
+    it('sets `totalLimit` and `individualLimit` in `data`', () => {
+      const batchService = new Batch({ batchConfig });
       assert.deepStrictEqual(Object.entries(batchService), [
         [
           'data',
           {
-            totalCap: 1n,
-            individualCap: 2n,
+            totalLimit: 9000000000000000000n,
+            individualLimit: 2000000000000000000n,
           },
         ],
       ]);
     });
   });
 
-  describe('#checkEligibility', () => {
-    const eligibleAddresses = [addr1, addr2];
-    const nonEligibleAddress = addr3;
-    const participants = {
-      [eligibleAddresses[0]]: {
-        contribution: contr1,
-      },
-      [eligibleAddresses[1]]: {
-        contribution: contr2,
-      },
-      [nonEligibleAddress]: {
-        contribution: contr3,
-      },
-    };
-    const batchService = new Batch();
-
-    beforeEach(() => {
-      batchService.checkEligibility(participants, eligibleAddresses);
-    });
-
-    it('adds `permitted` flag per participant', () => {
-      assert.deepStrictEqual(batchService.data.participants, {
-        [eligibleAddresses[0]]: {
-          contribution:
-            participants[eligibleAddresses[0]].contribution,
-          permitted: true,
-        },
-        [eligibleAddresses[1]]: {
-          contribution:
-            participants[eligibleAddresses[1]].contribution,
-          permitted: true,
-        },
-        [nonEligibleAddress]: {
-          contribution: participants[nonEligibleAddress].contribution,
-          permitted: false,
-        },
-      });
-    });
-
-    it('adds field `totalEligibleContributions`', () => {
-      assert.equal(
-        batchService.data.totalEligibleContributions,
-        contr1 + contr2
-      );
-    });
-  });
-
-  describe('#getContributors', () => {
-    const participants = {
-      [addr1]: {
-        contribution: contr1,
-        permitted: true,
-      },
-      [addr2]: {
-        contribution: contr2,
-        permitted: true,
-      },
-      [addr3]: {
-        contribution: contr3,
-        permitted: false,
-      },
-    };
-    const batchService = new Batch();
-    batchService.data.participants = participants;
-
-    it("returns a list of contributors' addresses (`eligible` = true)", () => {
-      const contributors = batchService.getContributors();
-
-      assert.deepStrictEqual(contributors, [addr1, addr2]);
-    });
-  });
-
   describe('#assessInflows', () => {
     const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
-    const totalCap = parseUnits(batchConfig.CAPS.TOTAL, 18);
-    const individualCap = parseUnits(batchConfig.CAPS.INDIVIDUAL, 18);
+    const totalLimit = parseUnits(batchConfig.CAPS.TOTAL, 18);
+    const individualLimit = parseUnits(
+      batchConfig.CAPS.INDIVIDUAL,
+      18
+    );
 
-    const batchService = new Batch();
-    batchService.data = {
-      totalCap,
-      individualCap,
-    };
+    const batchService = new Batch({
+      batchConfig,
+    });
 
     before(() => {
       batchService.assessInflows(inflows, allowlist);
@@ -128,8 +53,8 @@ describe('Batch', () => {
 
     it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
       assert.deepStrictEqual(Object.keys(batchService.data), [
-        'totalCap',
-        'individualCap',
+        'totalLimit',
+        'individualLimit',
         'totalContribution',
         'totalValidContribution',
         'totalInvalidContribution',
@@ -140,7 +65,7 @@ describe('Batch', () => {
     it('calculates the correct `totalValidContribution`', () => {
       assert.equal(
         batchService.data.totalValidContribution,
-        totalCap
+        totalLimit
       );
     });
 
@@ -155,7 +80,7 @@ describe('Batch', () => {
       assert.equal(
         batchService.data.totalInvalidContribution,
         inflows.reduce((acc, curr) => acc + curr.contribution, 0n) -
-          totalCap
+          totalLimit
       );
     });
 
@@ -196,9 +121,9 @@ describe('Batch', () => {
           assert.equal(contribution, inflows[1].contribution);
           assert.equal(
             invalidContribution,
-            inflows[1].contribution - individualCap
+            inflows[1].contribution - individualLimit
           );
-          assert.equal(validContribution, individualCap);
+          assert.equal(validContribution, individualLimit);
         });
       });
     });
@@ -266,9 +191,12 @@ describe('Batch', () => {
             validContribution,
           } = participants[contributor];
 
-          assert.equal(contribution, totalCap);
-          assert.equal(invalidContribution, totalCap - individualCap);
-          assert.equal(validContribution, individualCap);
+          assert.equal(contribution, totalLimit);
+          assert.equal(
+            invalidContribution,
+            totalLimit - individualLimit
+          );
+          assert.equal(validContribution, individualLimit);
         });
       });
     });
@@ -297,7 +225,9 @@ describe('Batch', () => {
       },
     };
 
-    const batchService = new Batch();
+    const batchService = new Batch({
+      batchConfig,
+    });
     batchService.data = data;
 
     it('adds an `issuanceAllocation` field containing the allocation for each contributor', () => {
@@ -335,7 +265,9 @@ describe('Batch', () => {
         },
       },
     };
-    const batchService = new Batch();
+    const batchService = new Batch({
+      batchConfig,
+    });
     batchService.data = data;
 
     it('returns an object with the addresses as keys and their allocations as values', () => {

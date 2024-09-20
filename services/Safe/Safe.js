@@ -1,7 +1,8 @@
 import 'dotenv/config';
-import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
+import SafeApiKit from '@safe-global/api-kit';
 import ProtocolKit from '@safe-global/protocol-kit';
+import { getAddress } from 'viem';
 
 export class Safe {
   safeAddress;
@@ -9,12 +10,12 @@ export class Safe {
   protocolKit;
   safeTransactions;
 
-  constructor(chainId, safeAddress, rpcUrl) {
+  constructor(chainId, projectConfig, rpcUrl) {
     this.apiKit = new SafeApiKit.default({
       chainId,
     });
     this.rpcUrl = rpcUrl;
-    this.safeAddress = safeAddress;
+    this.safeAddress = getAddress(projectConfig.SAFE);
     this.safeTransactions = [];
   }
 
