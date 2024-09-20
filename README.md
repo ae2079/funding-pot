@@ -11,6 +11,12 @@ Within the project the term `batch` refers to one instance of running a funding 
 
 Note: this script does not cover the claiming of tokens by contributors
 
+## Installation
+
+Clone the repository and install the dependencies:
+
+`git clone https://github.com/InverterNetwork/funding-pot.git && cd funding-pot && npm install`
+
 ## Run the tests
 
 ### Prerequisites
