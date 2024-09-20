@@ -6,16 +6,14 @@ import { defineBatch } from './04_defineBatch.js';
 import { Queries } from '../../services/Queries/Queries.js';
 import {
   batchConfig,
-  batchData,
+  batchReportData,
   projectConfig,
   allowlist,
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
-import { parseUnits } from 'viem';
 import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
-const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
-  process.env;
+const { CHAIN_ID, INDEXER_URL } = process.env;
 
 describe('#defineBatch', () => {
   let queryService, batchService;
@@ -42,6 +40,6 @@ describe('#defineBatch', () => {
       allowlist,
     });
 
-    assert.deepStrictEqual(batchService.data, batchData);
+    assert.deepStrictEqual(batchService.data, batchReportData);
   });
 });

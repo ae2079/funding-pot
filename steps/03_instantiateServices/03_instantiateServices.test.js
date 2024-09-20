@@ -71,14 +71,12 @@ describe('#instantiateServices', () => {
   });
 
   it('instantiates the batch service', () => {
-    assert.deepStrictEqual(Object.entries(batchService), [
-      [
-        'data',
-        {
-          individualLimit: 2000000000000000000n,
-          totalLimit: 9000000000000000000n,
-        },
-      ],
-    ]);
+    assert.deepEqual(Object.keys(batchService), ['config', 'data']);
+    assert.deepStrictEqual(batchService.config, {
+      individualLimit: 2000000000000000000n,
+      totalLimit: 9000000000000000000n,
+      isEarlyAccess: false,
+    });
+    assert.deepStrictEqual(batchService.data, {});
   });
 });

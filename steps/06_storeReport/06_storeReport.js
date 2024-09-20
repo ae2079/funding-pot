@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 import { serializeBigInt } from '../../utils/helpers.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const storeReport = async (
   projectName,
@@ -19,7 +20,7 @@ export const storeReport = async (
   const report = {
     projectName,
     batchNr,
-    batch: batchService.data,
+    batch: { data: batchService.data, config: batchService.config },
     safe: {
       proposedTransactions: safeService.safeTransactions,
     },

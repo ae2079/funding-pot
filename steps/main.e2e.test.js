@@ -20,6 +20,7 @@ describe('#main', () => {
 
   before(async () => {
     await setupForE2E();
+
     console.info(
       '🕒 Waiting for 5 seconds for ANKR API to catch up...'
     );
@@ -28,23 +29,23 @@ describe('#main', () => {
     const {
       projectConfig: { SAFE },
     } = loadInputs(projectName, batchNr);
+
     safeAddress = SAFE;
   });
 
   it('creates vestings for eligible contributors', async () => {
     await main(projectName, batchNr);
+
     const [txReceipt] = await signAndExecutePendingTxs(safeAddress);
     const vestings = await getVestings(txReceipt.hash);
     const report = await getReport(projectName, batchNr);
     const { participants } = report.batch;
-
     for (const address in participants) {
       const { issuanceAllocation } = participants[address];
       if (!issuanceAllocation) continue;
       const found = !!vestings.find((vesting) => {
         return vesting.amount.toString() === issuanceAllocation;
       });
-
       assert.ok(found);
     }
   });

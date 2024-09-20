@@ -147,7 +147,7 @@ export class Queries {
           transactionHash,
         } = tx;
         return {
-          participant: fromAddress,
+          participant: fromAddress.toLowerCase(),
           contribution: parseUnits(value, tokenDecimals),
           timestamp,
           transactionHash,
@@ -190,6 +190,15 @@ export class Queries {
 
     this.queries.vestedBalances = keysToLowerCase(vestedBalances);
     return this.queries.vestedBalances;
+  }
+
+  async getNftHolders(token) {
+    const { holders } = await this.ankrProvider.getNFTHolders({
+      blockchain: this.networkIdString,
+      contractAddress: token,
+    });
+    this.queries.nftHolders = holders.map((h) => h.toLowerCase());
+    return this.queries.nftHolders;
   }
 
   /* 

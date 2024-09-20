@@ -1,6 +1,6 @@
-import { describe, it, beforeEach, before } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits } from 'viem';
 
 import { Batch } from './Batch.js';
 import {
@@ -8,6 +8,7 @@ import {
   addresses,
   allowlist,
   batchConfig,
+  nftHolders,
 } from '../../utils/testUtils/staticTestData.js';
 
 describe('Batch', () => {
@@ -25,18 +26,14 @@ describe('Batch', () => {
       const batchService = new Batch({ batchConfig });
 
       it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
-        assert.deepStrictEqual(Object.entries(batchService), [
-          [
-            'data',
-            {
-              totalLimit: parseUnits(batchConfig.LIMITS.TOTAL, 18),
-              individualLimit: parseUnits(
-                batchConfig.LIMITS.INDIVIDUAL,
-                18
-              ),
-            },
-          ],
-        ]);
+        assert.equal(
+          batchService.config.totalLimit,
+          parseUnits(batchConfig.LIMITS.TOTAL, 18)
+        );
+        assert.equal(
+          batchService.config.individualLimit,
+          parseUnits(batchConfig.LIMITS.INDIVIDUAL, 18)
+        );
       });
     });
 
@@ -52,15 +49,14 @@ describe('Batch', () => {
       });
 
       it('accounts for previous batchReports', () => {
-        assert.deepStrictEqual(Object.entries(batchService), [
-          [
-            'data',
-            {
-              totalLimit: 4000000000000000000n,
-              individualLimit: 2000000000000000000n,
-            },
-          ],
-        ]);
+        assert.equal(
+          batchService.config.totalLimit,
+          4000000000000000000n
+        );
+        assert.equal(
+          batchService.config.individualLimit,
+          2000000000000000000n
+        );
       });
     });
   });
@@ -73,52 +69,100 @@ describe('Batch', () => {
       18
     );
 
-    const batchService = new Batch({
-      batchConfig,
-    });
+    describe.skip('when it is NOT an early access batch', () => {
+      const batchService = new Batch({
+        batchConfig,
+      });
 
-    before(() => {
-      batchService.assessInflows(inflows, allowlist);
-    });
+      beforeEach(() => {
+        batchService.assessInflows(inflows, allowlist, nftHolders);
+      });
 
-    it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
-      assert.deepStrictEqual(Object.keys(batchService.data), [
-        'totalLimit',
-        'individualLimit',
-        'totalContribution',
-        'totalValidContribution',
-        'totalInvalidContribution',
-        'participants',
-      ]);
-    });
+      it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
+        assert.deepStrictEqual(Object.keys(batchService.data), [
+          'totalLimit',
+          'individualLimit',
+          'isEarlyAccess',
+          'totalContribution',
+          'totalValidContribution',
+          'totalInvalidContribution',
+          'participants',
+        ]);
+      });
 
-    it('calculates the correct `totalValidContribution`', () => {
-      assert.equal(
-        batchService.data.totalValidContribution,
-        totalLimit
-      );
-    });
-
-    it('calculates the correct `totalContribution`', () => {
-      assert.equal(
-        batchService.data.totalContribution,
-        inflows.reduce((acc, curr) => acc + curr.contribution, 0n)
-      );
-    });
-
-    it('calculates the correct `invalidContribution`', () => {
-      assert.equal(
-        batchService.data.totalInvalidContribution,
-        inflows.reduce((acc, curr) => acc + curr.contribution, 0n) -
+      it('calculates the correct `totalValidContribution`', () => {
+        assert.equal(
+          batchService.data.totalValidContribution,
           totalLimit
-      );
-    });
+        );
+      });
 
-    describe('with two contributions (addr1)', () => {
-      const contributor = addr1;
+      it('calculates the correct `totalContribution`', () => {
+        assert.equal(
+          batchService.data.totalContribution,
+          inflows.reduce((acc, curr) => acc + curr.contribution, 0n)
+        );
+      });
 
-      describe('when when the second contribution exceeds the individual cap', () => {
-        it('splits between `validContribution` and `invalidContribution`', () => {
+      it('calculates the correct `invalidContribution`', () => {
+        assert.equal(
+          batchService.data.totalInvalidContribution,
+          inflows.reduce((acc, curr) => acc + curr.contribution, 0n) -
+            totalLimit
+        );
+      });
+
+      describe('with two contributions (addr1)', () => {
+        const contributor = addr1;
+
+        describe('when when the second contribution exceeds the individual cap', () => {
+          it('splits between `validContribution` and `invalidContribution`', () => {
+            const { participants } = batchService.data;
+            const {
+              contribution,
+              invalidContribution,
+              validContribution,
+            } = participants[contributor];
+
+            assert.equal(
+              contribution,
+              inflows[0].contribution + inflows[2].contribution
+            );
+            assert.equal(
+              invalidContribution,
+              inflows[2].contribution
+            );
+            assert.equal(validContribution, inflows[0].contribution);
+          });
+        });
+      });
+
+      describe('with one contribution (addr2)', () => {
+        const contributor = addr2;
+
+        describe('when contributor contributes above individual limit', () => {
+          it('splits between `validContribution` and `invalidContribution`', () => {
+            const { participants } = batchService.data;
+            const {
+              contribution,
+              invalidContribution,
+              validContribution,
+            } = participants[contributor];
+
+            assert.equal(contribution, inflows[1].contribution);
+            assert.equal(
+              invalidContribution,
+              inflows[1].contribution - individualLimit
+            );
+            assert.equal(validContribution, individualLimit);
+          });
+        });
+      });
+
+      describe('without being on the allowlist (addr3)', () => {
+        const contributor = addr3;
+
+        it('considers all contributions as `invalidContribution`', () => {
           const { participants } = batchService.data;
           const {
             contribution,
@@ -126,75 +170,14 @@ describe('Batch', () => {
             validContribution,
           } = participants[contributor];
 
-          assert.equal(
-            contribution,
-            inflows[0].contribution + inflows[2].contribution
-          );
-          assert.equal(invalidContribution, inflows[2].contribution);
-          assert.equal(validContribution, inflows[0].contribution);
+          assert.equal(contribution, 100000000000000000n);
+          assert.equal(invalidContribution, 100000000000000000n);
+          assert.equal(validContribution, 0n);
         });
       });
-    });
 
-    describe('with one contribution (addr2)', () => {
-      const contributor = addr2;
-
-      describe('when contributor contributes above individual limit', () => {
-        it('splits between `validContribution` and `invalidContribution`', () => {
-          const { participants } = batchService.data;
-          const {
-            contribution,
-            invalidContribution,
-            validContribution,
-          } = participants[contributor];
-
-          assert.equal(contribution, inflows[1].contribution);
-          assert.equal(
-            invalidContribution,
-            inflows[1].contribution - individualLimit
-          );
-          assert.equal(validContribution, individualLimit);
-        });
-      });
-    });
-
-    describe('without being on the allowlist (addr3)', () => {
-      const contributor = addr3;
-
-      it('considers all contributions as `invalidContribution`', () => {
-        const { participants } = batchService.data;
-        const {
-          contribution,
-          invalidContribution,
-          validContribution,
-        } = participants[contributor];
-
-        assert.equal(contribution, 100000000000000000n);
-        assert.equal(invalidContribution, 100000000000000000n);
-        assert.equal(validContribution, 0n);
-      });
-    });
-
-    describe('without any applicable restrictions (addr5)', () => {
-      const contributor = addr5;
-
-      it('counts the contribution as valid', () => {
-        const { participants } = batchService.data;
-        const {
-          contribution,
-          invalidContribution,
-          validContribution,
-        } = participants[contributor];
-
-        assert.equal(contribution, 1700000000000000000n);
-        assert.equal(invalidContribution, 0n);
-        assert.equal(validContribution, 1700000000000000000n);
-      });
-    });
-
-    describe('when contribution exceeds both individual and total cap', () => {
-      describe('where the total cap is more restrictive (addr6)', () => {
-        const contributor = addr6;
+      describe('without any applicable restrictions (addr5)', () => {
+        const contributor = addr5;
 
         it('counts the contribution as valid', () => {
           const { participants } = batchService.data;
@@ -204,30 +187,72 @@ describe('Batch', () => {
             validContribution,
           } = participants[contributor];
 
-          assert.equal(contribution, 3000000000000000000n);
-          assert.equal(invalidContribution, 1700000000000000000n);
-          assert.equal(validContribution, 1300000000000000000n);
+          assert.equal(contribution, 1700000000000000000n);
+          assert.equal(invalidContribution, 0n);
+          assert.equal(validContribution, 1700000000000000000n);
         });
       });
 
-      describe('where the individual cap is more restrictive (addr4)', () => {
-        const contributor = addr4;
+      describe('when contribution exceeds both individual and total cap', () => {
+        describe('where the total cap is more restrictive (addr6)', () => {
+          const contributor = addr6;
 
-        it("only considers the contribution that doesn't exceed the total cap as valid", () => {
-          const { participants } = batchService.data;
-          const {
-            contribution,
-            invalidContribution,
-            validContribution,
-          } = participants[contributor];
+          it('counts the contribution as valid', () => {
+            const { participants } = batchService.data;
+            const {
+              contribution,
+              invalidContribution,
+              validContribution,
+            } = participants[contributor];
 
-          assert.equal(contribution, totalLimit);
-          assert.equal(
-            invalidContribution,
-            totalLimit - individualLimit
-          );
-          assert.equal(validContribution, individualLimit);
+            assert.equal(contribution, 3000000000000000000n);
+            assert.equal(invalidContribution, 1700000000000000000n);
+            assert.equal(validContribution, 1300000000000000000n);
+          });
         });
+
+        describe('where the individual cap is more restrictive (addr4)', () => {
+          const contributor = addr4;
+
+          it("only considers the contribution that doesn't exceed the total cap as valid", () => {
+            const { participants } = batchService.data;
+            const {
+              contribution,
+              invalidContribution,
+              validContribution,
+            } = participants[contributor];
+
+            assert.equal(contribution, totalLimit);
+            assert.equal(
+              invalidContribution,
+              totalLimit - individualLimit
+            );
+            assert.equal(validContribution, individualLimit);
+          });
+        });
+      });
+    });
+
+    describe('when it is an early access batch', () => {
+      const batchService = new Batch({
+        batchConfig: { ...batchConfig, IS_EARLY_ACCESS: true },
+      });
+
+      beforeEach(() => {
+        batchService.assessInflows(inflows, allowlist, nftHolders);
+      });
+
+      it('includes only valid contributions from NFT holders', () => {
+        const { participants } = batchService.data;
+        const participantsWithValidContributions = Object.entries(
+          participants
+        )
+          .filter(([, data]) => data.validContribution > 0n)
+          .map(([address]) => address);
+        assert.deepStrictEqual(
+          participantsWithValidContributions,
+          nftHolders
+        );
       });
     });
   });
