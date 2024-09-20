@@ -9,6 +9,7 @@ describe('#validateInputs', () => {
   const projectConfig = {
     SAFE: '0x4ffe42c1666e50104e997DD07E43c673FD39C81d',
     ORCHESTRATOR: '0x4ffe42c1666e50104e997DD07E43c673FD39C81d',
+    NFT: '0xa47f284a5be76c10b902446acb1aea9550f4c71d',
   };
   const batchConfig = {
     VESTING_DETAILS: {
@@ -20,6 +21,7 @@ describe('#validateInputs', () => {
       TOTAL: '500000',
       INDIVIDUAL: '5000',
     },
+    IS_EARLY_ACCESS: false,
   };
   const allowlist = ['0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb'];
   const batchReports = {
@@ -331,6 +333,50 @@ describe('#validateInputs', () => {
         {
           name: 'Error',
           message: 'LIMITS missing or empty',
+        }
+      );
+    });
+  });
+
+  describe('without IS_EARLY_ACCESS flag', () => {
+    const configWithoutFlag = { ...batchConfig };
+    delete configWithoutFlag.IS_EARLY_ACCESS;
+
+    it('throws an error', () => {
+      assert.throws(
+        () => {
+          validateInputs({
+            projectConfig,
+            batchConfig: configWithoutFlag,
+            allowlist,
+            batchReports,
+          });
+        },
+        {
+          name: 'Error',
+          message: 'IS_EARLY_ACCESS missing or empty',
+        }
+      );
+    });
+  });
+
+  describe('without NFT', () => {
+    const projectConfigWithoutNft = { ...projectConfig };
+    delete projectConfigWithoutNft.NFT;
+
+    it('throws an error', () => {
+      assert.throws(
+        () => {
+          validateInputs({
+            projectConfig: projectConfigWithoutNft,
+            batchConfig,
+            allowlist,
+            batchReports,
+          });
+        },
+        {
+          name: 'Error',
+          message: 'NFT missing or invalid address',
         }
       );
     });

@@ -31,14 +31,18 @@ const validateConfigs = ({
   batchConfig,
   allowlist,
 }) => {
-  const { VESTING_DETAILS, LIMITS } = batchConfig;
-  const { SAFE, ORCHESTRATOR } = projectConfig;
+  const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS } = batchConfig;
+  const { SAFE, ORCHESTRATOR, NFT } = projectConfig;
 
   if (!SAFE || !isAddress(SAFE))
     throw new Error('SAFE missing or invalid address');
   if (!ORCHESTRATOR || !isAddress(ORCHESTRATOR))
     throw new Error('ORCHESTRATOR missing or invalid address');
+  if (!NFT || !isAddress(NFT))
+    throw new Error('NFT missing or invalid address');
 
+  if (IS_EARLY_ACCESS === undefined)
+    throw new Error('IS_EARLY_ACCESS missing or empty');
   if (!LIMITS || !LIMITS.TOTAL || !LIMITS.INDIVIDUAL)
     throw new Error('LIMITS missing or empty');
   if (!allowlist || allowlist.length === 0)

@@ -1,6 +1,6 @@
-import { describe, it, beforeEach, before } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { parseUnits, formatUnits } from 'viem';
+import { parseUnits } from 'viem';
 
 import { Batch } from './Batch.js';
 import {
@@ -27,11 +27,11 @@ describe('Batch', () => {
 
       it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
         assert.equal(
-          batchService.data.totalLimit,
+          batchService.config.totalLimit,
           parseUnits(batchConfig.LIMITS.TOTAL, 18)
         );
         assert.equal(
-          batchService.data.individualLimit,
+          batchService.config.individualLimit,
           parseUnits(batchConfig.LIMITS.INDIVIDUAL, 18)
         );
       });
@@ -50,11 +50,11 @@ describe('Batch', () => {
 
       it('accounts for previous batchReports', () => {
         assert.equal(
-          batchService.data.totalLimit,
+          batchService.config.totalLimit,
           4000000000000000000n
         );
         assert.equal(
-          batchService.data.individualLimit,
+          batchService.config.individualLimit,
           2000000000000000000n
         );
       });

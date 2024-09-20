@@ -6,7 +6,7 @@ import { defineBatch } from './04_defineBatch.js';
 import { Queries } from '../../services/Queries/Queries.js';
 import {
   batchConfig,
-  batchData,
+  batchReportData,
   projectConfig,
   allowlist,
 } from '../../utils/testUtils/staticTestData.js';
@@ -42,6 +42,6 @@ describe('#defineBatch', () => {
       allowlist,
     });
 
-    assert.deepStrictEqual(batchService.data, batchData);
+    assert.deepStrictEqual(batchService.data, batchReportData);
   });
 });

@@ -90,13 +90,16 @@ export const inflows = [
   },
 ];
 
-export const batchData = {
-  totalValidContribution: 9000000000000000000n,
-  totalInvalidContribution: 9000000000000000000n,
+export const batchReportConfig = {
   totalLimit: 9000000000000000000n,
   individualLimit: 2000000000000000000n,
-  totalContribution: 18000000000000000000n,
   isEarlyAccess: false,
+};
+
+export const batchReportData = {
+  totalValidContribution: 9000000000000000000n,
+  totalInvalidContribution: 9000000000000000000n,
+  totalContribution: 18000000000000000000n,
   participants: {
     [addresses.addr1]: {
       contribution: 2100000000000000000n,

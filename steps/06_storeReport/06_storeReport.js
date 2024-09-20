@@ -19,7 +19,7 @@ export const storeReport = async (
   const report = {
     projectName,
     batchNr,
-    batch: batchService.data,
+    batch: { data: batchService.data, config: batchService.config },
     safe: {
       proposedTransactions: safeService.safeTransactions,
     },

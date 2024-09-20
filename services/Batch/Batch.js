@@ -1,6 +1,7 @@
 import { formatUnits, parseUnits } from 'viem';
 
 export class Batch {
+  config;
   data;
 
   constructor({ batchConfig, batchReports }) {
@@ -18,7 +19,8 @@ export class Batch {
     }
     const totalLimit = totalBatchLimit;
 
-    this.data = { totalLimit, individualLimit, isEarlyAccess };
+    this.config = { totalLimit, individualLimit, isEarlyAccess };
+    this.data = {};
   }
 
   assessInflows(inflows, allowlist, nftHolders) {
@@ -38,7 +40,8 @@ export class Batch {
       // OR if it's an early access batch and the participant is not an NFT holder
       if (
         !allowlist.includes(participant) ||
-        (this.data.isEarlyAccess && !nftHolders.includes(participant))
+        (this.config.isEarlyAccess &&
+          !nftHolders.includes(participant))
       ) {
         this.manageContribution(participant, {
           invalidContribution: contribution,
@@ -56,7 +59,7 @@ export class Batch {
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
       const individualDiff =
-        this.data.individualLimit - (prevValid + contribution);
+        this.config.individualLimit - (prevValid + contribution);
 
       // means that the individual cap has been exceeded
       if (individualDiff < 0n) {
@@ -69,7 +72,7 @@ export class Batch {
       // difference between total cap and own contribution
       // if negative, means that the total cap has been exceeded
       const totalDiff =
-        this.data.totalLimit -
+        this.config.totalLimit -
         this.data.totalValidContribution -
         (prevValid + contribution);
 

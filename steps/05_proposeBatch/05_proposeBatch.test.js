@@ -1,6 +1,6 @@
 import '../../env.js';
 
-import { describe, it, before, beforeEach } from 'node:test';
+import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
 import { getAddress } from 'viem';
 import {
@@ -11,22 +11,17 @@ import {
 import { proposeBatch } from './05_proposeBatch.js';
 import { instantiateServices } from '../03_instantiateServices/03_instantiateServices.js';
 import {
-  getProjectConfig,
   signAndExecutePendingTxs,
   mintMockTokens,
 } from '../../utils/testUtils/testHelpers.js';
 import {
   batchConfig,
-  batchData,
+  batchReportData,
   projectConfig,
-  allowlist,
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
 
-import {
-  getAnkrRpcUrl,
-  keysToLowerCase,
-} from '../../utils/helpers.js';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 import { TransactionBuilder } from '../../services/TransactionBuilder/TransactionBuilder.js';
 import { Safe } from '../../services/Safe/Safe.js';
 import { Queries } from '../../services/Queries/Queries.js';
@@ -38,12 +33,8 @@ describe('#proposeBatch', () => {
     batchService;
 
   describe('with a small batch (2 vestings)', () => {
-    const addr1 = '0xAeC9D8128a75Cb93B56D4dCf693a04251f8b9340';
-    const addr2 = '0xce989336BdED425897Ac63d1359628E26E24f794';
     const issuance1 = 6_000_000_000_000_000n;
     const issuance2 = 4_000_000_000_000_000n;
-    const additionalIssuance = issuance1 + issuance2;
-    const totalValidContribution = 10_000_000_000_000_000n;
 
     beforeEach(async () => {
       batchService = new Batch({
@@ -66,7 +57,7 @@ describe('#proposeBatch', () => {
         batchConfig,
       });
 
-      batchService.data = batchData;
+      batchService.data = batchReportData;
     });
 
     it('adds a transaction to the safe', async () => {
