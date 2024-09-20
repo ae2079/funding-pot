@@ -22,7 +22,7 @@ describe('#validateInputs', () => {
     },
   };
   const allowlist = ['0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb'];
-  const reports = {
+  const batchReports = {
     1: {},
     2: {},
   };
@@ -30,7 +30,7 @@ describe('#validateInputs', () => {
   const batchNr = 1;
 
   describe('with batchNr = 1', () => {
-    describe('without reports', () => {
+    describe('without batchReports', () => {
       it('does not throw', () => {
         assert.doesNotThrow(() => {
           validateInputs({
@@ -47,7 +47,7 @@ describe('#validateInputs', () => {
   describe('with batchNr = 3', () => {
     const thirdBatch = 3;
 
-    describe('when there are less reports than the batchNr suggests', () => {
+    describe('when there are less batchReports than the batchNr suggests', () => {
       it('throws', () => {
         assert.throws(
           () => {
@@ -56,13 +56,13 @@ describe('#validateInputs', () => {
               batchConfig,
               allowlist,
               batchNr: thirdBatch,
-              reports: { 1: {} },
+              batchReports: { 1: {} },
             });
           },
           {
             name: 'Error',
             message:
-              'Current batch nr is 3, but there are only 1 previous reports',
+              'Current batch nr is 3, but there are only 1 previous batchReports',
           }
         );
       });
@@ -77,7 +77,7 @@ describe('#validateInputs', () => {
               batchConfig,
               allowlist,
               batchNr: thirdBatch,
-              reports: { 1: {}, 3: {} },
+              batchReports: { 1: {}, 3: {} },
             });
           },
           {
@@ -88,7 +88,7 @@ describe('#validateInputs', () => {
       });
     });
 
-    describe('with reports', () => {
+    describe('with batchReports', () => {
       it('does not throw', () => {
         assert.doesNotThrow(() => {
           validateInputs({
@@ -96,7 +96,7 @@ describe('#validateInputs', () => {
             batchConfig,
             allowlist,
             batchNr: thirdBatch,
-            reports,
+            batchReports,
           });
         });
       });
@@ -111,7 +111,7 @@ describe('#validateInputs', () => {
             projectConfig: {},
             batchConfig: {},
             allowlist: [],
-            reports: {},
+            batchReports: {},
           });
         },
         {
@@ -133,7 +133,7 @@ describe('#validateInputs', () => {
             },
             batchConfig,
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -156,7 +156,7 @@ describe('#validateInputs', () => {
             },
             batchConfig,
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -181,7 +181,7 @@ describe('#validateInputs', () => {
               },
             },
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -206,7 +206,7 @@ describe('#validateInputs', () => {
               },
             },
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -231,7 +231,7 @@ describe('#validateInputs', () => {
               },
             },
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -257,7 +257,7 @@ describe('#validateInputs', () => {
               },
             },
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -284,7 +284,7 @@ describe('#validateInputs', () => {
               },
             },
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {
@@ -303,7 +303,7 @@ describe('#validateInputs', () => {
             projectConfig,
             batchConfig,
             allowlist: [],
-            reports,
+            batchReports,
           });
         },
         {
@@ -325,7 +325,7 @@ describe('#validateInputs', () => {
             projectConfig,
             batchConfig: configWithoutLimits,
             allowlist,
-            reports,
+            batchReports,
           });
         },
         {

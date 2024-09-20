@@ -5,9 +5,9 @@ export class Batch {
   data;
 
   constructor({ batchConfig }) {
-    const totalLimit = parseUnits(batchConfig.CAPS.TOTAL, 18);
+    const totalLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
     const individualLimit = parseUnits(
-      batchConfig.CAPS.INDIVIDUAL,
+      batchConfig.LIMITS.INDIVIDUAL,
       18
     );
     this.data = { totalLimit, individualLimit };

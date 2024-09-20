@@ -8,7 +8,7 @@ export const batchConfig = {
     CLIFF: 10,
     END: 100,
   },
-  CAPS: {
+  LIMITS: {
     TOTAL: '9',
     INDIVIDUAL: '2',
   },

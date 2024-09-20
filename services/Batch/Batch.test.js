@@ -37,9 +37,9 @@ describe('Batch', () => {
 
   describe('#assessInflows', () => {
     const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
-    const totalLimit = parseUnits(batchConfig.CAPS.TOTAL, 18);
+    const totalLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
     const individualLimit = parseUnits(
-      batchConfig.CAPS.INDIVIDUAL,
+      batchConfig.LIMITS.INDIVIDUAL,
       18
     );
 

@@ -7,7 +7,7 @@ import { getAnkrRpcUrl } from '../../utils/helpers.js';
 export const instantiateServices = async (
   projectConfig,
   batchConfig,
-  reports
+  batchReports
 ) => {
   const { CHAIN_ID, INDEXER_URL } = process.env;
   const { ORCHESTRATOR } = projectConfig;
@@ -35,6 +35,7 @@ export const instantiateServices = async (
 
   const batchService = new Batch({
     batchConfig,
+    batchReports,
   });
 
   return {

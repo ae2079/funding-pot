@@ -5,7 +5,7 @@ export const validateInputs = ({
   projectConfig,
   batchConfig,
   allowlist,
-  reports,
+  batchReports,
 }) => {
   validateEnvVars();
   validateConfigs({
@@ -13,7 +13,7 @@ export const validateInputs = ({
     batchConfig,
     allowlist,
   });
-  validateReports({ batchNr, reports });
+  validatebatchReports({ batchNr, batchReports });
 };
 
 const validateEnvVars = () => {
@@ -60,16 +60,16 @@ const validateConfigs = ({
     throw new Error('Vesting: START + CLIFF > END');
 };
 
-const validateReports = ({ reports, batchNr }) => {
+const validatebatchReports = ({ batchReports, batchNr }) => {
   if (batchNr == 1) return;
 
-  if (!reports) throw new Error('Reports missing');
+  if (!batchReports) throw new Error('batchReports missing');
 
-  const reportNumbers = Object.keys(reports);
+  const reportNumbers = Object.keys(batchReports);
 
   if (batchNr - reportNumbers.length > 1)
     throw new Error(
-      `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous reports`
+      `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous batchReports`
     );
 
   for (let i = 1; i <= reportNumbers.length; i++) {

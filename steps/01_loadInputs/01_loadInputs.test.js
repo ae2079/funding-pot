@@ -11,7 +11,7 @@ describe('#loadInputs', () => {
   });
 
   describe('with existing batch number', () => {
-    describe('without previous batch reports', () => {
+    describe('without previous batch batchReports', () => {
       const projectName = 'STATIC_TEST_PROJECT_1';
       const batchNumber = 1;
 
@@ -26,18 +26,18 @@ describe('#loadInputs', () => {
       });
     });
 
-    describe('with previous batch reports', () => {
+    describe('with previous batch batchReports', () => {
       const projectName = 'STATIC_TEST_PROJECT_2';
       const batchNumber = 2;
 
-      it('returns the configs: projectsConfig, allowlist, batchConfig, reports', () => {
+      it('returns the configs: projectsConfig, allowlist, batchConfig, batchReports', () => {
         const inputs = loadInputs(projectName, batchNumber);
 
         assert.deepEqual(Object.keys(inputs), [
           'projectConfig',
           'allowlist',
           'batchConfig',
-          'reports',
+          'batchReports',
         ]);
       });
     });

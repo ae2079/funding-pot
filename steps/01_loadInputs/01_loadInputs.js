@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 export const loadInputs = (projectName, batch) => {
   return {
     ...loadConfigs(projectName, batch),
-    ...loadReports(projectName),
+    ...loadbatchReports(projectName),
   };
 };
 
@@ -41,26 +41,26 @@ const loadConfigs = (projectName, batch) => {
   };
 };
 
-const loadReports = (projectName) => {
-  const reportsPath = path.join(
+const loadbatchReports = (projectName) => {
+  const batchReportsPath = path.join(
     __dirname,
     `${getBasePath('output')}/${projectName}`
   );
 
-  const reports = {};
+  const batchReports = {};
   try {
-    const files = fs.readdirSync(reportsPath);
+    const files = fs.readdirSync(batchReportsPath);
     files.forEach((file) => {
-      const filePath = path.join(reportsPath, file);
+      const filePath = path.join(batchReportsPath, file);
       const report = fs.readFileSync(filePath, 'utf8');
       const key = path.basename(file, '.json');
-      reports[key] = JSON.parse(report);
+      batchReports[key] = JSON.parse(report);
     });
-    if (Object.keys(reports).length > 0) {
-      return { reports };
+    if (Object.keys(batchReports).length > 0) {
+      return { batchReports };
     }
   } catch (err) {
-    console.error('ERROR - could not read reports:', err);
+    console.error('ERROR - could not read batchReports:', err);
   }
   return;
 };

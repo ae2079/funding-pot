@@ -10,9 +10,9 @@ export const main = async (projectName, batchNr) => {
     `🚀 Starting batch execution for project ${projectName} with batch number ${batchNr}`
   );
 
-  // load configs & reports
+  // load configs & batchReports
   console.info(`1️⃣ Loading configs...`);
-  const { projectConfig, batchConfig, allowlist, reports } =
+  const { projectConfig, batchConfig, allowlist, batchReports } =
     loadInputs(projectName, batchNr);
 
   // checks if all required inputs are set in configs
@@ -22,7 +22,7 @@ export const main = async (projectName, batchNr) => {
     projectConfig,
     batchConfig,
     allowlist,
-    reports,
+    batchReports,
   });
 
   // instantiate services
