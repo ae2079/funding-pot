@@ -17,6 +17,8 @@ Clone the repository and install the dependencies:
 
 `git clone https://github.com/InverterNetwork/funding-pot.git && cd funding-pot && npm install`
 
+Next you will have to set some environment variables.
+
 ## Run the tests
 
 ### Prerequisites
