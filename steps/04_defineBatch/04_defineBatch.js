@@ -7,7 +7,7 @@ export const defineBatch = async ({
 }) => {
   // get project & batch specific config
   const { TIMEFRAME } = batchConfig;
-  const { SAFE } = projectConfig;
+  const { SAFE, NFT } = projectConfig;
 
   // get timeframe
   const { fromTimestamp, toTimestamp } =
@@ -24,7 +24,9 @@ export const defineBatch = async ({
     toTimestamp
   );
 
-  batchService.assessInflows(inflows, allowlist);
+  const nftHolders = await queryService.getNftHolders(NFT);
+
+  batchService.assessInflows(inflows, allowlist, nftHolders);
 
   if (batchService.data.totalValidContribution === 0n)
     throw new Error('No valid contributions found');

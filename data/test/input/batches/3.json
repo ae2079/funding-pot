@@ -11,5 +11,6 @@
   "LIMITS": {
     "INDIVIDUAL": "500",
     "TOTAL": "1500"
-  }
+  },
+  "IS_EARLY_ACCESS": false
 }

@@ -6,7 +6,10 @@ import assert from 'node:assert';
 import { getContract } from 'viem';
 
 import abis from '../../data/abis.js';
-import { inflows } from '../../utils/testUtils/staticTestData.js';
+import {
+  inflows,
+  projectConfig,
+} from '../../utils/testUtils/staticTestData.js';
 import { Queries } from './Queries.js';
 import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
@@ -155,7 +158,7 @@ describe('Queries', () => {
       chainId: process.env.CHAIN_ID,
     });
     querySevice.queries.addresses = {
-      orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+      orchestrator: projectConfig.ORCHESTRATOR,
     };
 
     it('gets aggregate vestings', async () => {
@@ -176,7 +179,7 @@ describe('Queries', () => {
       chainId: process.env.CHAIN_ID,
     });
     querySevice.queries.addresses = {
-      orchestrator: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+      orchestrator: projectConfig.ORCHESTRATOR,
     };
     const mockSafe = '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
 
@@ -208,6 +211,24 @@ describe('Queries', () => {
         assert.equal(timeframe.fromTimestamp, '1725654505');
         assert.equal(timeframe.toTimestamp, '1725655119');
       });
+    });
+  });
+
+  describe('#getNftHolders', () => {
+    const querySevice = new Queries({
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: getAnkrRpcUrl(),
+      chainId: process.env.CHAIN_ID,
+    });
+
+    it('should return all NFT holders', async () => {
+      await querySevice.getNftHolders(projectConfig.NFT);
+
+      assert.deepStrictEqual(querySevice.queries.nftHolders, [
+        '0x6747772f37a4f7cfdea180d38e8ad372516c9548',
+        '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
+        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f',
+      ]);
     });
   });
 });

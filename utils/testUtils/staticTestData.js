@@ -12,11 +12,13 @@ export const batchConfig = {
     TOTAL: '9',
     INDIVIDUAL: '2',
   },
+  IS_EARLY_ACCESS: false,
 };
 
 export const projectConfig = {
   SAFE: '0x4ffe42c1666e50104e997DD07E43c673FD39C81d',
   ORCHESTRATOR: '0x49BC19af25056Db61cfB4035A23ce3B509DF46B3',
+  NFT: '0xa47f284a5be76c10b902446acb1aea9550f4c71d',
 };
 
 export const addresses = {
@@ -94,6 +96,7 @@ export const batchData = {
   totalLimit: 9000000000000000000n,
   individualLimit: 2000000000000000000n,
   totalContribution: 18000000000000000000n,
+  isEarlyAccess: false,
   participants: {
     [addresses.addr1]: {
       contribution: 2100000000000000000n,
@@ -133,3 +136,8 @@ export const batchData = {
   },
   additionalIssuance: 48700550011355454828n,
 };
+
+export const nftHolders = [
+  '0x6747772f37a4f7cfdea180d38e8ad372516c9548',
+  '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
+];

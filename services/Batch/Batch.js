@@ -4,6 +4,7 @@ export class Batch {
   data;
 
   constructor({ batchConfig, batchReports }) {
+    const isEarlyAccess = batchConfig.IS_EARLY_ACCESS;
     const individualLimit = parseUnits(
       batchConfig.LIMITS.INDIVIDUAL,
       18
@@ -17,10 +18,10 @@ export class Batch {
     }
     const totalLimit = totalBatchLimit;
 
-    this.data = { totalLimit, individualLimit };
+    this.data = { totalLimit, individualLimit, isEarlyAccess };
   }
 
-  assessInflows(inflows, allowlist) {
+  assessInflows(inflows, allowlist, nftHolders) {
     this.data.totalContribution = 0n;
     this.data.totalValidContribution = 0n;
     this.data.totalInvalidContribution = 0n;
@@ -33,8 +34,12 @@ export class Batch {
       // adds contribution to participants
       this.createOrAddContribution(participant, contribution);
 
-      // if the inflow is not on the allowlis, everything is invalid contribution
-      if (!allowlist.includes(participant)) {
+      // if the inflow is not on the allowlist, everything is invalid contribution
+      // OR if it's an early access batch and the participant is not an NFT holder
+      if (
+        !allowlist.includes(participant) ||
+        (this.data.isEarlyAccess && !nftHolders.includes(participant))
+      ) {
         this.manageContribution(participant, {
           invalidContribution: contribution,
         });
