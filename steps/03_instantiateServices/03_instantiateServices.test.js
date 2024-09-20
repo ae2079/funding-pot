@@ -77,6 +77,7 @@ describe('#instantiateServices', () => {
         {
           individualLimit: 2000000000000000000n,
           totalLimit: 9000000000000000000n,
+          isEarlyAccess: false,
         },
       ],
     ]);
