@@ -71,7 +71,7 @@ Copy `.env.example` to `.env` and fill in the values. If the delegate has alread
 
 There are three types of inputs that the script executor can take. They can all be found under `/data/production/input`.
 
-1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("TESTPROJECT") will be added to `/data/test/input/projects.json`.
+1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("GENERATED_TEST_PROJECT") will be added to `/data/test/input/projects.json`.
 2. `allowlist.json`: Contains an array of addresses that are allowed to contribute to the safe. This file should be updated whenever a new address is added or an existing one is removed. If you run the tests for the first time, an example test file is generated in `/data/test/input/allowlist.json`.
 3. `batches/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory. The file contains the vesting timelines (start, cliff, end) for that batch and optionally the timeframe (fromTimestamp, toTimestamp) where contributions will be considered. If the timeframe is not specified, contributions will be considered from the start of
 
@@ -104,7 +104,7 @@ In summary this project does three things:
   2. per contributor, check how many reward tokens the contributor already has (locked in vestings) **before the new batch**
   3. calculate difference between the token cap and the amount of reward tokens the contributor already has
   4. multiply the difference by the current spot price to get the amount of collateral tokens that the contributor can contribute
-  5. excess contributions are not used for buying reward tokens from the curve but retained by the safe
+  5. invalid contributions are not used for buying reward tokens from the curve but retained by the safe
 - example:
   - during last batch Alice contributed some amount
   - now the current total supply is 100, of which Alice owns 1 token (=1%)
@@ -135,14 +135,14 @@ In summary this project does three things:
 │   ├── input
 │   │   └── batches
 │   └── output
-│   └── TESTPROJECT
+│   └── GENERATED_TEST_PROJECT
 ├── services
 │   ├── Batch
 │   ├── Queries
 │   ├── Safe
 │   └── TransactionBuilder
 ├── steps
-│   ├── 01_getConfigs
+│   ├── 01_loadInputs
 │   ├── 02_validateInputs
 │   ├── 03_instantiateServices
 │   ├── 04_defineBatch
@@ -171,7 +171,7 @@ The services are where the most of the logic sits. All services are classes that
 
 The steps tie the services together and bring an order into the execution flow.
 
-1. `getConfigs`: loads input parameters provided by the user as JSON files
+1. `loadInputs`: loads input parameters provided by the user as JSON files
 2. `validateInputs`: validates the input parameters and environment variables
 3. `instantiateServices`: instantiates the services using the input parameters and environment variables
 4. `defineBatch`: defines the batch by calculating the contributions, eligibility, received allocations, vesting details etc.

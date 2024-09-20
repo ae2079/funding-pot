@@ -6,7 +6,9 @@ import assert from 'node:assert';
 import { getContract } from 'viem';
 
 import abis from '../../data/abis.js';
+import { inflows } from '../../utils/testUtils/staticTestData.js';
 import { Queries } from './Queries.js';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 describe('Queries', () => {
   describe('#setup', () => {
@@ -67,39 +69,26 @@ describe('Queries', () => {
 
   // NOTE: requires the secret ANKR API key to be set in .env.test
   describe('#getInflows', () => {
-    const fromTimestamp = '1725654505';
-    const toTimestamp = '1725655119';
+    const fromTimestamp = '1726684518';
+    const toTimestamp = '1726692378';
     const token = '0x9464905aA41672B1fA9f2DC98fE54852f43bEBB3';
-    const recipient = '0x5e657719AEE21a6BB1BCaAd7781DcE222186Ca72';
+    const recipient = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
 
     const querySevice = new Queries({
       indexerUrl: process.env.INDEXER_URL,
-      rpcUrl: `https://rpc.ankr.com/${process.env.ANKR_NETWORK_ID}/${process.env.ANKR_API_KEY}`,
+      rpcUrl: getAnkrRpcUrl(),
       chainId: process.env.CHAIN_ID,
     });
 
     it('should return all inflows within the timeframe', async () => {
-      const inflows = await querySevice.getInflows(
+      const receivedInflows = await querySevice.getInflows(
         token,
         recipient,
         fromTimestamp,
         toTimestamp
       );
 
-      assert.deepStrictEqual(inflows, {
-        '0x6747772f37a4f7cfdea180d38e8ad372516c9548': {
-          contribution: 21300000000000000000000n,
-        },
-        '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b': {
-          contribution: 110000000000000000000n,
-        },
-        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': {
-          contribution: 15422100000000000000n,
-        },
-        '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': {
-          contribution: 420690000000000000000n,
-        },
-      });
+      assert.deepStrictEqual(receivedInflows, inflows);
     });
   });
 

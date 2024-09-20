@@ -1,136 +1,108 @@
 import { formatUnits, parseUnits } from 'viem';
-import { CAP } from '../../config.js';
 
 export class Batch {
   data;
 
-  constructor() {
-    this.data = {};
-  }
-
-  // STATE-MODIFYING METHODS
-
-  checkEligibility(inflows, qualifiedAddresses) {
-    this.data = { participants: inflows };
-
-    const { participants } = this.data;
-    for (const address of Object.keys(participants)) {
-      if (
-        !qualifiedAddresses
-          .map((addr) => addr.toLowerCase())
-          .includes(address.toLowerCase())
-      ) {
-        this.data.participants[address] = {
-          ...participants[address],
-          permitted: false,
-        };
-      } else {
-        this.data.participants[address] = {
-          ...participants[address],
-          permitted: true,
-        };
-      }
-    }
-  }
-
-  calculateAggregateContributions() {
-    const { participants } = this.data;
-
-    const totalValidContributions = Object.entries(
-      participants
-    ).reduce((acc, [, data]) => {
-      return data.validContribution
-        ? acc + data.validContribution
-        : acc;
-    }, 0n);
-    const totalExcessContributions = Object.entries(
-      participants
-    ).reduce((acc, [, data]) => {
-      return data.excessContribution
-        ? acc + data.excessContribution
-        : acc;
-    }, 0n);
-    this.data = {
-      totalValidContributions,
-      totalExcessContributions,
-      ...this.data,
-    };
-  }
-
-  calculateValidContributions(
-    exAnteSupply,
-    exAnteSpotPrice,
-    exAnteBalances
-  ) {
-    // store exAnteSupply and exAnteSpotPrice
-    this.data.exAnteSupply = exAnteSupply;
-    this.data.exAnteSpotPrice = exAnteSpotPrice;
-
-    // calculate individual and store individual CAP
-    this.data.issuanceTokenCap = parseUnits(
-      (CAP * parseFloat(formatUnits(exAnteSupply, 18))).toString(),
+  constructor({ batchConfig, batchReports }) {
+    const individualLimit = parseUnits(
+      batchConfig.LIMITS.INDIVIDUAL,
       18
     );
+    // since batch caps are accumulative, if it is not the very first batch
+    // we need to consider how much was already contributed in previous batches
+    let totalBatchLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
+    for (const reportNr in batchReports) {
+      const report = batchReports[reportNr];
+      totalBatchLimit -= BigInt(report.totalValidContribution);
+    }
+    const totalLimit = totalBatchLimit;
 
-    const relSpotPrice = parseFloat(exAnteSpotPrice) / 100000;
+    this.data = { totalLimit, individualLimit };
+  }
 
-    for (const address of Object.keys(this.data.participants)) {
-      const { contribution, permitted } =
-        this.data.participants[address];
+  assessInflows(inflows, allowlist) {
+    this.data.totalContribution = 0n;
+    this.data.totalValidContribution = 0n;
+    this.data.totalInvalidContribution = 0n;
+    this.data.participants = {};
 
-      const exAnteBalance = exAnteBalances[address] || 0n;
-      const issuanceTokenPotential =
-        this.data.issuanceTokenCap - exAnteBalance; // how many issuance tokens the address may buy
+    // iterate over the inflows
+    for (const inflow of inflows) {
+      const { participant, contribution } = inflow;
 
-      // if no more issuance token potential, all contributions are excess contributions
-      if (issuanceTokenPotential <= 0n) {
-        this.data.participants[address].excessContribution =
-          contribution;
+      // adds contribution to participants
+      this.createOrAddContribution(participant, contribution);
+
+      // if the inflow is not on the allowlis, everything is invalid contribution
+      if (!allowlist.includes(participant)) {
+        this.manageContribution(participant, {
+          invalidContribution: contribution,
+        });
         continue;
       }
 
-      // if user is not permitted, all contributions are excess contributions
-      if (!permitted) {
-        this.data.participants[address].excessContribution =
-          contribution;
-        continue;
+      const p = this.data.participants[participant];
+      const prevValid = p ? p.validContribution || 0n : 0n;
+
+      // optimistic assumption to be challenged in the next steps
+      let validContribution = contribution,
+        invalidContribution = 0n;
+
+      // difference between individual cap and own contribution
+      // if negative, means that the individual cap has been exceeded
+      const individualDiff =
+        this.data.individualLimit - (prevValid + contribution);
+
+      // means that the individual cap has been exceeded
+      if (individualDiff < 0n) {
+        // set valid contribution to difference between individual cap and own contributions
+        validContribution = validContribution + individualDiff;
+        // set invalid contribution to the difference between the individual cap and own contribution
+        invalidContribution = individualDiff * -1n; //
       }
 
-      // based on ex ante spot price, ex ante balance, and issuance token potential, calculate contribution potential
-      // store per address
-      const contributionPotentialFloat =
-        this.bigIntToFloat(issuanceTokenPotential) * relSpotPrice;
-      const contributionPotential = this.floatToBigInt(
-        contributionPotentialFloat
-      );
+      // difference between total cap and own contribution
+      // if negative, means that the total cap has been exceeded
+      const totalDiff =
+        this.data.totalLimit -
+        this.data.totalValidContribution -
+        (prevValid + contribution);
 
-      // if contribution is larger than contribution potential
-      // note excess contribution and actual contribution
-      // if contribution is below contribution potential
-      // all contributions are actual contributions
-      if (contribution > contributionPotential) {
-        const excess = contribution - contributionPotential;
-        this.data.participants[address].excessContribution = excess;
-        this.data.participants[address].validContribution =
-          contributionPotential;
-      } else {
-        this.data.participants[address].validContribution =
-          contribution;
+      // means that the total cap has been exceeded
+      if (totalDiff < 0n) {
+        // what is the invalid amount with respect to the total cap
+        const e = totalDiff * -1n;
+        // what is the valid amount with respect to the total cap
+        const v = prevValid + contribution - e;
+        // check which is more restrictive: the individual cap or the total cap
+        const isMoreRestrictive = v < validContribution;
+        // if total cap is more restrictive, overwrite valid contribution according to the total cap limit
+        validContribution = isMoreRestrictive ? v : validContribution;
+        // if total cap is more restrictive, overwrite invalid contribution according to the total cap limit
+        invalidContribution = isMoreRestrictive
+          ? e
+          : invalidContribution;
       }
+
+      // add valid and invalid contribution to participant
+      this.manageContribution(participant, {
+        validContribution,
+        invalidContribution,
+      });
     }
   }
 
-  calculateAllocations(amountOut) {
+  calcAllocations(amountOut) {
     this.data.additionalIssuance = amountOut;
 
     const {
-      totalValidContributions,
+      totalValidContribution,
       additionalIssuance,
       participants,
     } = this.data;
 
     const totalValidContributionFloat = this.bigIntToFloat(
-      totalValidContributions
+      totalValidContribution
     );
     const additionalIssuanceFloat = this.bigIntToFloat(
       additionalIssuance
@@ -154,17 +126,41 @@ export class Batch {
     }
   }
 
-  addVestingDetails({ start, cliff, end }) {
-    this.data.vestingDetails = { start, cliff, end };
+  // INTERNAL HELPER FUNCTIONS
+
+  manageContribution(addr, contributionObj) {
+    const { invalidContribution, validContribution } =
+      contributionObj;
+
+    if (!this.data.participants[addr].invalidContribution) {
+      this.data.participants[addr].invalidContribution =
+        invalidContribution || 0n;
+    } else {
+      this.data.participants[addr].invalidContribution +=
+        invalidContribution;
+    }
+
+    if (!this.data.participants[addr].validContribution) {
+      this.data.participants[addr].validContribution =
+        validContribution || 0n;
+    } else {
+      this.data.participants[addr].validContribution +=
+        validContribution;
+    }
+    this.data.totalInvalidContribution += invalidContribution || 0n;
+    this.data.totalValidContribution += validContribution || 0n;
+  }
+
+  createOrAddContribution(addr, contribution) {
+    if (!this.data.participants[addr]) {
+      this.data.participants[addr] = { contribution };
+    } else {
+      this.data.participants[addr].contribution += contribution;
+    }
+    this.data.totalContribution += contribution;
   }
 
   // GETTERS
-
-  getContributors() {
-    return Object.keys(this.data.participants).filter(
-      (address) => this.data.participants[address].permitted
-    );
-  }
 
   getAllocations() {
     const { participants } = this.data;
@@ -178,7 +174,7 @@ export class Batch {
       });
   }
 
-  // UTILS
+  // STATIC
 
   bigIntToFloat(bigInt) {
     return parseFloat(formatUnits(bigInt, 18));
@@ -186,5 +182,9 @@ export class Batch {
 
   floatToBigInt(float) {
     return parseUnits(float.toString(), 18);
+  }
+
+  diffOrZero(a, b) {
+    return a - b > 0n ? a - b : 0n;
   }
 }

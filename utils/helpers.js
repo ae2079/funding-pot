@@ -16,3 +16,7 @@ export const serializeBigInt = (obj) => {
     4
   );
 };
+
+export const getAnkrRpcUrl = () => {
+  return `https://rpc.ankr.com/${process.env.ANKR_NETWORK_ID}/${process.env.ANKR_API_KEY}`;
+};

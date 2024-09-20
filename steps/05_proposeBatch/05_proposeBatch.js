@@ -4,7 +4,7 @@ export const proposeBatch = async ({
   transactionBuilderService,
   safeService,
 }) => {
-  const { totalValidContributions, additionalIssuance } =
+  const { totalValidContribution, additionalIssuance } =
     batchService.data;
   const { collateralToken, bondingCurve } =
     queryService.queries.addresses;
@@ -14,13 +14,13 @@ export const proposeBatch = async ({
   transactionBuilderService.approve(
     collateralToken,
     bondingCurve,
-    totalValidContributions
+    totalValidContribution
   );
 
   // add batch buy tx
-  transactionBuilderService.buy(totalValidContributions);
+  transactionBuilderService.buy(totalValidContribution);
 
-  // send issuance tokens to payment router
+  // send issuance tokens to payment router˚
   transactionBuilderService.transferTokens(
     queryService.queries.addresses.issuanceToken,
     queryService.queries.addresses.paymentRouter,

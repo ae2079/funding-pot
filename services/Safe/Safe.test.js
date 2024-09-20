@@ -1,3 +1,5 @@
+import '../../env.js';
+
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
 
@@ -5,6 +7,7 @@ import SafeApiKit from '@safe-global/api-kit';
 
 import { Safe } from './Safe.js';
 import { TransactionBuilder } from '../TransactionBuilder/TransactionBuilder.js';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 describe('Safe', () => {
   const mockAddress2 = '0xc0B16b40c6079b0A317a2fEBc062509CDF447f5c';
@@ -14,19 +17,33 @@ describe('Safe', () => {
 
   const baseSepoliaChainId = 84532n;
   const safeAddress = '0x4ffe42c1666e50104e997DD07E43c673FD39C81d';
-  const rpc =
-    'https://rpc.ankr.com/base_sepolia/83faca2c6ed984789a58e5dfbf9ba75d5b2b5d7c48646f6f51a004cb6cccca29';
+  const rpc = getAnkrRpcUrl();
+
+  const projectConfig = {
+    SAFE: safeAddress,
+  };
+
+  const batchConfig = {
+    VESTING_DETAILS: {
+      START: 10n,
+      CLIFF: 11n,
+      END: 12n,
+    },
+  };
 
   let transactionBuilder, safe;
 
   beforeEach(() => {
-    safe = new Safe(baseSepoliaChainId, safeAddress, rpc);
+    safe = new Safe(baseSepoliaChainId, projectConfig, rpc);
     transactionBuilder = new TransactionBuilder({
-      safe: safeAddress,
-      paymentRouter: mockAddress2,
-      issuanceToken: mockAddress3,
-      collateralToken: mockAddress4,
-      bondingCurve: mockAddress5,
+      projectConfig,
+      workflowAddresses: {
+        paymentRouter: mockAddress2,
+        issuanceToken: mockAddress3,
+        collateralToken: mockAddress4,
+        bondingCurve: mockAddress5,
+      },
+      batchConfig,
     });
   });
 

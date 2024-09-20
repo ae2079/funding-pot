@@ -1,9 +1,11 @@
 import { isAddress } from 'viem';
 
 export const validateInputs = ({
+  batchNr,
   projectConfig,
   batchConfig,
   allowlist,
+  batchReports,
 }) => {
   validateEnvVars();
   validateConfigs({
@@ -11,6 +13,7 @@ export const validateInputs = ({
     batchConfig,
     allowlist,
   });
+  validatebatchReports({ batchNr, batchReports });
 };
 
 const validateEnvVars = () => {
@@ -28,9 +31,7 @@ const validateConfigs = ({
   batchConfig,
   allowlist,
 }) => {
-  const {
-    VESTING_DETAILS: { START, CLIFF, END },
-  } = batchConfig;
+  const { VESTING_DETAILS, LIMITS } = batchConfig;
   const { SAFE, ORCHESTRATOR } = projectConfig;
 
   if (!SAFE || !isAddress(SAFE))
@@ -38,12 +39,42 @@ const validateConfigs = ({
   if (!ORCHESTRATOR || !isAddress(ORCHESTRATOR))
     throw new Error('ORCHESTRATOR missing or invalid address');
 
+  if (!LIMITS || !LIMITS.TOTAL || !LIMITS.INDIVIDUAL)
+    throw new Error('LIMITS missing or empty');
   if (!allowlist || allowlist.length === 0)
     throw new Error('ALLOWLIST missing or empty');
-  if (!START || !CLIFF || !END)
+  if (
+    !VESTING_DETAILS ||
+    !VESTING_DETAILS.START ||
+    !VESTING_DETAILS.CLIFF ||
+    !VESTING_DETAILS.END
+  )
     throw new Error('VESTING_DETAILS missing or empty');
-  if (parseInt(START) > parseInt(END))
+  if (parseInt(VESTING_DETAILS.START) > parseInt(VESTING_DETAILS.END))
     throw new Error('Vesting: START > END');
-  if (parseInt(START) + parseInt(CLIFF) > parseInt(END))
-    throw new Error('Vesting: START > END');
+  if (
+    parseInt(VESTING_DETAILS.START) +
+      parseInt(VESTING_DETAILS.CLIFF) >
+    parseInt(VESTING_DETAILS.END)
+  )
+    throw new Error('Vesting: START + CLIFF > END');
+};
+
+const validatebatchReports = ({ batchReports, batchNr }) => {
+  if (batchNr == 1) return;
+
+  if (!batchReports) throw new Error('batchReports missing');
+
+  const reportNumbers = Object.keys(batchReports);
+
+  if (batchNr - reportNumbers.length > 1)
+    throw new Error(
+      `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous batchReports`
+    );
+
+  for (let i = 1; i <= reportNumbers.length; i++) {
+    if (!reportNumbers.includes(i.toString())) {
+      throw new Error(`Report missing for batchNr ${i}`);
+    }
+  }
 };

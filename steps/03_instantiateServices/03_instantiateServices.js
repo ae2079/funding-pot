@@ -2,22 +2,19 @@ import { Queries } from '../../services/Queries/Queries.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { Safe } from '../../services/Safe/Safe.js';
 import { TransactionBuilder } from '../../services/TransactionBuilder/TransactionBuilder.js';
+import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 export const instantiateServices = async (
   projectConfig,
-  batchConfig
+  batchConfig,
+  batchReports
 ) => {
-  const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
-    process.env;
-
-  const { SAFE, ORCHESTRATOR } = projectConfig;
-  const {
-    VESTING_DETAILS: { START, CLIFF, END },
-  } = batchConfig;
+  const { CHAIN_ID, INDEXER_URL } = process.env;
+  const { ORCHESTRATOR } = projectConfig;
 
   // instantiate services
   const queryService = new Queries({
-    rpcUrl: `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`,
+    rpcUrl: getAnkrRpcUrl(),
     indexerUrl: INDEXER_URL,
     chainId: CHAIN_ID,
   });
@@ -25,23 +22,21 @@ export const instantiateServices = async (
   await queryService.setup(ORCHESTRATOR);
 
   const transactionBuilderService = new TransactionBuilder({
-    safe: SAFE,
-    paymentRouter: queryService.queries.addresses.paymentRouter,
-    issuanceToken: queryService.queries.addresses.issuanceToken,
-    collateralToken: queryService.queries.addresses.collateralToken,
-    bondingCurve: queryService.queries.addresses.bondingCurve,
-    start: START,
-    cliff: CLIFF,
-    end: END,
+    batchConfig,
+    projectConfig,
+    workflowAddresses: queryService.queries.addresses,
   });
 
   const safeService = new Safe(
     CHAIN_ID,
-    SAFE,
-    `https://rpc.ankr.com/${ANKR_NETWORK_ID}/${ANKR_API_KEY}`
+    projectConfig,
+    getAnkrRpcUrl()
   );
 
-  const batchService = new Batch();
+  const batchService = new Batch({
+    batchConfig,
+    batchReports,
+  });
 
   return {
     safeService,

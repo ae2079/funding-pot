@@ -13,20 +13,16 @@ async function main() {
     fs.unlinkSync(
       path.join(__dirname, '../../data/test/input/allowlist.json')
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
-  // remove batch config 420.json
+  // remove batch config 3.json
   try {
     fs.unlinkSync(
-      path.join(__dirname, '../../data/test/input/batches/420.json')
+      path.join(__dirname, '../../data/test/input/batches/3.json')
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
-  // remove TESTPROJECT from projects.json
+  // remove GENERATED_TEST_PROJECT from projects.json
   try {
     const projects = JSON.parse(
       fs.readFileSync(
@@ -34,28 +30,25 @@ async function main() {
         'utf8'
       )
     );
-    if (projects && projects.TESTPROJECT) delete projects.TESTPROJECT;
+    if (projects && projects.GENERATED_TEST_PROJECT)
+      delete projects.GENERATED_TEST_PROJECT;
 
     fs.writeFileSync(
       path.join(__dirname, '../../data/test/input/projects.json'),
       JSON.stringify(projects, null, 2),
       'utf8'
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 
-  // remove test output file 420.json
+  // remove test output file 3.json
   try {
     fs.unlinkSync(
       path.join(
         __dirname,
-        '../../data/test/output/TESTPROJECT/420.json'
+        '../../data/test/output/GENERATED_TEST_PROJECT/3.json'
       )
     );
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
 }
 
 main();

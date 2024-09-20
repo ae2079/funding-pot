@@ -6,9 +6,13 @@ import { Safe } from '../services/Safe/Safe.js';
 async function main() {
   const [, , SAFE, DELEGATE] = process.argv;
 
+  const projectConfig = {
+    SAFE,
+  };
+
   const safeService = new Safe(
     process.env.CHAIN_ID,
-    SAFE,
+    projectConfig,
     process.env.RPC_URL
   );
 

@@ -7,14 +7,14 @@ import {
   signAndExecutePendingTxs,
   getVestings,
   getReport,
-} from '../utils/testHelpers.js';
+} from '../utils/testUtils/testHelpers.js';
 
 import { main } from './main.js';
-import { getConfigs } from './01_getConfigs/01_getConfigs.js';
+import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 
 describe('#main', () => {
-  const batchNr = '420';
-  const projectName = 'TESTPROJECT';
+  const batchNr = '3';
+  const projectName = 'GENERATED_TEST_PROJECT';
 
   let safeAddress;
 
@@ -26,10 +26,8 @@ describe('#main', () => {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 
     const {
-      projectsConfig: {
-        [projectName]: { SAFE },
-      },
-    } = getConfigs(batchNr);
+      projectConfig: { SAFE },
+    } = loadInputs(projectName, batchNr);
     safeAddress = SAFE;
   });
 

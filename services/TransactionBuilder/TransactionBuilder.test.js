@@ -9,20 +9,30 @@ describe('TransactionBuilder', () => {
   const mockAddress4 = '0xdbC3363De051550D122D9C623CBaff441AFb477C';
   const mockAddress5 = '0xEf409c51aDdCf4642E2C98e935Bc5D9AC273AF57';
 
-  const start = 10n;
-  const cliff = 11n;
-  const end = 12n;
+  const mockBatchConfig = {
+    VESTING_DETAILS: {
+      START: 10n,
+      CLIFF: 11n,
+      END: 12n,
+    },
+  };
+
+  const mockProjectConfig = {
+    SAFE: mockAddress1,
+  };
+
+  const mockWorkflowAddresses = {
+    paymentRouter: mockAddress2,
+    issuanceToken: mockAddress3,
+    collateralToken: mockAddress4,
+    bondingCurve: mockAddress5,
+  };
 
   const setupTransactionBuilder = () => {
     return new TransactionBuilder({
-      safe: mockAddress1,
-      paymentRouter: mockAddress2,
-      issuanceToken: mockAddress3,
-      collateralToken: mockAddress4,
-      bondingCurve: mockAddress5,
-      start,
-      cliff,
-      end,
+      projectConfig: mockProjectConfig,
+      workflowAddresses: mockWorkflowAddresses,
+      batchConfig: mockBatchConfig,
     });
   };
 
@@ -125,9 +135,9 @@ describe('TransactionBuilder', () => {
               recipient,
               mockAddress3,
               amount,
-              start,
-              cliff,
-              end,
+              mockBatchConfig.VESTING_DETAILS.START,
+              mockBatchConfig.VESTING_DETAILS.CLIFF,
+              mockBatchConfig.VESTING_DETAILS.END,
             ],
           },
         ],

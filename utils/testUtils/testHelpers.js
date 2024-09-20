@@ -16,7 +16,7 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
 
-import abis from '../data/abis.js';
+import abis from '../../data/abis.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -256,7 +256,7 @@ export const deployWorkflow = async (safeAddress) => {
 export const getProjectConfig = async () => {
   const filePath = path.join(
     __dirname,
-    '../data/test/input/projects.json'
+    '../../data/test/input/projects.json'
   );
 
   let projectsConfig;
@@ -264,14 +264,14 @@ export const getProjectConfig = async () => {
   try {
     projectsConfig = JSON.parse(
       fs.readFileSync(
-        path.join(__dirname, `../data/test/input/projects.json`)
+        path.join(__dirname, `../../data/test/input/projects.json`)
       )
     );
   } catch (e) {}
 
-  if (projectsConfig && projectsConfig.TESTPROJECT) {
+  if (projectsConfig && projectsConfig.GENERATED_TEST_PROJECT) {
     console.info('🥳 Project config already exists');
-    return projectsConfig.TESTPROJECT;
+    return projectsConfig.GENERATED_TEST_PROJECT;
   } else {
     console.info(
       'No project config found, setting up new e2e environment...'
@@ -285,7 +285,7 @@ export const getProjectConfig = async () => {
       JSON.stringify(
         {
           ...projectsConfig,
-          TESTPROJECT: {
+          GENERATED_TEST_PROJECT: {
             SAFE: safeAddress,
             ORCHESTRATOR: orchestratorAddress,
           },
@@ -298,18 +298,24 @@ export const getProjectConfig = async () => {
 
     console.info('✅ All contracts deployed');
     console.info(
-      '💾 Project with name TESTPROJECT saved to data/test/input/projects.json'
+      '💾 Project with name GENERATED_TEST_PROJECT saved to data/test/input/projects.json'
     );
   }
 
-  return JSON.parse(fs.readFileSync(filePath)).TESTPROJECT;
+  return JSON.parse(fs.readFileSync(filePath)).GENERATED_TEST_PROJECT;
 };
 
 export const getBatchConfig = async (safe) => {
   const batchConfig = {
     VESTING_DETAILS: {},
     TIMEFRAME: {},
+    LIMITS: {},
   };
+
+  const minContribution = 1_000_000_000_000_000_000;
+  const maxContribution = 1000_000_000_000_000_000_000;
+  const individualLimit = '500';
+  const totalLimit = '1500';
 
   const { owner, delegate } = getTestClients();
 
@@ -321,6 +327,8 @@ export const getBatchConfig = async (safe) => {
   ).toString();
   batchConfig.VESTING_DETAILS.CLIFF = '60';
   batchConfig.VESTING_DETAILS.END = (fromTimestamp + 120n).toString();
+  batchConfig.LIMITS.INDIVIDUAL = individualLimit;
+  batchConfig.LIMITS.TOTAL = totalLimit;
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
@@ -333,8 +341,8 @@ export const getBatchConfig = async (safe) => {
     const contributor = contributors[i];
     const { publicClient, walletClient } = contributor;
     const contribution = randomIntFromInterval(
-      100_000_000_000_000,
-      10_000_000_000_000_000_000
+      minContribution,
+      maxContribution
     );
 
     console.info(
@@ -378,7 +386,7 @@ export const getBatchConfig = async (safe) => {
 
   const batchConfigFilePath = path.join(
     __dirname,
-    '../data/test/input/batches/420.json'
+    '../../data/test/input/batches/3.json'
   );
 
   fs.writeFileSync(
@@ -388,7 +396,7 @@ export const getBatchConfig = async (safe) => {
   );
 
   console.info(
-    '💾 Batch config stored to data/test/input/batches/420.json'
+    '💾 Batch config stored to data/test/input/batches/3.json'
   );
 
   return { batchConfig, contributions, contributors };
@@ -400,7 +408,7 @@ export const createAndSaveAllowlist = async () => {
 
   const allowListFilePath = path.join(
     __dirname,
-    '../data/test/input/allowlist.json'
+    '../../data/test/input/allowlist.json'
   );
 
   const allowlist = [ownerAccount.address, delegateAccount.address];
@@ -426,6 +434,7 @@ function randomIntFromInterval(min, max) {
 export const setupForE2E = async () => {
   const { SAFE } = await getProjectConfig();
   await getBatchConfig(SAFE);
+  await createAndSaveAllowlist();
 };
 
 export const signAndExecutePendingTxs = async (safeAddress) => {
@@ -496,7 +505,7 @@ export const getVestings = async (txHash) => {
 export const getReport = (projectName, batchNr) => {
   const filePath = path.join(
     __dirname,
-    `../data/test/output/${projectName}/${batchNr}.json`
+    `../../data/test/output/${projectName}/${batchNr}.json`
   );
 
   const report = JSON.parse(fs.readFileSync(path.join(filePath)));
