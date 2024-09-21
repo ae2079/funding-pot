@@ -1,5 +1,21 @@
 # Funding Pot
 
+## Quickstart
+
+1. Get an ankr api key [here](<[here](https://www.ankr.com/rpc/advanced-api/)>)
+2. Fund two accounts with testnet ETH on Base Sepolia
+3. Copy the `.env.example` file to `.env.test` and fill in the api key as well as the two private keys
+4. Run `npm install`
+5. Run `npm run test:e2e`
+6. Check the following files for the results:
+
+- inputs:
+  - batchConfig (to be set per batch): `data/test/input/batches/3.json`
+  - projects (to be set per project): `data/test/input/projects.json` (=> `GENERATED_TEST_PROJECT`)
+  - allowlist (to be once; can be edited over time): `data/test/input/allowlist.json`
+- outputs:
+  - batchReport: `data/test/output/GENERATED_TEST_PROJECT/3.json`
+
 ## Terminology
 
 Within the project the term `batch` refers to one instance of running a funding interval. That includes
