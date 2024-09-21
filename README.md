@@ -11,7 +11,7 @@
 
 - inputs:
   - batchConfig (to be set per batch): `data/test/input/batches/3.json`
-  - projects (to be set per project): `data/test/input/projects.json` (=> `GENERATED_TEST_PROJECT`)
+  - projects (to be set once): `data/test/input/projects.json` (=> `GENERATED_TEST_PROJECT`)
   - allowlist (to be once; can be edited over time): `data/test/input/allowlist.json`
 - outputs:
   - batchReport: `data/test/output/GENERATED_TEST_PROJECT/3.json`
