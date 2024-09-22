@@ -49,7 +49,7 @@ export const mintMockTokens = async (token, amount, to) => {
   });
 
   const hash = await tokenInstance.write.mint([to, amount]);
-  console.info(`Minting ${amount} tokens (${token}) to ${to}...`);
+  console.info(`> Minting ${amount} tokens (${token}) to ${to}...`);
   await publicClient.waitForTransactionReceipt({ hash });
   console.info('✅ Tokens minted');
 };
@@ -365,7 +365,7 @@ export const getBatchConfig = async (safe) => {
       abi: abis.erc20Abi,
     });
 
-    console.info('Sending contribution to safe...');
+    console.info('> Sending contribution to safe...');
     const tx = await tokenInstance.write.transfer([
       safe,
       contributions[i],

@@ -34,7 +34,7 @@ export class Batch {
       const { participant, contribution } = inflow;
 
       // adds contribution to participants
-      this.createOrAddContribution(participant, contribution);
+      this.createOrAddContribution(inflow);
 
       // if the inflow is not on the allowlist, everything is invalid contribution
       // OR if it's an early access batch and the participant is not an NFT holder
@@ -43,7 +43,7 @@ export class Batch {
         (this.config.isEarlyAccess &&
           !nftHolders.includes(participant))
       ) {
-        this.manageContribution(participant, {
+        this.manageContribution(inflow, {
           invalidContribution: contribution,
         });
         continue;
@@ -93,7 +93,7 @@ export class Batch {
       }
 
       // add valid and invalid contribution to participant
-      this.manageContribution(participant, {
+      this.manageContribution(inflow, {
         validContribution,
         invalidContribution,
       });
@@ -136,34 +136,57 @@ export class Batch {
 
   // INTERNAL HELPER FUNCTIONS
 
-  manageContribution(addr, contributionObj) {
+  manageContribution(inflow, contributionObj) {
+    const { participant, contribution, transactionHash } = inflow;
+
     const { invalidContribution, validContribution } =
       contributionObj;
 
-    if (!this.data.participants[addr].invalidContribution) {
-      this.data.participants[addr].invalidContribution =
-        invalidContribution || 0n;
+    const adjustedInvalidContribution = invalidContribution || 0n;
+    const adjustedValidContribution = validContribution || 0n;
+
+    if (!this.data.participants[participant].invalidContribution) {
+      this.data.participants[participant].invalidContribution =
+        adjustedInvalidContribution;
     } else {
-      this.data.participants[addr].invalidContribution +=
-        invalidContribution;
+      this.data.participants[participant].invalidContribution +=
+        adjustedInvalidContribution;
     }
 
-    if (!this.data.participants[addr].validContribution) {
-      this.data.participants[addr].validContribution =
-        validContribution || 0n;
+    if (!this.data.participants[participant].validContribution) {
+      this.data.participants[participant].validContribution =
+        adjustedValidContribution;
     } else {
-      this.data.participants[addr].validContribution +=
-        validContribution;
+      this.data.participants[participant].validContribution +=
+        adjustedValidContribution;
     }
-    this.data.totalInvalidContribution += invalidContribution || 0n;
-    this.data.totalValidContribution += validContribution || 0n;
+
+    this.data.totalInvalidContribution += adjustedInvalidContribution;
+    this.data.totalValidContribution += adjustedValidContribution;
+
+    const lastTxIdx =
+      this.data.participants[participant].transactions.length - 1;
+    this.data.participants[participant].transactions[lastTxIdx] = {
+      ...this.data.participants[participant].transactions[lastTxIdx],
+      invalidContribution,
+      validContribution,
+    };
   }
 
-  createOrAddContribution(addr, contribution) {
-    if (!this.data.participants[addr]) {
-      this.data.participants[addr] = { contribution };
+  createOrAddContribution(inflow) {
+    const { participant, contribution, transactionHash } = inflow;
+    if (!this.data.participants[participant]) {
+      this.data.participants[participant] = {
+        contribution,
+        transactions: [{ transactionHash, contribution }],
+      };
     } else {
-      this.data.participants[addr].contribution += contribution;
+      this.data.participants[participant].contribution +=
+        contribution;
+      this.data.participants[participant].transactions.push({
+        transactionHash,
+        contribution,
+      });
     }
     this.data.totalContribution += contribution;
   }
