@@ -69,7 +69,7 @@ describe('Batch', () => {
       18
     );
 
-    describe.skip('when it is NOT an early access batch', () => {
+    describe('when it is NOT an early access batch', () => {
       const batchService = new Batch({
         batchConfig,
       });
@@ -80,9 +80,6 @@ describe('Batch', () => {
 
       it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
         assert.deepStrictEqual(Object.keys(batchService.data), [
-          'totalLimit',
-          'individualLimit',
-          'isEarlyAccess',
           'totalContribution',
           'totalValidContribution',
           'totalInvalidContribution',
