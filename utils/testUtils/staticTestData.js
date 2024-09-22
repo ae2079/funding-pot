@@ -97,41 +97,102 @@ export const batchReportConfig = {
 };
 
 export const batchReportData = {
+  totalContribution: 18000000000000000000n,
   totalValidContribution: 9000000000000000000n,
   totalInvalidContribution: 9000000000000000000n,
-  totalContribution: 18000000000000000000n,
   participants: {
     [addresses.addr1]: {
       contribution: 2100000000000000000n,
+      transactions: [
+        {
+          transactionHash:
+            '0x7d5b14cc482d201ef6b0803bc2fefeab805951e6d04817f64dc9ba35b9094ae0',
+          contribution: 2000000000000000000n,
+          invalidContribution: 0n,
+          validContribution: 2000000000000000000n,
+        },
+        {
+          transactionHash:
+            '0xcd638b63fed26ac9e425813429a8e53e8e6b13bcc540362f888e033740973dd3',
+          contribution: 100000000000000000n,
+          invalidContribution: 100000000000000000n,
+          validContribution: 0n,
+        },
+      ],
       invalidContribution: 100000000000000000n,
       validContribution: 2000000000000000000n,
       issuanceAllocation: 10822300000000000000n,
     },
     [addresses.addr2]: {
       contribution: 2100000000000000000n,
+      transactions: [
+        {
+          transactionHash:
+            '0x81bfc33fab4d3507f859e6b2593029752318f8790ac9109a8b1ebdf79d5ec38d',
+          contribution: 2100000000000000000n,
+          invalidContribution: 100000000000000000n,
+          validContribution: 2000000000000000000n,
+        },
+      ],
       invalidContribution: 100000000000000000n,
       validContribution: 2000000000000000000n,
       issuanceAllocation: 10822300000000000000n,
     },
     [addresses.addr3]: {
       contribution: 100000000000000000n,
+      transactions: [
+        {
+          transactionHash:
+            '0xd043e97a233e96d9a8fd9001e21269a604b0b7f4e77ad58bd579c701b6308b09',
+          contribution: 100000000000000000n,
+          invalidContribution: 100000000000000000n,
+          validContribution: undefined,
+        },
+      ],
       invalidContribution: 100000000000000000n,
       validContribution: 0n,
     },
     [addresses.addr4]: {
       contribution: 9000000000000000000n,
+      transactions: [
+        {
+          transactionHash:
+            '0xf73796e17e336e90c1341f311bf6718f99e6fede48bc197a164e0d7a0417da9c',
+          contribution: 9000000000000000000n,
+          invalidContribution: 7000000000000000000n,
+          validContribution: 2000000000000000000n,
+        },
+      ],
       invalidContribution: 7000000000000000000n,
       validContribution: 2000000000000000000n,
       issuanceAllocation: 10822300000000000000n,
     },
     [addresses.addr5]: {
       contribution: 1700000000000000000n,
+      transactions: [
+        {
+          transactionHash:
+            '0x2a3696b34a801adfd8432337ed9dc7f66be648512cbe01da1c77c98cc115a7c7',
+          contribution: 1700000000000000000n,
+          invalidContribution: 0n,
+          validContribution: 1700000000000000000n,
+        },
+      ],
       invalidContribution: 0n,
       validContribution: 1700000000000000000n,
       issuanceAllocation: 9198900000000000000n,
     },
     [addresses.addr6]: {
       contribution: 3000000000000000000n,
+      transactions: [
+        {
+          transactionHash:
+            '0xf83b09143f55fad1dbe15441ff738bc3d567f5cbdd1b0dabb3bdb3c9b48dcae9',
+          contribution: 3000000000000000000n,
+          invalidContribution: 1700000000000000000n,
+          validContribution: 1300000000000000000n,
+        },
+      ],
       invalidContribution: 1700000000000000000n,
       validContribution: 1300000000000000000n,
       issuanceAllocation: 7034500000000000000n,

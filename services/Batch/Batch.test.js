@@ -87,6 +87,22 @@ describe('Batch', () => {
         ]);
       });
 
+      it('adds the transactions to the participants', () => {
+        const participantAddresses = Object.values(addresses);
+
+        for (const addr of participantAddresses) {
+          const { transactions } =
+            batchService.data.participants[addr];
+          const participantInflowTxs = inflows
+            .filter((i) => i.participant === addr)
+            .map((i) => i.transactionHash);
+          assert.deepStrictEqual(
+            participantInflowTxs,
+            transactions.map((t) => t.transactionHash)
+          );
+        }
+      });
+
       it('calculates the correct `totalValidContribution`', () => {
         assert.equal(
           batchService.data.totalValidContribution,
