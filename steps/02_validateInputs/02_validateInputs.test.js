@@ -38,7 +38,6 @@ describe('#validateInputs', () => {
           validateInputs({
             projectConfig,
             batchConfig,
-            allowlist,
             batchNr,
           });
         });
@@ -56,7 +55,6 @@ describe('#validateInputs', () => {
             validateInputs({
               projectConfig,
               batchConfig,
-              allowlist,
               batchNr: thirdBatch,
               batchReports: { 1: {} },
             });
@@ -77,7 +75,6 @@ describe('#validateInputs', () => {
             validateInputs({
               projectConfig,
               batchConfig,
-              allowlist,
               batchNr: thirdBatch,
               batchReports: { 1: {}, 3: {} },
             });
@@ -96,7 +93,6 @@ describe('#validateInputs', () => {
           validateInputs({
             projectConfig,
             batchConfig,
-            allowlist,
             batchNr: thirdBatch,
             batchReports,
           });
@@ -112,7 +108,6 @@ describe('#validateInputs', () => {
           validateInputs({
             projectConfig: {},
             batchConfig: {},
-            allowlist: [],
             batchReports: {},
           });
         },
@@ -134,7 +129,6 @@ describe('#validateInputs', () => {
               SAFE: undefined,
             },
             batchConfig,
-            allowlist,
             batchReports,
           });
         },
@@ -157,7 +151,6 @@ describe('#validateInputs', () => {
               ORCHESTRATOR: undefined,
             },
             batchConfig,
-            allowlist,
             batchReports,
           });
         },
@@ -182,7 +175,6 @@ describe('#validateInputs', () => {
                 START: undefined,
               },
             },
-            allowlist,
             batchReports,
           });
         },
@@ -207,7 +199,6 @@ describe('#validateInputs', () => {
                 CLIFF: undefined,
               },
             },
-            allowlist,
             batchReports,
           });
         },
@@ -232,7 +223,6 @@ describe('#validateInputs', () => {
                 END: undefined,
               },
             },
-            allowlist,
             batchReports,
           });
         },
@@ -258,7 +248,6 @@ describe('#validateInputs', () => {
                 END: 1,
               },
             },
-            allowlist,
             batchReports,
           });
         },
@@ -285,32 +274,12 @@ describe('#validateInputs', () => {
                 END: 2,
               },
             },
-            allowlist,
             batchReports,
           });
         },
         {
           name: 'Error',
           message: 'Vesting: START + CLIFF > END',
-        }
-      );
-    });
-  });
-
-  describe('with empty allowlist', () => {
-    it('throws an error', () => {
-      assert.throws(
-        () => {
-          validateInputs({
-            projectConfig,
-            batchConfig,
-            allowlist: [],
-            batchReports,
-          });
-        },
-        {
-          name: 'Error',
-          message: 'ALLOWLIST missing or empty',
         }
       );
     });
@@ -326,7 +295,7 @@ describe('#validateInputs', () => {
           validateInputs({
             projectConfig,
             batchConfig: configWithoutLimits,
-            allowlist,
+
             batchReports,
           });
         },
@@ -348,7 +317,6 @@ describe('#validateInputs', () => {
           validateInputs({
             projectConfig,
             batchConfig: configWithoutFlag,
-            allowlist,
             batchReports,
           });
         },
@@ -370,7 +338,6 @@ describe('#validateInputs', () => {
           validateInputs({
             projectConfig: projectConfigWithoutNft,
             batchConfig,
-            allowlist,
             batchReports,
           });
         },
