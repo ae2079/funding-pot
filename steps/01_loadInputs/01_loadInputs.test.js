@@ -20,7 +20,6 @@ describe('#loadInputs', () => {
 
         assert.deepEqual(Object.keys(inputs), [
           'projectConfig',
-          'allowlist',
           'batchConfig',
         ]);
       });
@@ -35,7 +34,6 @@ describe('#loadInputs', () => {
 
         assert.deepEqual(Object.keys(inputs), [
           'projectConfig',
-          'allowlist',
           'batchConfig',
           'batchReports',
         ]);
