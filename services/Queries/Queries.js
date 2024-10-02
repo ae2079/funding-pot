@@ -226,6 +226,8 @@ export class Queries {
         }),
       });
 
+      console.log(response);
+
       const { data } = await response.json();
       return data;
     };

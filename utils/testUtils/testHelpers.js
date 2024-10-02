@@ -16,7 +16,7 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
 
-import { projectConfig } from './staticTestData.js';
+import { projectConfig, allowlist } from './staticTestData.js';
 import abis from '../../data/abis.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -514,4 +514,22 @@ export const getReport = (projectName, batchNr) => {
   const report = JSON.parse(fs.readFileSync(path.join(filePath)));
 
   return report;
+};
+
+export const mockAllowlist = () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    if (url.includes(process.env.BACKEND_URL)) {
+      return {
+        json: async () => ({
+          data: {
+            batchMintingEligibleUsers: {
+              users: allowlist,
+            },
+          },
+        }),
+      };
+    }
+    return originalFetch(url, options);
+  };
 };
