@@ -1,6 +1,25 @@
 import './env.js';
 import { main } from './steps/main.js';
+import { getProjectNames } from './utils/helpers.js';
 
-const [, , PROJECT_NAME, BATCH] = process.argv;
+const [, , BATCH, PROJECT_NAME] = process.argv;
+const { TYPE } = process.env;
 
-main(PROJECT_NAME, BATCH);
+const runScript = async () => {
+  console.log(
+    `🙌 Starting script for batch ${BATCH} and ${
+      TYPE === 'all' ? 'all projects' : PROJECT_NAME
+    }`
+  );
+
+  if (TYPE === 'project') {
+    await main(PROJECT_NAME, BATCH);
+  } else if (TYPE === 'all') {
+    const projectNames = getProjectNames();
+    for (const projectName of projectNames) {
+      await main(projectName, BATCH);
+    }
+  }
+};
+
+runScript();
