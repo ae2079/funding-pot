@@ -23,7 +23,6 @@ describe('#validateInputs', () => {
     },
     IS_EARLY_ACCESS: false,
   };
-  const allowlist = ['0x327f6bc1b86eca753bfd2f8187d22b6aef7783eb'];
   const batchReports = {
     1: {},
     2: {},
