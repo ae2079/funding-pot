@@ -3,7 +3,7 @@ import '../../env.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
-import { getContract } from 'viem';
+import { getContract, isAddress } from 'viem';
 
 import abis from '../../data/abis.js';
 import {
@@ -22,6 +22,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
 
     it('sets relevant workflow addresses', async () => {
@@ -47,6 +48,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
 
     it('should return the blocknumber of the BUY', async () => {
@@ -62,6 +64,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
 
     it('should return the blocknumber of the BUY', async () => {
@@ -100,6 +103,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
     querySevice.bondingCurve = getContract({
       address: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
@@ -120,6 +124,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
     querySevice.bondingCurve = getContract({
       address: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
@@ -138,6 +143,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
     querySevice.bondingCurve = getContract({
       address: '0xb2c66815262f7a69189Fd7A2b2ea5482a6082958',
@@ -156,6 +162,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
     querySevice.queries.addresses = {
       orchestrator: projectConfig.ORCHESTRATOR,
@@ -177,6 +184,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: process.env.RPC_URL,
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
     querySevice.queries.addresses = {
       orchestrator: projectConfig.ORCHESTRATOR,
@@ -219,6 +227,7 @@ describe('Queries', () => {
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: getAnkrRpcUrl(),
       chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
     });
 
     it('should return all NFT holders', async () => {
@@ -229,6 +238,22 @@ describe('Queries', () => {
         '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
         '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f',
       ]);
+    });
+  });
+
+  describe.only('#getAllowlist', () => {
+    const querySevice = new Queries({
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: getAnkrRpcUrl(),
+      chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
+    });
+
+    it('should return the allowlist', async () => {
+      const addresses = await querySevice.getAllowlist();
+      for (const address of addresses) {
+        assert.ok(isAddress(address));
+      }
     });
   });
 });

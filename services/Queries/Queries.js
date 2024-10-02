@@ -18,8 +18,10 @@ export class Queries {
   ankrProvider;
   bondingCurve;
   queries;
+  backendUrl;
 
-  constructor({ rpcUrl, indexerUrl, chainId }) {
+  constructor({ rpcUrl, indexerUrl, chainId, backendUrl }) {
+    this.backendUrl = backendUrl;
     this.indexerUrl = indexerUrl;
     this.chainId = chainId;
     this.publicClient = createPublicClient({
@@ -201,22 +203,45 @@ export class Queries {
     return this.queries.nftHolders;
   }
 
+  async getAllowlist() {
+    const {
+      batchMintingEligibleUsers: { users },
+    } = await this.backendConnector(queryBuilder.backend.allowlist());
+    return users;
+  }
+
   /* 
     CONNECTORS
   */
 
-  async indexerConnector(query) {
-    const response = await fetch(this.indexerUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-      }),
-    });
+  async getGraphQLConnector(url) {
+    const connector = async (query) => {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query,
+        }),
+      });
 
-    const { data } = await response.json();
+      const { data } = await response.json();
+      return data;
+    };
+
+    return connector;
+  }
+
+  async indexerConnector(query) {
+    const connector = await this.getGraphQLConnector(this.indexerUrl);
+    const data = await connector(query);
+    return data;
+  }
+
+  async backendConnector(query) {
+    const connector = await this.getGraphQLConnector(this.backendUrl);
+    const data = await connector(query);
     return data;
   }
 
