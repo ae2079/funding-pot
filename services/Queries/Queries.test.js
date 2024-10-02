@@ -241,7 +241,7 @@ describe('Queries', () => {
     });
   });
 
-  describe.only('#getAllowlist', () => {
+  describe('#getAllowlist', () => {
     const querySevice = new Queries({
       indexerUrl: process.env.INDEXER_URL,
       rpcUrl: getAnkrRpcUrl(),

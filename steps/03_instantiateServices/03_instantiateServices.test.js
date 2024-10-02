@@ -30,6 +30,7 @@ describe('#instantiateServices', () => {
         'indexerUrl',
         'publicClient',
         'ankrProvider',
+        'backendUrl',
         'networkIdString',
         'chainId',
         'queries',
