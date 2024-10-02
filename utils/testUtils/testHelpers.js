@@ -16,7 +16,7 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
 
-import { projectConfig } from './staticTestData.js';
+import { projectConfig, allowlist } from './staticTestData.js';
 import abis from '../../data/abis.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -405,26 +405,11 @@ export const getBatchConfig = async (safe) => {
   return { batchConfig, contributions, contributors };
 };
 
-export const createAndSaveAllowlist = async () => {
+export const createAllowlist = () => {
   const ownerAccount = privateKeyToAccount(process.env.PK);
   const delegateAccount = privateKeyToAccount(process.env.DELEGATE);
 
-  const allowListFilePath = path.join(
-    __dirname,
-    '../../data/test/input/allowlist.json'
-  );
-
   const allowlist = [ownerAccount.address, delegateAccount.address];
-
-  fs.writeFileSync(
-    allowListFilePath,
-    JSON.stringify(allowlist, null, 2),
-    'utf8'
-  );
-
-  console.info(
-    '💾 Alllowlist stored to data/test/input/allowlist.json'
-  );
 
   return allowlist;
 };
@@ -437,7 +422,7 @@ function randomIntFromInterval(min, max) {
 export const setupForE2E = async () => {
   const { SAFE } = await getProjectConfig();
   await getBatchConfig(SAFE);
-  await createAndSaveAllowlist();
+  mockAllowlist({ type: 'dynamic' });
 };
 
 export const signAndExecutePendingTxs = async (safeAddress) => {
@@ -514,4 +499,25 @@ export const getReport = (projectName, batchNr) => {
   const report = JSON.parse(fs.readFileSync(path.join(filePath)));
 
   return report;
+};
+
+export const mockAllowlist = ({ type }) => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options) => {
+    if (url.includes(process.env.BACKEND_URL)) {
+      return {
+        json: async () => ({
+          data: {
+            batchMintingEligibleUsers: {
+              users:
+                type === 'static'
+                  ? allowlist
+                  : createAllowlist().map((a) => a.toLowerCase()),
+            },
+          },
+        }),
+      };
+    }
+    return originalFetch(url, options);
+  };
 };

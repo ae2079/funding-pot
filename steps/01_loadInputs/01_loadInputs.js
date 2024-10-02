@@ -20,13 +20,6 @@ const loadConfigs = (projectName, batch) => {
     fs.readFileSync(path.join(__dirname, `${basePath}/projects.json`))
   );
 
-  // load allowlist
-  const allowlist = JSON.parse(
-    fs.readFileSync(
-      path.join(__dirname, `${basePath}/allowlist.json`)
-    )
-  );
-
   // load batch config (batch-specific constants such as allowlist, start & end block, vesting schedule)
   const batchConfig = JSON.parse(
     fs.readFileSync(
@@ -36,7 +29,6 @@ const loadConfigs = (projectName, batch) => {
 
   return {
     projectConfig: projectsConfig[projectName],
-    allowlist: allowlist.map((addr) => addr.toLowerCase()),
     batchConfig,
   };
 };

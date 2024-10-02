@@ -12,18 +12,23 @@ import {
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { getAnkrRpcUrl } from '../../utils/helpers.js';
+import { mockAllowlist } from '../../utils/testUtils/testHelpers.js';
 
-const { CHAIN_ID, INDEXER_URL } = process.env;
+const { CHAIN_ID, INDEXER_URL, BACKEND_URL } = process.env;
 
 describe('#defineBatch', () => {
   let queryService, batchService;
 
   before(async () => {
+    mockAllowlist({ type: 'static' });
+
     queryService = new Queries({
       rpcUrl: getAnkrRpcUrl(),
       indexerUrl: INDEXER_URL,
       chainId: CHAIN_ID,
+      backendUrl: BACKEND_URL,
     });
+
     await queryService.setup(projectConfig.ORCHESTRATOR);
 
     batchService = new Batch({
@@ -37,7 +42,6 @@ describe('#defineBatch', () => {
       batchService,
       projectConfig,
       batchConfig,
-      allowlist,
     });
 
     assert.deepStrictEqual(batchService.data, batchReportData);

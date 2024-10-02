@@ -3,7 +3,6 @@ export const defineBatch = async ({
   batchService,
   projectConfig,
   batchConfig,
-  allowlist,
 }) => {
   // get project & batch specific config
   const { TIMEFRAME } = batchConfig;
@@ -24,10 +23,18 @@ export const defineBatch = async ({
     toTimestamp
   );
 
+  // get nft holders
   const nftHolders = await queryService.getNftHolders(NFT);
 
+  // get allowlist
+  const allowlist = await queryService.getAllowlist();
+
+  // based on allowlists and contribution limits per contributor
+  // assess how much valid contributions they have
   batchService.assessInflows(inflows, allowlist, nftHolders);
 
+  // no valid contributions => no allocations
+  // => no batch buy => no vestings => error
   if (batchService.data.totalValidContribution === 0n)
     throw new Error('No valid contributions found');
 

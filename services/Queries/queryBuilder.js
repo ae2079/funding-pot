@@ -22,4 +22,11 @@ export const queryBuilder = {
       }`;
     },
   },
+  backend: {
+    allowlist: () => `{
+      batchMintingEligibleUsers(limit:1000, skip:0) {
+        users
+      }
+    }`,
+  },
 };

@@ -4,33 +4,33 @@ export const validateInputs = ({
   batchNr,
   projectConfig,
   batchConfig,
-  allowlist,
   batchReports,
 }) => {
   validateEnvVars();
   validateConfigs({
     projectConfig,
     batchConfig,
-    allowlist,
   });
   validatebatchReports({ batchNr, batchReports });
 };
 
 const validateEnvVars = () => {
-  const { ANKR_API_KEY, ANKR_NETWORK_ID, CHAIN_ID, INDEXER_URL } =
-    process.env;
+  const {
+    ANKR_API_KEY,
+    ANKR_NETWORK_ID,
+    CHAIN_ID,
+    INDEXER_URL,
+    BACKEND_URL,
+  } = process.env;
 
   if (!ANKR_API_KEY) throw new Error('ANKR_API_KEY missing');
   if (!ANKR_NETWORK_ID) throw new Error('ANKR_NETWORK_ID missing');
   if (!CHAIN_ID) throw new Error('CHAIN_ID missing');
   if (!INDEXER_URL) throw new Error('INDEXER_URL missing');
+  if (!BACKEND_URL) throw new Error('BACKEND_URL missing');
 };
 
-const validateConfigs = ({
-  projectConfig,
-  batchConfig,
-  allowlist,
-}) => {
+const validateConfigs = ({ projectConfig, batchConfig }) => {
   const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS } = batchConfig;
   const { SAFE, ORCHESTRATOR, NFT } = projectConfig;
 
@@ -45,8 +45,6 @@ const validateConfigs = ({
     throw new Error('IS_EARLY_ACCESS missing or empty');
   if (!LIMITS || !LIMITS.TOTAL || !LIMITS.INDIVIDUAL)
     throw new Error('LIMITS missing or empty');
-  if (!allowlist || allowlist.length === 0)
-    throw new Error('ALLOWLIST missing or empty');
   if (
     !VESTING_DETAILS ||
     !VESTING_DETAILS.START ||

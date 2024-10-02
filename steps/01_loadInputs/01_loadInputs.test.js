@@ -1,15 +1,10 @@
 import '../../env.js';
 
-import { describe, it, before } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { loadInputs } from './01_loadInputs.js';
-import { createAndSaveAllowlist } from '../../utils/testUtils/testHelpers.js';
 
 describe('#loadInputs', () => {
-  before(async () => {
-    await createAndSaveAllowlist();
-  });
-
   describe('with existing batch number', () => {
     describe('without previous batch batchReports', () => {
       const projectName = 'STATIC_TEST_PROJECT_1';
@@ -20,7 +15,6 @@ describe('#loadInputs', () => {
 
         assert.deepEqual(Object.keys(inputs), [
           'projectConfig',
-          'allowlist',
           'batchConfig',
         ]);
       });
@@ -35,7 +29,6 @@ describe('#loadInputs', () => {
 
         assert.deepEqual(Object.keys(inputs), [
           'projectConfig',
-          'allowlist',
           'batchConfig',
           'batchReports',
         ]);

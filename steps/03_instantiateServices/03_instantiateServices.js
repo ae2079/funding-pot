@@ -9,7 +9,7 @@ export const instantiateServices = async (
   batchConfig,
   batchReports
 ) => {
-  const { CHAIN_ID, INDEXER_URL } = process.env;
+  const { CHAIN_ID, INDEXER_URL, BACKEND_URL } = process.env;
   const { ORCHESTRATOR } = projectConfig;
 
   // instantiate services
@@ -17,6 +17,7 @@ export const instantiateServices = async (
     rpcUrl: getAnkrRpcUrl(),
     indexerUrl: INDEXER_URL,
     chainId: CHAIN_ID,
+    backendUrl: BACKEND_URL,
   });
 
   await queryService.setup(ORCHESTRATOR);
