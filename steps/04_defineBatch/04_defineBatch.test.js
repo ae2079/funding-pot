@@ -20,7 +20,7 @@ describe('#defineBatch', () => {
   let queryService, batchService;
 
   before(async () => {
-    mockAllowlist();
+    mockAllowlist({ type: 'static' });
 
     queryService = new Queries({
       rpcUrl: getAnkrRpcUrl(),
