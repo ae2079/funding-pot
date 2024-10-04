@@ -7,12 +7,12 @@ const __dirname = dirname(__filename);
 
 export const loadInputs = (projectName, batch) => {
   return {
-    ...loadConfigs(projectName, batch),
+    ...loadConfigs(batch),
     ...loadbatchReports(projectName),
   };
 };
 
-const loadConfigs = (projectName, batch) => {
+const loadConfigs = (batch) => {
   const basePath = getBasePath('input');
 
   // load project config (= project-specific constants)
@@ -28,7 +28,7 @@ const loadConfigs = (projectName, batch) => {
   );
 
   return {
-    projectConfig: projectsConfig[projectName],
+    projectsConfig,
     batchConfig,
   };
 };

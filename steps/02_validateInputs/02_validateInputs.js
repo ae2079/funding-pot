@@ -2,13 +2,15 @@ import { isAddress } from 'viem';
 
 export const validateInputs = ({
   batchNr,
-  projectConfig,
+  projectsConfig,
+  projectName,
   batchConfig,
   batchReports,
 }) => {
   validateEnvVars();
   validateConfigs({
-    projectConfig,
+    projectsConfig,
+    projectName,
     batchConfig,
   });
   validatebatchReports({ batchNr, batchReports });
@@ -30,36 +32,64 @@ const validateEnvVars = () => {
   if (!BACKEND_URL) throw new Error('BACKEND_URL missing');
 };
 
-const validateConfigs = ({ projectConfig, batchConfig }) => {
+const validateConfigs = ({
+  projectsConfig,
+  projectName,
+  batchConfig,
+}) => {
   const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS } = batchConfig;
-  const { SAFE, ORCHESTRATOR, NFT } = projectConfig;
+  const { SAFE, ORCHESTRATOR, NFT } = projectsConfig[projectName];
 
   if (!SAFE || !isAddress(SAFE))
-    throw new Error('SAFE missing or invalid address');
+    throwConfigError('SAFE missing or invalid address', {
+      projectName,
+      batchConfig,
+    });
   if (!ORCHESTRATOR || !isAddress(ORCHESTRATOR))
-    throw new Error('ORCHESTRATOR missing or invalid address');
+    throwConfigError('ORCHESTRATOR missing or invalid address', {
+      projectName,
+      batchConfig,
+    });
   if (!NFT || !isAddress(NFT))
-    throw new Error('NFT missing or invalid address');
+    throwConfigError('NFT missing or invalid address', {
+      projectName,
+      batchConfig,
+    });
 
   if (IS_EARLY_ACCESS === undefined)
-    throw new Error('IS_EARLY_ACCESS missing or empty');
+    throwConfigError('IS_EARLY_ACCESS missing or empty', {
+      projectName,
+      batchConfig,
+    });
   if (!LIMITS || !LIMITS.TOTAL || !LIMITS.INDIVIDUAL)
-    throw new Error('LIMITS missing or empty');
+    throwConfigError('LIMITS missing or empty', {
+      projectName,
+      batchConfig,
+    });
   if (
     !VESTING_DETAILS ||
     !VESTING_DETAILS.START ||
     !VESTING_DETAILS.CLIFF ||
     !VESTING_DETAILS.END
   )
-    throw new Error('VESTING_DETAILS missing or empty');
+    throwConfigError('VESTING_DETAILS missing or empty', {
+      projectName,
+      batchConfig,
+    });
   if (parseInt(VESTING_DETAILS.START) > parseInt(VESTING_DETAILS.END))
-    throw new Error('Vesting: START > END');
+    throwConfigError('Vesting: START > END', {
+      projectName,
+      batchConfig,
+    });
   if (
     parseInt(VESTING_DETAILS.START) +
       parseInt(VESTING_DETAILS.CLIFF) >
     parseInt(VESTING_DETAILS.END)
   )
-    throw new Error('Vesting: START + CLIFF > END');
+    throwConfigError('Vesting: START + CLIFF > END', {
+      projectName,
+      batchConfig,
+    });
 };
 
 const validatebatchReports = ({ batchReports, batchNr }) => {
@@ -79,4 +109,8 @@ const validatebatchReports = ({ batchReports, batchNr }) => {
       throw new Error(`Report missing for batchNr ${i}`);
     }
   }
+};
+
+const throwConfigError = (msg, { projectName }) => {
+  throw new Error(`Error in project ${projectName}: ${msg}`);
 };

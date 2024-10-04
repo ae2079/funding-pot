@@ -14,7 +14,7 @@ describe('#loadInputs', () => {
         const inputs = loadInputs(projectName, batchNumber);
 
         assert.deepEqual(Object.keys(inputs), [
-          'projectConfig',
+          'projectsConfig',
           'batchConfig',
         ]);
       });
@@ -28,7 +28,7 @@ describe('#loadInputs', () => {
         const inputs = loadInputs(projectName, batchNumber);
 
         assert.deepEqual(Object.keys(inputs), [
-          'projectConfig',
+          'projectsConfig',
           'batchConfig',
           'batchReports',
         ]);

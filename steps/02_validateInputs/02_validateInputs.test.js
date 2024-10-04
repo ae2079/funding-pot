@@ -11,6 +11,7 @@ describe('#validateInputs', () => {
     ORCHESTRATOR: '0x4ffe42c1666e50104e997DD07E43c673FD39C81d',
     NFT: '0xa47f284a5be76c10b902446acb1aea9550f4c71d',
   };
+
   const batchConfig = {
     VESTING_DETAILS: {
       START: 1,
@@ -35,7 +36,8 @@ describe('#validateInputs', () => {
       it('does not throw', () => {
         assert.doesNotThrow(() => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig,
             batchNr,
           });
@@ -52,7 +54,8 @@ describe('#validateInputs', () => {
         assert.throws(
           () => {
             validateInputs({
-              projectConfig,
+              projectsConfig: { exampleProject: projectConfig },
+              projectName: 'exampleProject',
               batchConfig,
               batchNr: thirdBatch,
               batchReports: { 1: {} },
@@ -72,7 +75,8 @@ describe('#validateInputs', () => {
         assert.throws(
           () => {
             validateInputs({
-              projectConfig,
+              projectsConfig: { exampleProject: projectConfig },
+              projectName: 'exampleProject',
               batchConfig,
               batchNr: thirdBatch,
               batchReports: { 1: {}, 3: {} },
@@ -90,7 +94,8 @@ describe('#validateInputs', () => {
       it('does not throw', () => {
         assert.doesNotThrow(() => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig,
             batchNr: thirdBatch,
             batchReports,
@@ -105,14 +110,16 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig: {},
+            projectsConfig: { exampleProject: {} },
+            projectName: 'exampleProject',
             batchConfig: {},
             batchReports: {},
           });
         },
         {
           name: 'Error',
-          message: 'SAFE missing or invalid address',
+          message:
+            'Error in project exampleProject: SAFE missing or invalid address',
         }
       );
     });
@@ -123,17 +130,18 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig: {
-              ...projectConfig,
-              SAFE: undefined,
+            projectsConfig: {
+              exampleProject: { ...projectConfig, SAFE: undefined },
             },
+            projectName: 'exampleProject',
             batchConfig,
             batchReports,
           });
         },
         {
           name: 'Error',
-          message: 'SAFE missing or invalid address',
+          message:
+            'Error in project exampleProject: SAFE missing or invalid address',
         }
       );
     });
@@ -145,17 +153,21 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig: {
-              ...projectConfig,
-              ORCHESTRATOR: undefined,
+            projectsConfig: {
+              exampleProject: {
+                ...projectConfig,
+                ORCHESTRATOR: undefined,
+              },
             },
+            projectName: 'exampleProject',
             batchConfig,
             batchReports,
           });
         },
         {
           name: 'Error',
-          message: 'ORCHESTRATOR missing or invalid address',
+          message:
+            'Error in project exampleProject: ORCHESTRATOR missing or invalid address',
         }
       );
     });
@@ -166,7 +178,8 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: {
               ...batchConfig,
               VESTING_DETAILS: {
@@ -179,7 +192,8 @@ describe('#validateInputs', () => {
         },
         {
           name: 'Error',
-          message: 'VESTING_DETAILS missing or empty',
+          message:
+            'Error in project exampleProject: VESTING_DETAILS missing or empty',
         }
       );
     });
@@ -190,7 +204,8 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: {
               ...batchConfig,
               VESTING_DETAILS: {
@@ -203,7 +218,8 @@ describe('#validateInputs', () => {
         },
         {
           name: 'Error',
-          message: 'VESTING_DETAILS missing or empty',
+          message:
+            'Error in project exampleProject: VESTING_DETAILS missing or empty',
         }
       );
     });
@@ -214,7 +230,8 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: {
               ...batchConfig,
               VESTING_DETAILS: {
@@ -227,7 +244,8 @@ describe('#validateInputs', () => {
         },
         {
           name: 'Error',
-          message: 'VESTING_DETAILS missing or empty',
+          message:
+            'Error in project exampleProject: VESTING_DETAILS missing or empty',
         }
       );
     });
@@ -238,7 +256,8 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: {
               ...batchConfig,
               VESTING_DETAILS: {
@@ -252,7 +271,8 @@ describe('#validateInputs', () => {
         },
         {
           name: 'Error',
-          message: 'Vesting: START > END',
+          message:
+            'Error in project exampleProject: Vesting: START > END',
         }
       );
     });
@@ -263,7 +283,8 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: {
               ...batchConfig,
               VESTING_DETAILS: {
@@ -278,7 +299,8 @@ describe('#validateInputs', () => {
         },
         {
           name: 'Error',
-          message: 'Vesting: START + CLIFF > END',
+          message:
+            'Error in project exampleProject: Vesting: START + CLIFF > END',
         }
       );
     });
@@ -292,15 +314,16 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: configWithoutLimits,
-
             batchReports,
           });
         },
         {
           name: 'Error',
-          message: 'LIMITS missing or empty',
+          message:
+            'Error in project exampleProject: LIMITS missing or empty',
         }
       );
     });
@@ -314,14 +337,16 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig,
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
             batchConfig: configWithoutFlag,
             batchReports,
           });
         },
         {
           name: 'Error',
-          message: 'IS_EARLY_ACCESS missing or empty',
+          message:
+            'Error in project exampleProject: IS_EARLY_ACCESS missing or empty',
         }
       );
     });
@@ -335,14 +360,21 @@ describe('#validateInputs', () => {
       assert.throws(
         () => {
           validateInputs({
-            projectConfig: projectConfigWithoutNft,
+            projectsConfig: {
+              exampleProject: {
+                ...projectConfig,
+                NFT: undefined,
+              },
+            },
+            projectName: 'exampleProject',
             batchConfig,
             batchReports,
           });
         },
         {
           name: 'Error',
-          message: 'NFT missing or invalid address',
+          message:
+            'Error in project exampleProject: NFT missing or invalid address',
         }
       );
     });
