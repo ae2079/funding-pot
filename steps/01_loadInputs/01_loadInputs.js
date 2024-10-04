@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 export const loadInputs = (projectName, batch) => {
   return {
     ...loadConfigs(batch),
-    ...loadbatchReports(projectName),
+    ...loadbatchReports(projectName, batch),
   };
 };
 
@@ -33,13 +33,17 @@ const loadConfigs = (batch) => {
   };
 };
 
-const loadbatchReports = (projectName) => {
+const loadbatchReports = (projectName, batch) => {
   const batchReportsPath = path.join(
     __dirname,
     `${getBasePath('output')}/${projectName}`
   );
 
   const batchReports = {};
+
+  // for the first batch dont search for previous reports
+  if (batch == 1) return { batchReports };
+
   try {
     const files = fs.readdirSync(batchReportsPath);
     files.forEach((file) => {
