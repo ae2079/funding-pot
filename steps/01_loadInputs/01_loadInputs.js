@@ -7,24 +7,17 @@ const __dirname = dirname(__filename);
 
 export const loadInputs = (projectName, batch) => {
   return {
-    ...loadConfigs(projectName, batch),
-    ...loadbatchReports(projectName),
+    ...loadConfigs(batch),
+    ...loadbatchReports(projectName, batch),
   };
 };
 
-const loadConfigs = (projectName, batch) => {
+const loadConfigs = (batch) => {
   const basePath = getBasePath('input');
 
   // load project config (= project-specific constants)
   const projectsConfig = JSON.parse(
     fs.readFileSync(path.join(__dirname, `${basePath}/projects.json`))
-  );
-
-  // load allowlist
-  const allowlist = JSON.parse(
-    fs.readFileSync(
-      path.join(__dirname, `${basePath}/allowlist.json`)
-    )
   );
 
   // load batch config (batch-specific constants such as allowlist, start & end block, vesting schedule)
@@ -35,19 +28,22 @@ const loadConfigs = (projectName, batch) => {
   );
 
   return {
-    projectConfig: projectsConfig[projectName],
-    allowlist: allowlist.map((addr) => addr.toLowerCase()),
+    projectsConfig,
     batchConfig,
   };
 };
 
-const loadbatchReports = (projectName) => {
+const loadbatchReports = (projectName, batch) => {
   const batchReportsPath = path.join(
     __dirname,
     `${getBasePath('output')}/${projectName}`
   );
 
   const batchReports = {};
+
+  // for the first batch dont search for previous reports
+  if (batch == 1) return { batchReports };
+
   try {
     const files = fs.readdirSync(batchReportsPath);
     files.forEach((file) => {

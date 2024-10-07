@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
+    "project": "NODE_ENV=production TYPE=project node index.js",
+    "all": "NODE_ENV=production TYPE=all node index.js",
     "test:unit": "NODE_ENV=test node utils/testUtils/unitTestRunner.js",
     "test:e2e": "NODE_ENV=test node steps/main.e2e.test.js",
     "clean": "NODE_ENV=test node utils/scripts/resetTestFiles.js"

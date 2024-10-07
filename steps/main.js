@@ -12,18 +12,22 @@ export const main = async (projectName, batchNr) => {
 
   // load configs & batchReports
   console.info(`1️⃣ Loading configs...`);
-  const { projectConfig, batchConfig, allowlist, batchReports } =
+  const { projectsConfig, batchConfig, allowlist, batchReports } =
     loadInputs(projectName, batchNr);
 
   // checks if all required inputs are set in configs
   console.info(`2️⃣ Validating inputs...`);
   validateInputs({
     batchNr,
-    projectConfig,
+    projectsConfig,
+    projectName,
     batchConfig,
     allowlist,
     batchReports,
   });
+
+  // deconstruct project config
+  const projectConfig = projectsConfig[projectName];
 
   // instantiate services
   console.info(`3️⃣ Instantiating services...`);
