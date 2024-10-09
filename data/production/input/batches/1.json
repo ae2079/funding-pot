@@ -9,8 +9,8 @@
     "END": 1729000000
   },
   "LIMITS": {
-    "TOTAL": "500000",
-    "INDIVIDUAL": "5000"
+    "TOTAL": "5000000",
+    "INDIVIDUAL": "20000"
   },
   "IS_EARLY_ACCESS": true
 }
