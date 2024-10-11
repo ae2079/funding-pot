@@ -6,9 +6,9 @@ export class Batch {
 
   constructor({ batchConfig, batchReports }) {
     const isEarlyAccess = batchConfig.IS_EARLY_ACCESS;
-    const individualLimit = parseUnits(
+    const individualLimit = this.denominatedInCollateral(
       batchConfig.LIMITS.INDIVIDUAL,
-      18
+      batchConfig.PRICE
     );
     // since batch caps are accumulative, if it is not the very first batch
     // we need to consider how much was already contributed in previous batches
@@ -19,7 +19,7 @@ export class Batch {
     // similar for individual caps we need to know how much each address had already contributed before
     // because we need it to calculate the individual cap per round
     const aggregatedPreviousContributions = {};
-
+    // therefore we iterate over previous reports and calculate the "real" applicable limits
     for (const reportNr in batchReports) {
       const report = batchReports[reportNr];
       totalBatchLimit -= BigInt(report.totalValidContribution);

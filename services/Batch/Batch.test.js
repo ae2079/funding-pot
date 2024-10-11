@@ -21,6 +21,9 @@ describe('Batch', () => {
   const contr3 = 5_000_000_000_000_000_000n;
   const contr4 = 6_000_000_000_000_000_000n;
 
+  const collateralDenominatedTotalLimit = parseUnits('9', 18);
+  const collateralDenominatedIndividualLimit = parseUnits('2', 18);
+
   describe('#constructor', () => {
     describe('without previous batchReports', () => {
       const batchService = new Batch({ batchConfig });
@@ -38,7 +41,7 @@ describe('Batch', () => {
         );
         assert.equal(
           batchService.config.individualLimit,
-          parseUnits(batchConfig.LIMITS.INDIVIDUAL, 18)
+          collateralDenominatedIndividualLimit
         );
       });
     });
@@ -76,7 +79,7 @@ describe('Batch', () => {
       it('adjusts the totalLimit', () => {
         assert.equal(
           batchService.config.totalLimit,
-          parseUnits('9', 18) -
+          collateralDenominatedTotalLimit -
             mockBatchReports[1].totalValidContribution -
             mockBatchReports[2].totalValidContribution
         );
@@ -96,11 +99,8 @@ describe('Batch', () => {
 
   describe('#assessInflows', () => {
     const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
-    const totalLimit = parseUnits('9', 18);
-    const individualLimit = parseUnits(
-      batchConfig.LIMITS.INDIVIDUAL,
-      18
-    );
+    const totalLimit = collateralDenominatedTotalLimit;
+    const individualLimit = collateralDenominatedIndividualLimit;
 
     describe('when it is NOT an early access batch', () => {
       const batchService = new Batch({

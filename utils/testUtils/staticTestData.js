@@ -10,7 +10,7 @@ export const batchConfig = {
   },
   LIMITS: {
     TOTAL: '90',
-    INDIVIDUAL: '2',
+    INDIVIDUAL: '20',
   },
   IS_EARLY_ACCESS: false,
   PRICE: '0.1',
