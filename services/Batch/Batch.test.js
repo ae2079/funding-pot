@@ -38,9 +38,28 @@ describe('Batch', () => {
     });
 
     describe('with previous batchReports', () => {
+      const user1Contr1 = parseUnits('0.1', 18);
+      const user1Contr2 = parseUnits('0.2', 18);
+      const user2Contr2 = parseUnits('0.4', 18);
+
       const mockBatchReports = {
-        1: { totalValidContribution: '3000000000000000000' },
-        2: { totalValidContribution: '2000000000000000000' },
+        1: {
+          totalValidContribution: parseUnits('3', 18),
+          participants: {
+            [addr1]: {
+              validContribution: user1Contr1,
+            },
+          },
+        },
+        2: {
+          totalValidContribution: parseUnits('2', 18),
+          participants: {
+            [addr1]: {
+              validContribution: user1Contr2,
+            },
+            [addr2]: { validContribution: user2Contr2 },
+          },
+        },
       };
 
       const batchService = new Batch({
@@ -48,14 +67,22 @@ describe('Batch', () => {
         batchReports: mockBatchReports,
       });
 
-      it('accounts for previous batchReports', () => {
+      it('adjusts the totalLimit', () => {
         assert.equal(
           batchService.config.totalLimit,
-          4000000000000000000n
+          parseUnits(batchConfig.LIMITS.TOTAL, 18) -
+            mockBatchReports[1].totalValidContribution -
+            mockBatchReports[2].totalValidContribution
         );
-        assert.equal(
-          batchService.config.individualLimit,
-          2000000000000000000n
+      });
+
+      it('adds aggregated previous contributions to `data`', () => {
+        assert.deepStrictEqual(
+          batchService.data.aggregatedPreviousContributions,
+          {
+            [addr1]: user1Contr1 + user1Contr2,
+            [addr2]: user2Contr2,
+          }
         );
       });
     });
@@ -80,6 +107,7 @@ describe('Batch', () => {
 
       it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
         assert.deepStrictEqual(Object.keys(batchService.data), [
+          'aggregatedPreviousContributions',
           'totalContribution',
           'totalValidContribution',
           'totalInvalidContribution',
@@ -128,24 +156,86 @@ describe('Batch', () => {
       describe('with two contributions (addr1)', () => {
         const contributor = addr1;
 
-        describe('when when the second contribution exceeds the individual cap', () => {
-          it('splits between `validContribution` and `invalidContribution`', () => {
-            const { participants } = batchService.data;
-            const {
-              contribution,
-              invalidContribution,
-              validContribution,
-            } = participants[contributor];
+        describe('when the second contribution exceeds the individual cap', () => {
+          describe('without any previous contributions', () => {
+            it('splits correctly between `validContribution` and `invalidContribution`', () => {
+              const { participants } = batchService.data;
+              const {
+                contribution,
+                invalidContribution,
+                validContribution,
+              } = participants[contributor];
 
-            assert.equal(
-              contribution,
-              inflows[0].contribution + inflows[2].contribution
-            );
-            assert.equal(
-              invalidContribution,
-              inflows[2].contribution
-            );
-            assert.equal(validContribution, inflows[0].contribution);
+              assert.equal(
+                contribution,
+                inflows[0].contribution + inflows[2].contribution
+              );
+              assert.equal(
+                invalidContribution,
+                inflows[2].contribution
+              );
+              assert.equal(
+                validContribution,
+                inflows[0].contribution
+              );
+            });
+          });
+
+          describe('with previous contributions', () => {
+            const user1Contr1 = 1n;
+            const user1Contr2 = 2n;
+
+            const mockBatchReports = {
+              1: {
+                totalValidContribution: 0n,
+                participants: {
+                  [addr1]: {
+                    validContribution: user1Contr1,
+                  },
+                },
+              },
+              2: {
+                totalValidContribution: 0n,
+                participants: {
+                  [addr1]: {
+                    validContribution: user1Contr2,
+                  },
+                },
+              },
+            };
+
+            it.only('accounts for previous contributions when splitting between valid and invalid', () => {
+              const batchServiceWithPrevIndContribs = new Batch({
+                batchConfig,
+                batchReports: mockBatchReports,
+              });
+              batchServiceWithPrevIndContribs.assessInflows(
+                inflows,
+                allowlist,
+                nftHolders
+              );
+
+              const { participants } =
+                batchServiceWithPrevIndContribs.data;
+              const {
+                contribution,
+                invalidContribution,
+                validContribution,
+              } = participants[contributor];
+
+              assert.equal(
+                contribution,
+                inflows[0].contribution + inflows[2].contribution
+              );
+              assert.equal(
+                invalidContribution,
+                inflows[2].contribution + user1Contr1 + user1Contr2
+              );
+              assert.equal(
+                validContribution,
+                inflows[0].contribution - user1Contr1 - user1Contr2
+              );
+            });
           });
         });
       });

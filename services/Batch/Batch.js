@@ -13,14 +13,30 @@ export class Batch {
     // since batch caps are accumulative, if it is not the very first batch
     // we need to consider how much was already contributed in previous batches
     let totalBatchLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
+    // similar for individual caps we need to know how much each address had already contributed before
+    // because we need it to calculate the individual cap per round
+    const aggregatedPreviousContributions = {};
+
     for (const reportNr in batchReports) {
       const report = batchReports[reportNr];
       totalBatchLimit -= BigInt(report.totalValidContribution);
+      for (const address in report.participants) {
+        const contribution = report.participants[address];
+        if (!contribution.validContribution) continue;
+        if (!aggregatedPreviousContributions[address]) {
+          aggregatedPreviousContributions[address] =
+            contribution.validContribution;
+        } else {
+          aggregatedPreviousContributions[address] +=
+            contribution.validContribution;
+        }
+      }
     }
+
     const totalLimit = totalBatchLimit;
 
     this.config = { totalLimit, individualLimit, isEarlyAccess };
-    this.data = {};
+    this.data = { aggregatedPreviousContributions };
   }
 
   assessInflows(inflows, allowlist, nftHolders) {
@@ -56,10 +72,17 @@ export class Batch {
       let validContribution = contribution,
         invalidContribution = 0n;
 
+      // get individual limit considering potential previous contributions
+      const participantLimit = this.data
+        .aggregatedPreviousContributions[participant]
+        ? this.config.individualLimit -
+          this.data.aggregatedPreviousContributions[participant]
+        : this.config.individualLimit;
+
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
       const individualDiff =
-        this.config.individualLimit - (prevValid + contribution);
+        participantLimit - (prevValid + contribution);
 
       // means that the individual cap has been exceeded
       if (individualDiff < 0n) {
@@ -78,7 +101,7 @@ export class Batch {
 
       // means that the total cap has been exceeded
       if (totalDiff < 0n) {
-        // what is the invalid amount with respect to the total cap
+        // what is the invalid amount with respect to the total cap ("excess")
         const e = totalDiff * -1n;
         // what is the valid amount with respect to the total cap
         const v = prevValid + contribution - e;
@@ -137,7 +160,7 @@ export class Batch {
   // INTERNAL HELPER FUNCTIONS
 
   manageContribution(inflow, contributionObj) {
-    const { participant, contribution, transactionHash } = inflow;
+    const { participant } = inflow;
 
     const { invalidContribution, validContribution } =
       contributionObj;
