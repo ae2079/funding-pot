@@ -28,7 +28,13 @@ describe('Batch', () => {
       it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
         assert.equal(
           batchService.config.totalLimit,
-          parseUnits(batchConfig.LIMITS.TOTAL, 18)
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
         );
         assert.equal(
           batchService.config.individualLimit,
@@ -70,7 +76,7 @@ describe('Batch', () => {
       it('adjusts the totalLimit', () => {
         assert.equal(
           batchService.config.totalLimit,
-          parseUnits(batchConfig.LIMITS.TOTAL, 18) -
+          parseUnits('9', 18) -
             mockBatchReports[1].totalValidContribution -
             mockBatchReports[2].totalValidContribution
         );
@@ -90,7 +96,7 @@ describe('Batch', () => {
 
   describe('#assessInflows', () => {
     const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
-    const totalLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
+    const totalLimit = parseUnits('9', 18);
     const individualLimit = parseUnits(
       batchConfig.LIMITS.INDIVIDUAL,
       18

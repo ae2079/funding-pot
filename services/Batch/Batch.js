@@ -12,7 +12,10 @@ export class Batch {
     );
     // since batch caps are accumulative, if it is not the very first batch
     // we need to consider how much was already contributed in previous batches
-    let totalBatchLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
+    let totalBatchLimit = this.denominatedInCollateral(
+      batchConfig.LIMITS.TOTAL,
+      batchConfig.PRICE
+    );
     // similar for individual caps we need to know how much each address had already contributed before
     // because we need it to calculate the individual cap per round
     const aggregatedPreviousContributions = {};
@@ -20,6 +23,7 @@ export class Batch {
     for (const reportNr in batchReports) {
       const report = batchReports[reportNr];
       totalBatchLimit -= BigInt(report.totalValidContribution);
+
       for (const address in report.participants) {
         const contribution = report.participants[address];
         if (!contribution.validContribution) continue;
@@ -33,9 +37,12 @@ export class Batch {
       }
     }
 
-    const totalLimit = totalBatchLimit;
-
-    this.config = { totalLimit, individualLimit, isEarlyAccess };
+    this.config = {
+      totalLimit: totalBatchLimit,
+      individualLimit,
+      isEarlyAccess,
+      price: batchConfig.PRICE,
+    };
     this.data = { aggregatedPreviousContributions };
   }
 
@@ -243,5 +250,19 @@ export class Batch {
 
   diffOrZero(a, b) {
     return a - b > 0n ? a - b : 0n;
+  }
+
+  denominatedInCollateral(amount, price) {
+    return parseUnits(
+      (parseFloat(amount) * parseFloat(price)).toString(),
+      18
+    );
+  }
+
+  denominatedInDollars(amount, price) {
+    return parseUnits(
+      (parseFloat(amount) / parseFloat(price)).toString(),
+      18
+    );
   }
 }
