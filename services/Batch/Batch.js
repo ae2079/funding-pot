@@ -73,7 +73,7 @@ export class Batch {
         invalidContribution = 0n;
 
       // get individual limit considering potential previous contributions
-      const participantLimit = this.data
+      const adjustedIndividualLimit = this.data
         .aggregatedPreviousContributions[participant]
         ? this.config.individualLimit -
           this.data.aggregatedPreviousContributions[participant]
@@ -82,7 +82,7 @@ export class Batch {
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
       const individualDiff =
-        participantLimit - (prevValid + contribution);
+        adjustedIndividualLimit - (prevValid + contribution);
 
       // means that the individual cap has been exceeded
       if (individualDiff < 0n) {
@@ -120,6 +120,9 @@ export class Batch {
         validContribution,
         invalidContribution,
       });
+
+      this.data.participants[participant].adjustedIndividualLimit =
+        adjustedIndividualLimit;
     }
   }
 

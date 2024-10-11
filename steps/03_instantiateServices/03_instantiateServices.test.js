@@ -78,6 +78,8 @@ describe('#instantiateServices', () => {
       totalLimit: 9000000000000000000n,
       isEarlyAccess: false,
     });
-    assert.deepStrictEqual(batchService.data, {});
+    assert.deepStrictEqual(batchService.data, {
+      aggregatedPreviousContributions: {},
+    });
   });
 });
