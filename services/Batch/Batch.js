@@ -12,10 +12,8 @@ export class Batch {
     );
     // since batch caps are accumulative, if it is not the very first batch
     // we need to consider how much was already contributed in previous batches
-    let totalBatchLimit = this.denominatedInCollateral(
-      batchConfig.LIMITS.TOTAL,
-      batchConfig.PRICE
-    );
+    let totalBatchLimit = this.getApplicableTotalLimit(batchConfig);
+
     // similar for individual caps we need to know how much each address had already contributed before
     // because we need it to calculate the individual cap per round
     const aggregatedPreviousContributions = {};
@@ -36,10 +34,21 @@ export class Batch {
         }
       }
     }
-
     this.config = {
       totalLimit: totalBatchLimit,
+      totalLimit2:
+        batchConfig.LIMITS.TOTAL_2 &&
+        this.denominatedInCollateral(
+          batchConfig.LIMITS.TOTAL_2,
+          batchConfig.PRICE
+        ),
       individualLimit,
+      individualLimit2:
+        batchConfig.LIMITS.INDIVIDUAL_2 &&
+        this.denominatedInCollateral(
+          batchConfig.LIMITS.INDIVIDUAL_2,
+          batchConfig.PRICE
+        ),
       isEarlyAccess,
       price: batchConfig.PRICE,
     };
@@ -222,6 +231,20 @@ export class Batch {
       });
     }
     this.data.totalContribution += contribution;
+  }
+
+  getApplicableTotalLimit(batchConfig) {
+    if (batchConfig.IS_EARLY_ACCESS === true) {
+      return this.denominatedInCollateral(
+        batchConfig.LIMITS.TOTAL,
+        batchConfig.PRICE
+      );
+    } else if (batchConfig.IS_EARLY_ACCESS === false) {
+      return this.denominatedInCollateral(
+        batchConfig.LIMITS.TOTAL_2,
+        batchConfig.PRICE
+      );
+    }
   }
 
   // GETTERS

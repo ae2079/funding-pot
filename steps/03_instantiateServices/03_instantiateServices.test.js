@@ -7,6 +7,8 @@ import {
   batchConfig,
   projectConfig,
 } from '../../utils/testUtils/staticTestData.js';
+import { parseUnits } from 'viem';
+import { parse } from 'node:path';
 
 describe('#instantiateServices', () => {
   let queryService,
@@ -15,6 +17,7 @@ describe('#instantiateServices', () => {
     batchService;
 
   before(async () => {
+    console.log(batchConfig);
     ({
       queryService,
       safeService,
@@ -74,8 +77,10 @@ describe('#instantiateServices', () => {
   it('instantiates the batch service', () => {
     assert.deepEqual(Object.keys(batchService), ['config', 'data']);
     assert.deepStrictEqual(batchService.config, {
-      individualLimit: 2000000000000000000n,
-      totalLimit: 9000000000000000000n,
+      individualLimit: parseUnits('2', 18),
+      individualLimit2: parseUnits('0.2', 18),
+      totalLimit: parseUnits('9', 18),
+      totalLimit2: parseUnits('10', 18),
       isEarlyAccess: false,
       price: '0.1',
     });

@@ -25,6 +25,21 @@ describe('Batch', () => {
   const collateralDenominatedIndividualLimit = parseUnits('2', 18);
 
   describe('#constructor', () => {
+    describe('always', () => {
+      const batchService = new Batch({ batchConfig });
+
+      it('sets the correct keys in the config object', () => {
+        assert.deepStrictEqual(Object.keys(batchService.config), [
+          'totalLimit',
+          'totalLimit2',
+          'individualLimit',
+          'individualLimit2',
+          'isEarlyAccess',
+          'price',
+        ]);
+      });
+    });
+
     describe('without previous batchReports', () => {
       const batchService = new Batch({ batchConfig });
 
@@ -33,7 +48,7 @@ describe('Batch', () => {
           batchService.config.totalLimit,
           parseUnits(
             (
-              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.LIMITS.TOTAL_2) *
               parseFloat(batchConfig.PRICE)
             ).toString(),
             18
@@ -446,6 +461,52 @@ describe('Batch', () => {
           amount: contr2,
         },
       ]);
+    });
+  });
+
+  describe('#getApplicableTotalLimit', () => {
+    describe("when it's an early access round", () => {
+      it('returns the total limit', () => {
+        const batchService = new Batch({
+          batchConfig,
+        });
+
+        assert.equal(
+          batchService.getApplicableTotalLimit({
+            ...batchConfig,
+            IS_EARLY_ACCESS: true,
+          }),
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+      });
+    });
+
+    describe("when it's a QACC round", () => {
+      it('returns the `TOTAL_LIMIT_2`', () => {
+        const batchService = new Batch({
+          batchConfig,
+        });
+
+        assert.equal(
+          batchService.getApplicableTotalLimit({
+            ...batchConfig,
+            IS_EARLY_ACCESS: false,
+          }),
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL_2) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+      });
     });
   });
 });

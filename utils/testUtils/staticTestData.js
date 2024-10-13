@@ -9,8 +9,10 @@ export const batchConfig = {
     END: 100,
   },
   LIMITS: {
-    TOTAL: '90',
+    TOTAL: '80',
+    TOTAL_2: '90',
     INDIVIDUAL: '20',
+    INDIVIDUAL_2: '2',
   },
   IS_EARLY_ACCESS: false,
   PRICE: '0.1',
