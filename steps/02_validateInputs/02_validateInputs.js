@@ -37,7 +37,8 @@ const validateConfigs = ({
   projectName,
   batchConfig,
 }) => {
-  const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS } = batchConfig;
+  const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS, PRICE } =
+    batchConfig;
   const { SAFE, ORCHESTRATOR, NFT } = projectsConfig[projectName];
 
   if (!SAFE || !isAddress(SAFE))
@@ -52,6 +53,12 @@ const validateConfigs = ({
     });
   if (!NFT || !isAddress(NFT))
     throwConfigError('NFT missing or invalid address', {
+      projectName,
+      batchConfig,
+    });
+
+  if (!PRICE)
+    throwConfigError('PRICE missing or empty', {
       projectName,
       batchConfig,
     });
