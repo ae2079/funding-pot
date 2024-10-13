@@ -90,6 +90,21 @@ const validateConfigs = ({
       projectName,
       batchConfig,
     });
+
+  if (IS_EARLY_ACCESS === true) {
+    if (!LIMITS.TOTAL_2) {
+      throwConfigError('TOTAL_2 missing or empty', {
+        projectName,
+        batchConfig,
+      });
+    }
+    if (!LIMITS.INDIVIDUAL_2) {
+      throwConfigError('INDIVIDUAL_2 missing or empty', {
+        projectName,
+        batchConfig,
+      });
+    }
+  }
 };
 
 const validatebatchReports = ({ batchReports, batchNr }) => {

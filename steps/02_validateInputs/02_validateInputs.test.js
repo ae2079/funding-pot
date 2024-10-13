@@ -379,4 +379,60 @@ describe('#validateInputs', () => {
       );
     });
   });
+
+  describe("with EARLY_ACCESS = 'true'", () => {
+    describe('without TOTAL_2', () => {
+      it('throws an error', () => {
+        assert.throws(
+          () => {
+            validateInputs({
+              projectsConfig: { exampleProject: projectConfig },
+              projectName: 'exampleProject',
+              batchConfig: {
+                ...batchConfig,
+                LIMITS: {
+                  ...batchConfig.LIMITS,
+                  INDIVIDUAL_2: '420',
+                },
+                IS_EARLY_ACCESS: true,
+              },
+              batchReports,
+            });
+          },
+          {
+            name: 'Error',
+            message:
+              'Error in project exampleProject: TOTAL_2 missing or empty',
+          }
+        );
+      });
+    });
+
+    describe('without INDIVIDUAL_2', () => {
+      it('throws an error', () => {
+        assert.throws(
+          () => {
+            validateInputs({
+              projectsConfig: { exampleProject: projectConfig },
+              projectName: 'exampleProject',
+              batchConfig: {
+                ...batchConfig,
+                LIMITS: {
+                  ...batchConfig.LIMITS,
+                  TOTAL_2: '420',
+                },
+                IS_EARLY_ACCESS: true,
+              },
+              batchReports,
+            });
+          },
+          {
+            name: 'Error',
+            message:
+              'Error in project exampleProject: INDIVIDUAL_2 missing or empty',
+          }
+        );
+      });
+    });
+  });
 });
