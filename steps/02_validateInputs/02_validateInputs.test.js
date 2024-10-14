@@ -20,9 +20,12 @@ describe('#validateInputs', () => {
     },
     LIMITS: {
       TOTAL: '500000',
+      TOTAL_2: '50000',
       INDIVIDUAL: '5000',
+      INDIVIDUAL_2: '500',
     },
     IS_EARLY_ACCESS: false,
+    PRICE: '0.1',
   };
   const batchReports = {
     1: {},
@@ -352,6 +355,26 @@ describe('#validateInputs', () => {
     });
   });
 
+  describe('without PRICE', () => {
+    it('throws an error', () => {
+      assert.throws(
+        () => {
+          validateInputs({
+            projectsConfig: { exampleProject: projectConfig },
+            projectName: 'exampleProject',
+            batchConfig: { ...batchConfig, PRICE: undefined },
+            batchReports,
+          });
+        },
+        {
+          name: 'Error',
+          message:
+            'Error in project exampleProject: PRICE missing or empty',
+        }
+      );
+    });
+  });
+
   describe('without NFT', () => {
     const projectConfigWithoutNft = { ...projectConfig };
     delete projectConfigWithoutNft.NFT;
@@ -377,6 +400,64 @@ describe('#validateInputs', () => {
             'Error in project exampleProject: NFT missing or invalid address',
         }
       );
+    });
+  });
+
+  describe("with EARLY_ACCESS = 'true'", () => {
+    describe('without TOTAL_2', () => {
+      it('throws an error', () => {
+        assert.throws(
+          () => {
+            validateInputs({
+              projectsConfig: { exampleProject: projectConfig },
+              projectName: 'exampleProject',
+              batchConfig: {
+                ...batchConfig,
+                IS_EARLY_ACCESS: true,
+                LIMITS: {
+                  ...batchConfig.LIMITS,
+                  TOTAL_2: undefined,
+                },
+              },
+              batchReports,
+            });
+          },
+          {
+            name: 'Error',
+            message:
+              'Error in project exampleProject: TOTAL_2 missing or empty',
+          }
+        );
+      });
+    });
+
+    describe('without INDIVIDUAL_2', () => {
+      it('throws an error', () => {
+        const config = { ...batchConfig };
+        delete config.LIMITS.INDIVIDUAL_2;
+        assert.throws(
+          () => {
+            validateInputs({
+              projectsConfig: { exampleProject: projectConfig },
+              projectName: 'exampleProject',
+              batchConfig: {
+                ...batchConfig,
+                IS_EARLY_ACCESS: true,
+                LIMITS: {
+                  ...batchConfig.LIMITS,
+                  INDIVIDUAL_2: undefined,
+                },
+              },
+              batchReports,
+            });
+          },
+          {
+            name: 'Error',
+            message:
+              'Error in project exampleProject: INDIVIDUAL_2 missing or empty',
+          }
+        );
+      });
     });
   });
 });

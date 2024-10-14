@@ -8,6 +8,8 @@ import {
   getContract,
   toHex,
   decodeEventLog,
+  parseUnits,
+  formatUnits,
 } from 'viem';
 import * as chains from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
@@ -316,8 +318,11 @@ export const getBatchConfig = async (safe) => {
 
   const minContribution = 1_000_000_000_000_000_000;
   const maxContribution = 1000_000_000_000_000_000_000;
-  const individualLimit = '500';
-  const totalLimit = '1500';
+  const individualLimit = '5000';
+  const individualLimit2 = '500';
+  const totalLimit = '15000';
+  const totalLimit2 = '15500';
+  const price = '0.1';
 
   const { owner, delegate } = getTestClients();
 
@@ -330,7 +335,11 @@ export const getBatchConfig = async (safe) => {
   batchConfig.VESTING_DETAILS.CLIFF = '60';
   batchConfig.VESTING_DETAILS.END = (fromTimestamp + 120n).toString();
   batchConfig.LIMITS.INDIVIDUAL = individualLimit;
+  batchConfig.LIMITS.INDIVIDUAL_2 = individualLimit2;
   batchConfig.LIMITS.TOTAL = totalLimit;
+  batchConfig.LIMITS.TOTAL_2 = totalLimit2;
+  batchConfig.PRICE = price;
+
   batchConfig.IS_EARLY_ACCESS = false;
 
   console.info(
@@ -520,4 +529,11 @@ export const mockAllowlist = ({ type }) => {
     }
     return originalFetch(url, options);
   };
+};
+
+export const getDollarDenominated = (amount, price) => {
+  return parseUnits(
+    (parseFloat(amount) * parseFloat(price)).toString(),
+    18
+  );
 };
