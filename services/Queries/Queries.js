@@ -51,8 +51,17 @@ export class Queries {
     });
     this.queries.addresses.collateralToken =
       await this.bondingCurve.read.token();
-    this.queries.addresses.issuanceToken =
+    this.queries.addresses.mintWrapper =
       await this.bondingCurve.read.getIssuanceToken();
+
+    const mintWrapper = getContract({
+      address: this.queries.addresses.mintWrapper,
+      client: this.publicClient,
+      abi: abis.mintWrapperAbi,
+    });
+
+    this.queries.addresses.issuanceToken =
+      await mintWrapper.read.issuanceToken();
 
     const modules = await orchestrator.read.listModules();
     for (const module of modules) {
