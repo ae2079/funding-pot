@@ -70,9 +70,6 @@ export class Batch {
     // iterate over the inflows
     for (const inflow of inflows) {
       const { participant, contribution } = inflow;
-      console.log(
-        participant === '0x3cf0c87c79bc2119fe73853a475c1a194359d08c'
-      );
 
       // adds contribution to participants
       this.createOrAddContribution(inflow);
@@ -222,10 +219,6 @@ export class Batch {
       invalidContribution,
       validContribution,
     };
-    // console.log();
-    // console.log(participant);
-    // console.log(this.data.participants[participant]);
-    // console.log();
   }
 
   createOrAddContribution(inflow) {
@@ -303,13 +296,6 @@ export class Batch {
   }
 
   getApplicableIndividualLimit(participant) {
-    // console.log(this.data);
-    // console.log(
-    //   'TOTAL VALID CONTRIBUTION SO FAR: ',
-    //   this.data.totalValidContribution
-    // );
-    // console.log();
-
     // if it's an early access round, return the adjustedIndividualLimit
     // which is based on the defined individual limti per batch and all contributions
     // that have been made previously by the participant

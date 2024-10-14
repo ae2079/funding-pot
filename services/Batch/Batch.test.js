@@ -157,7 +157,6 @@ describe('Batch', () => {
     const individualLimit = collateralDenominatedIndividualLimit;
 
     describe('when it is NOT an early access batch', () => {
-      console.log(batchConfig);
       const batchService = new Batch({
         batchConfig,
       });
@@ -407,8 +406,6 @@ describe('Batch', () => {
           });
         });
       });
-
-      // describe('', () => )
     });
 
     describe('when it is an early access batch', () => {
