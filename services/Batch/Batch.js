@@ -88,17 +88,15 @@ export class Batch {
       let validContribution = contribution,
         invalidContribution = 0n;
 
+      // todo: get applicable individual limit
       // get individual limit considering potential previous contributions
-      const adjustedIndividualLimit = this.data
-        .aggregatedPreviousContributions[participant]
-        ? this.config.individualLimit -
-          this.data.aggregatedPreviousContributions[participant]
-        : this.config.individualLimit;
+      const participantLimit =
+        this.getApplicableIndividualLimit(participant);
 
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
       const individualDiff =
-        adjustedIndividualLimit - (prevValid + contribution);
+        participantLimit - (prevValid + contribution);
 
       // means that the individual cap has been exceeded
       if (individualDiff < 0n) {
@@ -137,8 +135,8 @@ export class Batch {
         invalidContribution,
       });
 
-      this.data.participants[participant].adjustedIndividualLimit =
-        adjustedIndividualLimit;
+      this.data.participants[participant].participantLimit =
+        participantLimit;
     }
   }
 
@@ -213,6 +211,10 @@ export class Batch {
       invalidContribution,
       validContribution,
     };
+    console.log();
+    console.log(participant);
+    console.log(this.data.participants[participant]);
+    console.log();
   }
 
   createOrAddContribution(inflow) {
@@ -231,20 +233,6 @@ export class Batch {
       });
     }
     this.data.totalContribution += contribution;
-  }
-
-  getApplicableTotalLimit(batchConfig) {
-    if (batchConfig.IS_EARLY_ACCESS === true) {
-      return this.denominatedInCollateral(
-        batchConfig.LIMITS.TOTAL,
-        batchConfig.PRICE
-      );
-    } else if (batchConfig.IS_EARLY_ACCESS === false) {
-      return this.denominatedInCollateral(
-        batchConfig.LIMITS.TOTAL_2,
-        batchConfig.PRICE
-      );
-    }
   }
 
   // GETTERS
@@ -287,5 +275,50 @@ export class Batch {
       (parseFloat(amount) / parseFloat(price)).toString(),
       18
     );
+  }
+
+  getApplicableTotalLimit(batchConfig) {
+    if (batchConfig.IS_EARLY_ACCESS === true) {
+      return this.denominatedInCollateral(
+        batchConfig.LIMITS.TOTAL,
+        batchConfig.PRICE
+      );
+    } else if (batchConfig.IS_EARLY_ACCESS === false) {
+      return this.denominatedInCollateral(
+        batchConfig.LIMITS.TOTAL_2,
+        batchConfig.PRICE
+      );
+    }
+  }
+
+  getApplicableIndividualLimit(participant) {
+    console.log(this.data);
+    console.log(
+      'TOTAL VALID CONTRIBUTION SO FAR: ',
+      this.data.totalValidContribution
+    );
+
+    // if it's an early access round, return the adjustedIndividualLimit
+    // which is based on the defined individual limti per batch and all contributions
+    // that have been made previously by the participant
+    if (this.config.isEarlyAccess) {
+      return this.data.aggregatedPreviousContributions[participant]
+        ? this.config.individualLimit -
+            this.data.aggregatedPreviousContributions[participant]
+        : this.config.individualLimit;
+      // if it is not an early access round the rules are different
+    } else if (!this.config.isEarlyAccess) {
+      // if all total aggregated valid contribution is less than the total limit
+      // the individual can contribute up to `LIMIT` (=> can contribute more)
+      if (
+        this.data.totalValidContribution <= this.config.totalLimit
+      ) {
+        return this.config.individualLimit;
+      } else {
+        console.log('!!!!! EXCEEDS SOFT CAP');
+        // if the "soft total limit has been reached", the individual limit is lowered to `LIMIT_2`
+        return this.config.individualLimit2;
+      }
+    }
   }
 }

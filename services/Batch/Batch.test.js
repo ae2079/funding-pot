@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 
 import { Batch } from './Batch.js';
 import {
@@ -118,6 +118,7 @@ describe('Batch', () => {
     const individualLimit = collateralDenominatedIndividualLimit;
 
     describe('when it is NOT an early access batch', () => {
+      console.log(batchConfig);
       const batchService = new Batch({
         batchConfig,
       });
@@ -153,6 +154,7 @@ describe('Batch', () => {
       });
 
       it('calculates the correct `totalValidContribution`', () => {
+        console.log('>START');
         assert.equal(
           batchService.data.totalValidContribution,
           totalLimit
@@ -225,9 +227,12 @@ describe('Batch', () => {
               },
             };
 
-            it.only('accounts for previous contributions when splitting between valid and invalid', () => {
+            it('accounts for previous contributions when splitting between valid and invalid', () => {
               const batchServiceWithPrevIndContribs = new Batch({
-                batchConfig,
+                batchConfig: {
+                  ...batchConfig,
+                  IS_EARLY_ACCESS: true,
+                },
                 batchReports: mockBatchReports,
               });
               batchServiceWithPrevIndContribs.assessInflows(
@@ -506,6 +511,77 @@ describe('Batch', () => {
             18
           )
         );
+      });
+    });
+  });
+
+  describe('#getApplicableIndividualLimit', () => {
+    describe('when it is an early access round', () => {
+      it('returns the adjusted individual limit', () => {
+        const batchService = new Batch({
+          batchConfig: { ...batchConfig, IS_EARLY_ACCESS: true },
+        });
+
+        assert.equal(
+          batchService.getApplicableIndividualLimit(addr1),
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+      });
+    });
+
+    describe('when it is not an early access round', () => {
+      describe('when `TOTAL` has not been reached', () => {
+        it('returns the fixed individual limit `INDIVIDUAL`', () => {
+          const batchService = new Batch({
+            batchConfig: { ...batchConfig, IS_EARLY_ACCESS: false },
+          });
+          batchService.data.totalValidContribution = parseUnits(
+            '0.00001',
+            18
+          );
+          assert.equal(
+            batchService.getApplicableIndividualLimit(addr1),
+            parseUnits(
+              (
+                parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+                parseFloat(batchConfig.PRICE)
+              ).toString(),
+              18
+            )
+          );
+        });
+      });
+
+      describe('when `TOTAL` has been exceeded', () => {
+        it('returns the fixed individual limit `INDIVIDUAL_2`', () => {
+          const batchService = new Batch({
+            batchConfig: { ...batchConfig, IS_EARLY_ACCESS: false },
+          });
+          batchService.data.totalValidContribution = parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          );
+
+          assert.equal(
+            batchService.getApplicableIndividualLimit(addr1),
+            parseUnits(
+              (
+                parseFloat(batchConfig.LIMITS.INDIVIDUAL_2) *
+                parseFloat(batchConfig.PRICE)
+              ).toString(),
+              18
+            )
+          );
+        });
       });
     });
   });
