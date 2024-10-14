@@ -12,7 +12,16 @@ export class Batch {
     );
     // since batch caps are accumulative, if it is not the very first batch
     // we need to consider how much was already contributed in previous batches
-    let totalBatchLimit = this.getApplicableTotalLimit(batchConfig);
+    this.config = {
+      totalLimit: this.denominatedInCollateral(
+        batchConfig.LIMITS.TOTAL,
+        batchConfig.PRICE
+      ),
+      totalLimit2: this.denominatedInCollateral(
+        batchConfig.LIMITS.TOTAL_2,
+        batchConfig.PRICE
+      ),
+    };
 
     // similar for individual caps we need to know how much each address had already contributed before
     // because we need it to calculate the individual cap per round
@@ -20,7 +29,10 @@ export class Batch {
     // therefore we iterate over previous reports and calculate the "real" applicable limits
     for (const reportNr in batchReports) {
       const report = batchReports[reportNr];
-      totalBatchLimit -= BigInt(report.totalValidContribution);
+      this.config.totalLimit -= BigInt(report.totalValidContribution);
+      this.config.totalLimit2 -= BigInt(
+        report.totalValidContribution
+      );
 
       for (const address in report.participants) {
         const contribution = report.participants[address];
@@ -35,13 +47,7 @@ export class Batch {
       }
     }
     this.config = {
-      totalLimit: totalBatchLimit,
-      totalLimit2:
-        batchConfig.LIMITS.TOTAL_2 &&
-        this.denominatedInCollateral(
-          batchConfig.LIMITS.TOTAL_2,
-          batchConfig.PRICE
-        ),
+      ...this.config,
       individualLimit,
       individualLimit2:
         batchConfig.LIMITS.INDIVIDUAL_2 &&
@@ -64,6 +70,9 @@ export class Batch {
     // iterate over the inflows
     for (const inflow of inflows) {
       const { participant, contribution } = inflow;
+      console.log(
+        participant === '0x3cf0c87c79bc2119fe73853a475c1a194359d08c'
+      );
 
       // adds contribution to participants
       this.createOrAddContribution(inflow);
@@ -109,7 +118,9 @@ export class Batch {
       // difference between total cap and own contribution
       // if negative, means that the total cap has been exceeded
       const totalDiff =
-        this.config.totalLimit -
+        (this.config.IS_EARLY_ACCESS
+          ? this.config.totalLimit
+          : this.config.totalLimit2) -
         this.data.totalValidContribution -
         (prevValid + contribution);
 
@@ -211,10 +222,10 @@ export class Batch {
       invalidContribution,
       validContribution,
     };
-    console.log();
-    console.log(participant);
-    console.log(this.data.participants[participant]);
-    console.log();
+    // console.log();
+    // console.log(participant);
+    // console.log(this.data.participants[participant]);
+    // console.log();
   }
 
   createOrAddContribution(inflow) {
@@ -292,11 +303,12 @@ export class Batch {
   }
 
   getApplicableIndividualLimit(participant) {
-    console.log(this.data);
-    console.log(
-      'TOTAL VALID CONTRIBUTION SO FAR: ',
-      this.data.totalValidContribution
-    );
+    // console.log(this.data);
+    // console.log(
+    //   'TOTAL VALID CONTRIBUTION SO FAR: ',
+    //   this.data.totalValidContribution
+    // );
+    // console.log();
 
     // if it's an early access round, return the adjustedIndividualLimit
     // which is based on the defined individual limti per batch and all contributions
@@ -310,12 +322,9 @@ export class Batch {
     } else if (!this.config.isEarlyAccess) {
       // if all total aggregated valid contribution is less than the total limit
       // the individual can contribute up to `LIMIT` (=> can contribute more)
-      if (
-        this.data.totalValidContribution <= this.config.totalLimit
-      ) {
+      if (this.data.totalValidContribution < this.config.totalLimit) {
         return this.config.individualLimit;
       } else {
-        console.log('!!!!! EXCEEDS SOFT CAP');
         // if the "soft total limit has been reached", the individual limit is lowered to `LIMIT_2`
         return this.config.individualLimit2;
       }

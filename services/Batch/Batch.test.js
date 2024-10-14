@@ -10,6 +10,7 @@ import {
   batchConfig,
   nftHolders,
 } from '../../utils/testUtils/staticTestData.js';
+import { getDollarDenominated } from '../../utils/testUtils/testHelpers.js';
 
 describe('Batch', () => {
   const addr1 = '0x6747772f37a4f7cfdea180d38e8ad372516c9548';
@@ -21,8 +22,27 @@ describe('Batch', () => {
   const contr3 = 5_000_000_000_000_000_000n;
   const contr4 = 6_000_000_000_000_000_000n;
 
-  const collateralDenominatedTotalLimit = parseUnits('9', 18);
-  const collateralDenominatedIndividualLimit = parseUnits('2', 18);
+  const collateralDenominatedTotalLimit = parseUnits(
+    (
+      parseFloat(batchConfig.LIMITS.TOTAL) *
+      parseFloat(batchConfig.PRICE)
+    ).toString(),
+    18
+  );
+  const collateralDenominatedTotalLimit2 = parseUnits(
+    (
+      parseFloat(batchConfig.LIMITS.TOTAL_2) *
+      parseFloat(batchConfig.PRICE)
+    ).toString(),
+    18
+  );
+  const collateralDenominatedIndividualLimit = parseUnits(
+    (
+      parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+      parseFloat(batchConfig.PRICE)
+    ).toString(),
+    18
+  );
 
   describe('#constructor', () => {
     describe('always', () => {
@@ -46,6 +66,16 @@ describe('Batch', () => {
       it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
         assert.equal(
           batchService.config.totalLimit,
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+        assert.equal(
+          batchService.config.totalLimit2,
           parseUnits(
             (
               parseFloat(batchConfig.LIMITS.TOTAL_2) *
@@ -91,10 +121,19 @@ describe('Batch', () => {
         batchReports: mockBatchReports,
       });
 
-      it('adjusts the totalLimit', () => {
+      it('adjusts the totalLimit1', () => {
         assert.equal(
           batchService.config.totalLimit,
           collateralDenominatedTotalLimit -
+            mockBatchReports[1].totalValidContribution -
+            mockBatchReports[2].totalValidContribution
+        );
+      });
+
+      it('adjusts the totalLimit2', () => {
+        assert.equal(
+          batchService.config.totalLimit2,
+          collateralDenominatedTotalLimit2 -
             mockBatchReports[1].totalValidContribution -
             mockBatchReports[2].totalValidContribution
         );
@@ -114,7 +153,7 @@ describe('Batch', () => {
 
   describe('#assessInflows', () => {
     const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
-    const totalLimit = collateralDenominatedTotalLimit;
+    const totalLimit = collateralDenominatedTotalLimit2;
     const individualLimit = collateralDenominatedIndividualLimit;
 
     describe('when it is NOT an early access batch', () => {
@@ -326,24 +365,32 @@ describe('Batch', () => {
         describe('where the total cap is more restrictive (addr6)', () => {
           const contributor = addr6;
 
-          it('counts the contribution as valid', () => {
-            const { participants } = batchService.data;
+          it('adhers to the total cap (TOTAL_2)', () => {
+            const { participants, totalValidContribution } =
+              batchService.data;
             const {
               contribution,
               invalidContribution,
               validContribution,
             } = participants[contributor];
 
-            assert.equal(contribution, 3000000000000000000n);
-            assert.equal(invalidContribution, 1700000000000000000n);
-            assert.equal(validContribution, 1300000000000000000n);
+            assert.equal(contribution, inflows[6].contribution);
+            assert.equal(invalidContribution, parseUnits('1.7', 18));
+            assert.equal(validContribution, parseUnits('1.3', 18));
+            assert.equal(
+              totalValidContribution,
+              getDollarDenominated(
+                batchConfig.LIMITS.TOTAL_2,
+                batchConfig.PRICE
+              )
+            );
           });
         });
 
         describe('where the individual cap is more restrictive (addr4)', () => {
           const contributor = addr4;
 
-          it("only considers the contribution that doesn't exceed the total cap as valid", () => {
+          it('adhers to the individual cap', () => {
             const { participants } = batchService.data;
             const {
               contribution,
@@ -360,6 +407,8 @@ describe('Batch', () => {
           });
         });
       });
+
+      // describe('', () => )
     });
 
     describe('when it is an early access batch', () => {

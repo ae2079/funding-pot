@@ -8,6 +8,8 @@ import {
   getContract,
   toHex,
   decodeEventLog,
+  parseUnits,
+  formatUnits,
 } from 'viem';
 import * as chains from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
@@ -527,4 +529,11 @@ export const mockAllowlist = ({ type }) => {
     }
     return originalFetch(url, options);
   };
+};
+
+export const getDollarDenominated = (amount, price) => {
+  return parseUnits(
+    (parseFloat(amount) * parseFloat(price)).toString(),
+    18
+  );
 };
