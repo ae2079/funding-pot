@@ -128,7 +128,7 @@ There are three types of inputs that the script executor can take. They can all 
 ]
 ```
 
-3. `batches/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory. The file contains the vesting timelines (start, cliff, end) for that batch, the timeframe (fromTimestamp, toTimestamp) expressed in unix time during which contributions will be considered, the limits that apply to the contributions, as well as a flag if it's an early access round or not. If you run the e2e test for the first time, an example file for a fictional 3rd batch is generated in `/data/test/input/batches/3.json`.
+3. `batches/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory. The file contains the vesting timelines (start, cliff, end) for that batch, the timeframe (fromTimestamp, toTimestamp) expressed in unix time (seconds, not miliseconds) during which contributions will be considered, the limits that apply to the contributions, as well as a flag if it's an early access round or not. If you run the e2e test for the first time, an example file for a fictional 3rd batch is generated in `/data/test/input/batches/3.json`. The following limits are
 
 **Example:**
 
@@ -144,10 +144,13 @@ There are three types of inputs that the script executor can take. They can all 
     "TO_TIMESTAMP": "1726861818" // end timestamp => between these timestamps users can contribute
   },
   "LIMITS": {
-    "INDIVIDUAL": "500", // individual contribution limit in collateral token (decimals are added automatically)
-    "TOTAL": "1500" // total limit applying to the batch in collateral token (decimals are added automatically)
+    "INDIVIDUAL": "2000", // individual contribution limit in dollar equivalent (decimals are added automatically)
+    "INDIVIDUAL_2": "250", // individual contribution limit in dollar equivalent if total cap is reached (the 1Mio); ONLY REQUIRED FOR QACC ROUND (early access = false) (decimals are added automatically)
+    "TOTAL": "1500", // batch limit in dollar equivalent (decimals are added automatically)
+    "TOTAL_2": "1700" // final batch limit in dollar equivalent; ONLY REQUIRED FOR QACC ROUND (early access = false) (decimals added automatically)
   },
-  "IS_EARLY_ACCESS": false // if its an early access round or not (=> if NFT check is applied in addition to allowlist check)
+  "IS_EARLY_ACCESS": false, // if its an early access round (true) or a qacc round (false),
+  "PRICE": "0.1" // assumed dollar price per collateral token for that batch
 }
 ```
 

@@ -6,7 +6,7 @@ const [, , BATCH, PROJECT_NAME] = process.argv;
 const { TYPE } = process.env;
 
 const runScript = async () => {
-  console.log(
+  console.info(
     `🙌 Starting script for batch ${BATCH} and ${
       TYPE === 'all' ? 'all projects' : PROJECT_NAME
     }`

@@ -13,8 +13,6 @@ describe('#loadInputs', () => {
       it('returns the configs: projectsConfig, allowlist, batchConfig', () => {
         const inputs = loadInputs(projectName, batchNumber);
 
-        console.log(inputs);
-
         assert.deepEqual(Object.keys(inputs), [
           'projectsConfig',
           'batchConfig',

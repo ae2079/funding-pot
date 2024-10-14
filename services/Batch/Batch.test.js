@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { parseUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 
 import { Batch } from './Batch.js';
 import {
@@ -10,6 +10,7 @@ import {
   batchConfig,
   nftHolders,
 } from '../../utils/testUtils/staticTestData.js';
+import { getDollarDenominated } from '../../utils/testUtils/testHelpers.js';
 
 describe('Batch', () => {
   const addr1 = '0x6747772f37a4f7cfdea180d38e8ad372516c9548';
@@ -21,26 +22,98 @@ describe('Batch', () => {
   const contr3 = 5_000_000_000_000_000_000n;
   const contr4 = 6_000_000_000_000_000_000n;
 
+  const collateralDenominatedTotalLimit = parseUnits(
+    (
+      parseFloat(batchConfig.LIMITS.TOTAL) *
+      parseFloat(batchConfig.PRICE)
+    ).toString(),
+    18
+  );
+  const collateralDenominatedTotalLimit2 = parseUnits(
+    (
+      parseFloat(batchConfig.LIMITS.TOTAL_2) *
+      parseFloat(batchConfig.PRICE)
+    ).toString(),
+    18
+  );
+  const collateralDenominatedIndividualLimit = parseUnits(
+    (
+      parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+      parseFloat(batchConfig.PRICE)
+    ).toString(),
+    18
+  );
+
   describe('#constructor', () => {
+    describe('always', () => {
+      const batchService = new Batch({ batchConfig });
+
+      it('sets the correct keys in the config object', () => {
+        assert.deepStrictEqual(Object.keys(batchService.config), [
+          'totalLimit',
+          'totalLimit2',
+          'individualLimit',
+          'individualLimit2',
+          'isEarlyAccess',
+          'price',
+        ]);
+      });
+    });
+
     describe('without previous batchReports', () => {
       const batchService = new Batch({ batchConfig });
 
       it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
         assert.equal(
           batchService.config.totalLimit,
-          parseUnits(batchConfig.LIMITS.TOTAL, 18)
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+        assert.equal(
+          batchService.config.totalLimit2,
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL_2) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
         );
         assert.equal(
           batchService.config.individualLimit,
-          parseUnits(batchConfig.LIMITS.INDIVIDUAL, 18)
+          collateralDenominatedIndividualLimit
         );
       });
     });
 
     describe('with previous batchReports', () => {
+      const user1Contr1 = parseUnits('0.1', 18);
+      const user1Contr2 = parseUnits('0.2', 18);
+      const user2Contr2 = parseUnits('0.4', 18);
+
       const mockBatchReports = {
-        1: { totalValidContribution: '3000000000000000000' },
-        2: { totalValidContribution: '2000000000000000000' },
+        1: {
+          totalValidContribution: parseUnits('3', 18),
+          participants: {
+            [addr1]: {
+              validContribution: user1Contr1,
+            },
+          },
+        },
+        2: {
+          totalValidContribution: parseUnits('2', 18),
+          participants: {
+            [addr1]: {
+              validContribution: user1Contr2,
+            },
+            [addr2]: { validContribution: user2Contr2 },
+          },
+        },
       };
 
       const batchService = new Batch({
@@ -48,14 +121,31 @@ describe('Batch', () => {
         batchReports: mockBatchReports,
       });
 
-      it('accounts for previous batchReports', () => {
+      it('adjusts the totalLimit1', () => {
         assert.equal(
           batchService.config.totalLimit,
-          4000000000000000000n
+          collateralDenominatedTotalLimit -
+            mockBatchReports[1].totalValidContribution -
+            mockBatchReports[2].totalValidContribution
         );
+      });
+
+      it('adjusts the totalLimit2', () => {
         assert.equal(
-          batchService.config.individualLimit,
-          2000000000000000000n
+          batchService.config.totalLimit2,
+          collateralDenominatedTotalLimit2 -
+            mockBatchReports[1].totalValidContribution -
+            mockBatchReports[2].totalValidContribution
+        );
+      });
+
+      it('adds aggregated previous contributions to `data`', () => {
+        assert.deepStrictEqual(
+          batchService.data.aggregatedPreviousContributions,
+          {
+            [addr1]: user1Contr1 + user1Contr2,
+            [addr2]: user2Contr2,
+          }
         );
       });
     });
@@ -63,11 +153,8 @@ describe('Batch', () => {
 
   describe('#assessInflows', () => {
     const { addr1, addr2, addr3, addr4, addr5, addr6 } = addresses;
-    const totalLimit = parseUnits(batchConfig.LIMITS.TOTAL, 18);
-    const individualLimit = parseUnits(
-      batchConfig.LIMITS.INDIVIDUAL,
-      18
-    );
+    const totalLimit = collateralDenominatedTotalLimit2;
+    const individualLimit = collateralDenominatedIndividualLimit;
 
     describe('when it is NOT an early access batch', () => {
       const batchService = new Batch({
@@ -80,6 +167,7 @@ describe('Batch', () => {
 
       it('adds fields `totalContribution`, `totalValidContribution`, `totalInvalidContribution` and `participants`', () => {
         assert.deepStrictEqual(Object.keys(batchService.data), [
+          'aggregatedPreviousContributions',
           'totalContribution',
           'totalValidContribution',
           'totalInvalidContribution',
@@ -128,24 +216,89 @@ describe('Batch', () => {
       describe('with two contributions (addr1)', () => {
         const contributor = addr1;
 
-        describe('when when the second contribution exceeds the individual cap', () => {
-          it('splits between `validContribution` and `invalidContribution`', () => {
-            const { participants } = batchService.data;
-            const {
-              contribution,
-              invalidContribution,
-              validContribution,
-            } = participants[contributor];
+        describe('when the second contribution exceeds the individual cap', () => {
+          describe('without any previous contributions', () => {
+            it('splits correctly between `validContribution` and `invalidContribution`', () => {
+              const { participants } = batchService.data;
+              const {
+                contribution,
+                invalidContribution,
+                validContribution,
+              } = participants[contributor];
 
-            assert.equal(
-              contribution,
-              inflows[0].contribution + inflows[2].contribution
-            );
-            assert.equal(
-              invalidContribution,
-              inflows[2].contribution
-            );
-            assert.equal(validContribution, inflows[0].contribution);
+              assert.equal(
+                contribution,
+                inflows[0].contribution + inflows[2].contribution
+              );
+              assert.equal(
+                invalidContribution,
+                inflows[2].contribution
+              );
+              assert.equal(
+                validContribution,
+                inflows[0].contribution
+              );
+            });
+          });
+
+          describe('with previous contributions', () => {
+            const user1Contr1 = 1n;
+            const user1Contr2 = 2n;
+
+            const mockBatchReports = {
+              1: {
+                totalValidContribution: 0n,
+                participants: {
+                  [addr1]: {
+                    validContribution: user1Contr1,
+                  },
+                },
+              },
+              2: {
+                totalValidContribution: 0n,
+                participants: {
+                  [addr1]: {
+                    validContribution: user1Contr2,
+                  },
+                },
+              },
+            };
+
+            it('accounts for previous contributions when splitting between valid and invalid', () => {
+              const batchServiceWithPrevIndContribs = new Batch({
+                batchConfig: {
+                  ...batchConfig,
+                  IS_EARLY_ACCESS: true,
+                },
+                batchReports: mockBatchReports,
+              });
+              batchServiceWithPrevIndContribs.assessInflows(
+                inflows,
+                allowlist,
+                nftHolders
+              );
+
+              const { participants } =
+                batchServiceWithPrevIndContribs.data;
+              const {
+                contribution,
+                invalidContribution,
+                validContribution,
+              } = participants[contributor];
+
+              assert.equal(
+                contribution,
+                inflows[0].contribution + inflows[2].contribution
+              );
+              assert.equal(
+                invalidContribution,
+                inflows[2].contribution + user1Contr1 + user1Contr2
+              );
+              assert.equal(
+                validContribution,
+                inflows[0].contribution - user1Contr1 - user1Contr2
+              );
+            });
           });
         });
       });
@@ -210,24 +363,32 @@ describe('Batch', () => {
         describe('where the total cap is more restrictive (addr6)', () => {
           const contributor = addr6;
 
-          it('counts the contribution as valid', () => {
-            const { participants } = batchService.data;
+          it('adhers to the total cap (TOTAL_2)', () => {
+            const { participants, totalValidContribution } =
+              batchService.data;
             const {
               contribution,
               invalidContribution,
               validContribution,
             } = participants[contributor];
 
-            assert.equal(contribution, 3000000000000000000n);
-            assert.equal(invalidContribution, 1700000000000000000n);
-            assert.equal(validContribution, 1300000000000000000n);
+            assert.equal(contribution, inflows[6].contribution);
+            assert.equal(invalidContribution, parseUnits('1.7', 18));
+            assert.equal(validContribution, parseUnits('1.3', 18));
+            assert.equal(
+              totalValidContribution,
+              getDollarDenominated(
+                batchConfig.LIMITS.TOTAL_2,
+                batchConfig.PRICE
+              )
+            );
           });
         });
 
         describe('where the individual cap is more restrictive (addr4)', () => {
           const contributor = addr4;
 
-          it("only considers the contribution that doesn't exceed the total cap as valid", () => {
+          it('adhers to the individual cap', () => {
             const { participants } = batchService.data;
             const {
               contribution,
@@ -242,6 +403,65 @@ describe('Batch', () => {
             );
             assert.equal(validContribution, individualLimit);
           });
+        });
+      });
+
+      describe.only('when only the soft cap has been reached', () => {
+        const excess = 69n;
+        const customBatchConfig = {
+          TIMEFRAME: {
+            FROM_TIMESTAMP: 1726684518,
+            TO_TIMESTAMP: 1726692378,
+          },
+          LIMITS: {
+            TOTAL: '89',
+            TOTAL_2: '90',
+            INDIVIDUAL: '89',
+            INDIVIDUAL_2: '0.5',
+          },
+          IS_EARLY_ACCESS: false,
+          PRICE: '0.1',
+        };
+        const customInflows = [
+          {
+            participant: addresses.addr1,
+            contribution: getDollarDenominated(
+              customBatchConfig.LIMITS.TOTAL,
+              customBatchConfig.PRICE
+            ),
+            timestamp: 1726691908,
+            transactionHash:
+              '0x7d5b14cc482d201ef6b0803bc2fefeab805951e6d04817f64dc9ba35b9094ae0',
+          },
+          {
+            participant: addresses.addr2,
+            contribution:
+              getDollarDenominated(
+                customBatchConfig.LIMITS.INDIVIDUAL_2,
+                customBatchConfig.PRICE
+              ) + excess,
+            timestamp: 1726691938,
+            transactionHash:
+              '0x81bfc33fab4d3507f859e6b2593029752318f8790ac9109a8b1ebdf79d5ec38d',
+          },
+        ];
+
+        it('counts everything exceeding INDIVIDUAL_2 as invalid contribution', () => {
+          const customBatchService = new Batch({
+            batchConfig: {
+              ...customBatchConfig,
+            },
+          });
+          customBatchService.assessInflows(
+            customInflows,
+            [addresses.addr1, addresses.addr2],
+            []
+          );
+          assert.equal(
+            customBatchService.data.participants[addr2]
+              .invalidContribution,
+            excess
+          );
         });
       });
     });
@@ -350,6 +570,123 @@ describe('Batch', () => {
           amount: contr2,
         },
       ]);
+    });
+  });
+
+  describe('#getApplicableTotalLimit', () => {
+    describe("when it's an early access round", () => {
+      it('returns the total limit', () => {
+        const batchService = new Batch({
+          batchConfig,
+        });
+
+        assert.equal(
+          batchService.getApplicableTotalLimit({
+            ...batchConfig,
+            IS_EARLY_ACCESS: true,
+          }),
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+      });
+    });
+
+    describe("when it's a QACC round", () => {
+      it('returns the `TOTAL_LIMIT_2`', () => {
+        const batchService = new Batch({
+          batchConfig,
+        });
+
+        assert.equal(
+          batchService.getApplicableTotalLimit({
+            ...batchConfig,
+            IS_EARLY_ACCESS: false,
+          }),
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL_2) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+      });
+    });
+  });
+
+  describe('#getApplicableIndividualLimit', () => {
+    describe('when it is an early access round', () => {
+      it('returns the adjusted individual limit', () => {
+        const batchService = new Batch({
+          batchConfig: { ...batchConfig, IS_EARLY_ACCESS: true },
+        });
+
+        assert.equal(
+          batchService.getApplicableIndividualLimit(addr1),
+          parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          )
+        );
+      });
+    });
+
+    describe('when it is not an early access round', () => {
+      describe('when `TOTAL` has not been reached', () => {
+        it('returns the fixed individual limit `INDIVIDUAL`', () => {
+          const batchService = new Batch({
+            batchConfig: { ...batchConfig, IS_EARLY_ACCESS: false },
+          });
+          batchService.data.totalValidContribution = parseUnits(
+            '0.00001',
+            18
+          );
+          assert.equal(
+            batchService.getApplicableIndividualLimit(addr1),
+            parseUnits(
+              (
+                parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+                parseFloat(batchConfig.PRICE)
+              ).toString(),
+              18
+            )
+          );
+        });
+      });
+
+      describe('when `TOTAL` has been exceeded', () => {
+        it('returns the fixed individual limit `INDIVIDUAL_2`', () => {
+          const batchService = new Batch({
+            batchConfig: { ...batchConfig, IS_EARLY_ACCESS: false },
+          });
+          batchService.data.totalValidContribution = parseUnits(
+            (
+              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.PRICE)
+            ).toString(),
+            18
+          );
+
+          assert.equal(
+            batchService.getApplicableIndividualLimit(addr1),
+            parseUnits(
+              (
+                parseFloat(batchConfig.LIMITS.INDIVIDUAL_2) *
+                parseFloat(batchConfig.PRICE)
+              ).toString(),
+              18
+            )
+          );
+        });
+      });
     });
   });
 });
