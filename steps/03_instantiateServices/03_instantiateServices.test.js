@@ -8,7 +8,7 @@ import {
   projectConfig,
 } from '../../utils/testUtils/staticTestData.js';
 import { parseUnits } from 'viem';
-import { parse } from 'node:path';
+import { getDollarDenominated } from '../../utils/testUtils/testHelpers.js';
 
 describe('#instantiateServices', () => {
   let queryService,
@@ -76,10 +76,22 @@ describe('#instantiateServices', () => {
   it('instantiates the batch service', () => {
     assert.deepEqual(Object.keys(batchService), ['config', 'data']);
     assert.deepStrictEqual(batchService.config, {
-      individualLimit: parseUnits('2', 18),
-      individualLimit2: parseUnits('0.2', 18),
-      totalLimit: parseUnits('9', 18),
-      totalLimit2: parseUnits('10', 18),
+      individualLimit: getDollarDenominated(
+        batchConfig.LIMITS.INDIVIDUAL,
+        batchConfig.PRICE
+      ),
+      individualLimit2: getDollarDenominated(
+        batchConfig.LIMITS.INDIVIDUAL_2,
+        batchConfig.PRICE
+      ),
+      totalLimit: getDollarDenominated(
+        batchConfig.LIMITS.TOTAL,
+        batchConfig.PRICE
+      ),
+      totalLimit2: getDollarDenominated(
+        batchConfig.LIMITS.TOTAL_2,
+        batchConfig.PRICE
+      ),
       isEarlyAccess: false,
       price: '0.1',
     });
