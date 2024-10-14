@@ -17,7 +17,6 @@ describe('#instantiateServices', () => {
     batchService;
 
   before(async () => {
-    console.log(batchConfig);
     ({
       queryService,
       safeService,

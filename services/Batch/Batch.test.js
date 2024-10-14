@@ -192,7 +192,6 @@ describe('Batch', () => {
       });
 
       it('calculates the correct `totalValidContribution`', () => {
-        console.log('>START');
         assert.equal(
           batchService.data.totalValidContribution,
           totalLimit
@@ -404,6 +403,65 @@ describe('Batch', () => {
             );
             assert.equal(validContribution, individualLimit);
           });
+        });
+      });
+
+      describe.only('when only the soft cap has been reached', () => {
+        const excess = 69n;
+        const customBatchConfig = {
+          TIMEFRAME: {
+            FROM_TIMESTAMP: 1726684518,
+            TO_TIMESTAMP: 1726692378,
+          },
+          LIMITS: {
+            TOTAL: '89',
+            TOTAL_2: '90',
+            INDIVIDUAL: '89',
+            INDIVIDUAL_2: '0.5',
+          },
+          IS_EARLY_ACCESS: false,
+          PRICE: '0.1',
+        };
+        const customInflows = [
+          {
+            participant: addresses.addr1,
+            contribution: getDollarDenominated(
+              customBatchConfig.LIMITS.TOTAL,
+              customBatchConfig.PRICE
+            ),
+            timestamp: 1726691908,
+            transactionHash:
+              '0x7d5b14cc482d201ef6b0803bc2fefeab805951e6d04817f64dc9ba35b9094ae0',
+          },
+          {
+            participant: addresses.addr2,
+            contribution:
+              getDollarDenominated(
+                customBatchConfig.LIMITS.INDIVIDUAL_2,
+                customBatchConfig.PRICE
+              ) + excess,
+            timestamp: 1726691938,
+            transactionHash:
+              '0x81bfc33fab4d3507f859e6b2593029752318f8790ac9109a8b1ebdf79d5ec38d',
+          },
+        ];
+
+        it('counts everything exceeding INDIVIDUAL_2 as invalid contribution', () => {
+          const customBatchService = new Batch({
+            batchConfig: {
+              ...customBatchConfig,
+            },
+          });
+          customBatchService.assessInflows(
+            customInflows,
+            [addresses.addr1, addresses.addr2],
+            []
+          );
+          assert.equal(
+            customBatchService.data.participants[addr2]
+              .invalidContribution,
+            excess
+          );
         });
       });
     });
