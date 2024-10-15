@@ -91,3 +91,71 @@ In order to do custom transactions within the Safe UI, you need to follow these 
    - `amount`: is the initial collateral supply; don't forget to convert into the correct units; POL is using 18 decimals so you can convert from ETH into WEI via [this](https://eth-converter.com/) tool
 
 3. Add transaction
+
+### Vesting the initial issuance supply to the project
+
+1. For a given project, get the address of the `LM_PC_PaymentRouter_v1`; for this you need the orchestrator address
+
+  Option 1: via BaseScan
+  a) Search for orchestrator address
+  b) click on deployment transaction
+  <img width="1537" alt="Screenshot 2024-10-16 at 00 43 11" src="https://github.com/user-attachments/assets/fa5eea80-51b5-4278-a4e3-84b5cc8b3ca4">
+  c) click on logs
+  <img width="1709" alt="Screenshot 2024-10-16 at 00 44 29" src="https://github.com/user-attachments/assets/a1c2585c-f8c2-4750-ac87-8120b21cc595">
+  d) search for `OrchestratorInitialized`
+  e) copy the address shown under `modules`
+  <img width="1710" alt="Screenshot 2024-10-16 at 00 45 06" src="https://github.com/user-attachments/assets/e05d09b7-8cbf-4f28-ac91-70825363fed7">
+
+2. Paste address into Safe UI's transaction builder
+3. Paste the following ABI into the ABI field
+```
+[
+  {
+    "type": "function",
+    "name": "pushPayment",
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "paymentToken",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "start",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "cliff",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "end",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  }
+]
+```
+4. Fill the parameters:
+- `address`: project multisig meant to receive vested tokens
+- `paymentToken`: the ABC token for the respective project
+- `amount`: amount of tokens to be vested (don't forget decimals)
+- `start`: the unix timestamp (seconds, not miliseconds!)
+- `cliff`: the **time period until the cliff starts in seconds**
+- `end`: the end of the vesting period in unix timestamp (seconds)
+
+5. Add transaction
