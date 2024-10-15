@@ -7,7 +7,6 @@ import {
   batchConfig,
   projectConfig,
 } from '../../utils/testUtils/staticTestData.js';
-import { parseUnits } from 'viem';
 import { getDollarDenominated } from '../../utils/testUtils/testHelpers.js';
 
 describe('#instantiateServices', () => {

@@ -51,9 +51,10 @@ export class Queries {
     });
     this.queries.addresses.collateralToken =
       await this.bondingCurve.read.token();
-    this.queries.addresses.issuanceToken =
+    this.queries.addresses.mintWrapper =
       await this.bondingCurve.read.getIssuanceToken();
-
+    this.queries.addresses.issuanceToken =
+      await this.getIssuanceTokenFromWrapper();
     const modules = await orchestrator.read.listModules();
     for (const module of modules) {
       const moduleContract = getContract({
@@ -208,6 +209,16 @@ export class Queries {
       batchMintingEligibleUsers: { users },
     } = await this.backendConnector(queryBuilder.backend.allowlist());
     return users;
+  }
+
+  async getIssuanceTokenFromWrapper() {
+    const mintWrapper = getContract({
+      address: this.queries.addresses.mintWrapper,
+      client: this.publicClient,
+      abi: abis.mintWrapperAbi,
+    });
+
+    return await mintWrapper.read.issuanceToken();
   }
 
   /* 

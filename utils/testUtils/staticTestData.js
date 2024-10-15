@@ -214,3 +214,51 @@ export const nftHolders = [
   '0x6747772f37a4f7cfdea180d38e8ad372516c9548',
   '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
 ];
+
+export const mockCollateralToken =
+  '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80';
+
+export const deployArgs = (admin, safe) => {
+  return {
+    orchestrator: {
+      independentUpdates: false,
+      independentUpdateAdmin:
+        '0x0000000000000000000000000000000000000000',
+    },
+    authorizer: { initialAdmin: admin },
+    fundingManager: {
+      issuanceToken: '0x0000000000000000000000000000000000000000',
+      bondingCurveParams: {
+        formula: '0xfaf6c989dB0582D7b31e40343dd4A41a1848E038',
+        buyFee: '50',
+        sellFee: '50',
+        reserveRatioForBuying: 333_333,
+        reserveRatioForSelling: 333_333,
+        buyIsOpen: true,
+        sellIsOpen: true,
+        initialIssuanceSupply: '200002.999999999999998676',
+        initialCollateralSupply: '296.306333665498798599',
+      },
+      collateralToken: mockCollateralToken,
+    },
+    issuanceToken: {
+      name: 'ABC TOKEN',
+      symbol: 'ABC',
+      decimals: 18,
+      maxSupply:
+        '11579208923731619542357098500868790785326998466564056403945',
+    },
+    beneficiary: safe,
+  };
+};
+
+export const requestedModules = {
+  fundingManager:
+    'FM_BC_Restricted_Bancor_Redeeming_VirtualSupply_v1',
+  paymentProcessor: 'PP_Streaming_v1',
+  authorizer: 'AUT_Roles_v1',
+  optionalModules: ['LM_PC_PaymentRouter_v1'],
+};
+
+export const restrictedPimFactory =
+  '0xECEb3717bfF7D18ce6C9ca7F11C2833F249a4377';
