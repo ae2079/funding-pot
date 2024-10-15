@@ -18,7 +18,13 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter, getModule } from '@inverter-network/sdk';
 
-import { projectConfig, allowlist } from './staticTestData.js';
+import {
+  projectConfig,
+  allowlist,
+  deployArgs,
+  requestedModules,
+  restrictedPimFactory,
+} from './staticTestData.js';
 import abis from '../../data/abis.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -141,6 +147,83 @@ export const getTestClients = () => {
   }
 
   return clients;
+};
+
+export const deployWorkflowViaFactory = async (safeAddress) => {
+  const {
+    owner: { publicClient, walletClient },
+  } = getTestClients();
+  const inverterSdk = new Inverter({ publicClient, walletClient });
+  const args = deployArgs(walletClient.account.address, safeAddress);
+
+  console.info(
+    `> Minting ${parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    )} tokens (${args.fundingManager.collateralToken}) to ${
+      walletClient.account.address
+    }...`
+  );
+  const tokenInstance = getContract({
+    address: args.fundingManager.collateralToken,
+    client: walletClient,
+    abi: abis.erc20Abi,
+  });
+  const hash = await tokenInstance.write.mint([
+    walletClient.account.address,
+    parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    ),
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash });
+  console.info('✅ Tokens minted');
+
+  console.info('> Approving collateral token to factory...');
+  const tx1 = await tokenInstance.write.approve([
+    restrictedPimFactory,
+    parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    ),
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash: tx1 });
+  console.info('✅ Collateral token approved');
+
+  console.info('> Adding funding to factory...');
+  console.log('actor: ', safeAddress);
+  console.log(
+    'amount: ',
+    parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    )
+  );
+  const factory = getContract({
+    abi: abis.restrictedPimFactoryAbi,
+    address: restrictedPimFactory,
+    client: walletClient,
+  });
+  const tx2 = await factory.write.addFunding([
+    safeAddress,
+    mockCollateralToken,
+    parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    ),
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash: tx2 });
+  console.info('✅ Funding added');
+
+  console.info('> Deploying workflow through restricted factory...');
+  const { run } = await inverterSdk.getDeploy({
+    requestedModules,
+    factoryType: 'restricted-pim',
+  });
+  const { orchestratorAddress } = await run(args);
+  console.info('✅ Workflow deployed');
+
+  return orchestratorAddress;
 };
 
 export const deployWorkflow = async (safeAddress) => {
@@ -281,7 +364,10 @@ export const getProjectConfig = async () => {
     );
 
     const safeAddress = await deployTestSafe();
-    const orchestratorAddress = await deployWorkflow(safeAddress);
+    // const orchestratorAddress = await deployWorkflow(safeAddress);
+    const orchestratorAddress = await deployWorkflowViaFactory(
+      safeAddress
+    );
 
     fs.writeFileSync(
       filePath,
