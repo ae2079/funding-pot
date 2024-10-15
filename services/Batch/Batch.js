@@ -69,6 +69,8 @@ export class Batch {
 
     // iterate over the inflows
     for (const inflow of inflows) {
+      let invalidReason;
+
       const { participant, contribution } = inflow;
 
       // adds contribution to participants
@@ -83,6 +85,7 @@ export class Batch {
       ) {
         this.manageContribution(inflow, {
           invalidContribution: contribution,
+          invalidReason: 'not on allowlist',
         });
         continue;
       }
@@ -110,12 +113,13 @@ export class Batch {
         validContribution = validContribution + individualDiff;
         // set invalid contribution to the difference between the individual cap and own contribution
         invalidContribution = individualDiff * -1n; //
+        invalidReason = 'individual cap exceeded';
       }
 
       // difference between total cap and own contribution
       // if negative, means that the total cap has been exceeded
       const totalDiff =
-        (this.config.IS_EARLY_ACCESS
+        (this.config.isEarlyAccess
           ? this.config.totalLimit
           : this.config.totalLimit2) -
         this.data.totalValidContribution -
@@ -135,12 +139,17 @@ export class Batch {
         invalidContribution = isMoreRestrictive
           ? e
           : invalidContribution;
+
+        if (isMoreRestrictive) {
+          invalidReason = 'total cap exceeded';
+        }
       }
 
       // add valid and invalid contribution to participant
       this.manageContribution(inflow, {
         validContribution,
         invalidContribution,
+        invalidReason,
       });
 
       this.data.participants[participant].participantLimit =
@@ -187,7 +196,7 @@ export class Batch {
   manageContribution(inflow, contributionObj) {
     const { participant } = inflow;
 
-    const { invalidContribution, validContribution } =
+    const { invalidContribution, validContribution, invalidReason } =
       contributionObj;
 
     const adjustedInvalidContribution = invalidContribution || 0n;
@@ -218,6 +227,7 @@ export class Batch {
       ...this.data.participants[participant].transactions[lastTxIdx],
       invalidContribution,
       validContribution,
+      invalidReason,
     };
   }
 

@@ -34,9 +34,8 @@ export const defineBatch = async ({
   batchService.assessInflows(inflows, allowlist, nftHolders);
 
   // no valid contributions => no allocations
-  // => no batch buy => no vestings => error
-  if (batchService.data.totalValidContribution === 0n)
-    throw new Error('No valid contributions found');
+  // => no batch buy => no vestings
+  if (batchService.data.totalValidContribution === 0n) return;
 
   // get amountOut based on aggregate valid contributions
   const additionalIssuance = await queryService.getAmountOut(

@@ -48,14 +48,16 @@ export const main = async (projectName, batchNr) => {
     allowlist,
   });
 
-  // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
-  console.info(`5️⃣ Proposing batch...`);
-  await proposeBatch({
-    batchService,
-    queryService,
-    transactionBuilderService,
-    safeService,
-  });
+  if (batchService.data.totalValidContribution > 0n) {
+    // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
+    console.info(`5️⃣ Proposing batch...`);
+    await proposeBatch({
+      batchService,
+      queryService,
+      transactionBuilderService,
+      safeService,
+    });
+  }
 
   // store comprehensive report in a JSON file
   console.info(`6️⃣ Storing report...`);
