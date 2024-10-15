@@ -53,16 +53,8 @@ export class Queries {
       await this.bondingCurve.read.token();
     this.queries.addresses.mintWrapper =
       await this.bondingCurve.read.getIssuanceToken();
-
-    const mintWrapper = getContract({
-      address: this.queries.addresses.mintWrapper,
-      client: this.publicClient,
-      abi: abis.mintWrapperAbi,
-    });
-
     this.queries.addresses.issuanceToken =
-      await mintWrapper.read.issuanceToken();
-
+      await this.getIssuanceTokenFromWrapper();
     const modules = await orchestrator.read.listModules();
     for (const module of modules) {
       const moduleContract = getContract({
@@ -217,6 +209,16 @@ export class Queries {
       batchMintingEligibleUsers: { users },
     } = await this.backendConnector(queryBuilder.backend.allowlist());
     return users;
+  }
+
+  async getIssuanceTokenFromWrapper() {
+    const mintWrapper = getContract({
+      address: this.queries.addresses.mintWrapper,
+      client: this.publicClient,
+      abi: abis.mintWrapperAbi,
+    });
+
+    return await mintWrapper.read.issuanceToken();
   }
 
   /* 
