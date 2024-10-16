@@ -279,14 +279,14 @@ export class Batch {
 
   denominatedInCollateral(amount, price) {
     return parseUnits(
-      (parseFloat(amount) * parseFloat(price)).toString(),
+      (parseFloat(amount) / parseFloat(price)).toString(),
       18
     );
   }
 
   denominatedInDollars(amount, price) {
     return parseUnits(
-      (parseFloat(amount) / parseFloat(price)).toString(),
+      (parseFloat(amount) * parseFloat(price)).toString(),
       18
     );
   }
