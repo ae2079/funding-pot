@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'node:test';
 import assert from 'node:assert';
-import { formatUnits, parseUnits } from 'viem';
+import { parseUnits } from 'viem';
 
 import { Batch } from './Batch.js';
 import {
@@ -10,7 +10,10 @@ import {
   batchConfig,
   nftHolders,
 } from '../../utils/testUtils/staticTestData.js';
-import { getDollarDenominated } from '../../utils/testUtils/testHelpers.js';
+import {
+  inCollateral,
+  inDollar,
+} from '../../utils/testUtils/testHelpers.js';
 
 describe('Batch', () => {
   const addr1 = '0x6747772f37a4f7cfdea180d38e8ad372516c9548';
@@ -24,21 +27,21 @@ describe('Batch', () => {
 
   const collateralDenominatedTotalLimit = parseUnits(
     (
-      parseFloat(batchConfig.LIMITS.TOTAL) *
+      parseFloat(batchConfig.LIMITS.TOTAL) /
       parseFloat(batchConfig.PRICE)
     ).toString(),
     18
   );
   const collateralDenominatedTotalLimit2 = parseUnits(
     (
-      parseFloat(batchConfig.LIMITS.TOTAL_2) *
+      parseFloat(batchConfig.LIMITS.TOTAL_2) /
       parseFloat(batchConfig.PRICE)
     ).toString(),
     18
   );
   const collateralDenominatedIndividualLimit = parseUnits(
     (
-      parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+      parseFloat(batchConfig.LIMITS.INDIVIDUAL) /
       parseFloat(batchConfig.PRICE)
     ).toString(),
     18
@@ -68,7 +71,7 @@ describe('Batch', () => {
           batchService.config.totalLimit,
           parseUnits(
             (
-              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.LIMITS.TOTAL) /
               parseFloat(batchConfig.PRICE)
             ).toString(),
             18
@@ -78,7 +81,7 @@ describe('Batch', () => {
           batchService.config.totalLimit2,
           parseUnits(
             (
-              parseFloat(batchConfig.LIMITS.TOTAL_2) *
+              parseFloat(batchConfig.LIMITS.TOTAL_2) /
               parseFloat(batchConfig.PRICE)
             ).toString(),
             18
@@ -377,7 +380,7 @@ describe('Batch', () => {
             assert.equal(validContribution, parseUnits('1.3', 18));
             assert.equal(
               totalValidContribution,
-              getDollarDenominated(
+              inCollateral(
                 batchConfig.LIMITS.TOTAL_2,
                 batchConfig.PRICE
               )
@@ -406,7 +409,7 @@ describe('Batch', () => {
         });
       });
 
-      describe.only('when only the soft cap has been reached', () => {
+      describe('when only the soft cap has been reached', () => {
         const excess = 69n;
         const customBatchConfig = {
           TIMEFRAME: {
@@ -420,12 +423,13 @@ describe('Batch', () => {
             INDIVIDUAL_2: '0.5',
           },
           IS_EARLY_ACCESS: false,
-          PRICE: '0.1',
+          PRICE: '1',
         };
+
         const customInflows = [
           {
             participant: addresses.addr1,
-            contribution: getDollarDenominated(
+            contribution: inDollar(
               customBatchConfig.LIMITS.TOTAL,
               customBatchConfig.PRICE
             ),
@@ -436,7 +440,7 @@ describe('Batch', () => {
           {
             participant: addresses.addr2,
             contribution:
-              getDollarDenominated(
+              inDollar(
                 customBatchConfig.LIMITS.INDIVIDUAL_2,
                 customBatchConfig.PRICE
               ) + excess,
@@ -457,6 +461,7 @@ describe('Batch', () => {
             [addresses.addr1, addresses.addr2],
             []
           );
+
           assert.equal(
             customBatchService.data.participants[addr2]
               .invalidContribution,
@@ -573,52 +578,6 @@ describe('Batch', () => {
     });
   });
 
-  describe('#getApplicableTotalLimit', () => {
-    describe("when it's an early access round", () => {
-      it('returns the total limit', () => {
-        const batchService = new Batch({
-          batchConfig,
-        });
-
-        assert.equal(
-          batchService.getApplicableTotalLimit({
-            ...batchConfig,
-            IS_EARLY_ACCESS: true,
-          }),
-          parseUnits(
-            (
-              parseFloat(batchConfig.LIMITS.TOTAL) *
-              parseFloat(batchConfig.PRICE)
-            ).toString(),
-            18
-          )
-        );
-      });
-    });
-
-    describe("when it's a QACC round", () => {
-      it('returns the `TOTAL_LIMIT_2`', () => {
-        const batchService = new Batch({
-          batchConfig,
-        });
-
-        assert.equal(
-          batchService.getApplicableTotalLimit({
-            ...batchConfig,
-            IS_EARLY_ACCESS: false,
-          }),
-          parseUnits(
-            (
-              parseFloat(batchConfig.LIMITS.TOTAL_2) *
-              parseFloat(batchConfig.PRICE)
-            ).toString(),
-            18
-          )
-        );
-      });
-    });
-  });
-
   describe('#getApplicableIndividualLimit', () => {
     describe('when it is an early access round', () => {
       it('returns the adjusted individual limit', () => {
@@ -630,7 +589,7 @@ describe('Batch', () => {
           batchService.getApplicableIndividualLimit(addr1),
           parseUnits(
             (
-              parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+              parseFloat(batchConfig.LIMITS.INDIVIDUAL) /
               parseFloat(batchConfig.PRICE)
             ).toString(),
             18
@@ -653,7 +612,7 @@ describe('Batch', () => {
             batchService.getApplicableIndividualLimit(addr1),
             parseUnits(
               (
-                parseFloat(batchConfig.LIMITS.INDIVIDUAL) *
+                parseFloat(batchConfig.LIMITS.INDIVIDUAL) /
                 parseFloat(batchConfig.PRICE)
               ).toString(),
               18
@@ -669,7 +628,7 @@ describe('Batch', () => {
           });
           batchService.data.totalValidContribution = parseUnits(
             (
-              parseFloat(batchConfig.LIMITS.TOTAL) *
+              parseFloat(batchConfig.LIMITS.TOTAL) /
               parseFloat(batchConfig.PRICE)
             ).toString(),
             18
@@ -679,7 +638,7 @@ describe('Batch', () => {
             batchService.getApplicableIndividualLimit(addr1),
             parseUnits(
               (
-                parseFloat(batchConfig.LIMITS.INDIVIDUAL_2) *
+                parseFloat(batchConfig.LIMITS.INDIVIDUAL_2) /
                 parseFloat(batchConfig.PRICE)
               ).toString(),
               18

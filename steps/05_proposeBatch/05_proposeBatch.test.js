@@ -13,11 +13,11 @@ import { instantiateServices } from '../03_instantiateServices/03_instantiateSer
 import {
   signAndExecutePendingTxs,
   mintMockTokens,
-} from '../../utils/testUtils/testHelpers.js';
+} from '../../utils/testUtils/e2eSetup.js';
 import {
-  batchConfig,
-  batchReportData,
-  projectConfig,
+  batchConfigWithWrapper,
+  batchReportDataWithWrapper,
+  projectConfigWithWrapper,
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
 
@@ -38,11 +38,11 @@ describe('#proposeBatch', () => {
 
     beforeEach(async () => {
       batchService = new Batch({
-        batchConfig,
+        batchConfig: batchConfigWithWrapper,
       });
       safeService = new Safe(
         process.env.CHAIN_ID,
-        projectConfig,
+        projectConfigWithWrapper,
         getAnkrRpcUrl()
       );
       queryService = new Queries({
@@ -50,14 +50,14 @@ describe('#proposeBatch', () => {
         indexerUrl: process.env.INDEXER_URL,
         chainId: process.env.CHAIN_ID,
       });
-      await queryService.setup(projectConfig.ORCHESTRATOR);
+      await queryService.setup(projectConfigWithWrapper.ORCHESTRATOR);
       transactionBuilderService = new TransactionBuilder({
-        projectConfig,
+        projectConfig: projectConfigWithWrapper,
         workflowAddresses: queryService.queries.addresses,
-        batchConfig,
+        batchConfig: batchConfigWithWrapper,
       });
 
-      batchService.data = batchReportData;
+      batchService.data = batchReportDataWithWrapper;
     });
 
     it('adds a transaction to the safe', async () => {
@@ -86,7 +86,10 @@ describe('#proposeBatch', () => {
         safeService,
         transactionBuilderService,
         batchService,
-      } = await instantiateServices(projectConfig, batchConfig));
+      } = await instantiateServices(
+        projectConfigWithWrapper,
+        batchConfigWithWrapper
+      ));
       additionalIssuance = await queryService.getAmountOut(
         totalValidContribution
       );
@@ -110,7 +113,7 @@ describe('#proposeBatch', () => {
       await mintMockTokens(
         getAddress(queryService.queries.addresses.collateralToken),
         totalValidContribution,
-        getAddress(projectConfig.SAFE)
+        getAddress(projectConfigWithWrapper.SAFE)
       );
     });
 
@@ -123,7 +126,7 @@ describe('#proposeBatch', () => {
       });
 
       assert.doesNotThrow(async () => {
-        await signAndExecutePendingTxs(projectConfig.SAFE);
+        await signAndExecutePendingTxs(projectConfigWithWrapper.SAFE);
       });
     });
   });

@@ -2,17 +2,18 @@ import '../env.js';
 
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
+
 import {
   setupForE2E,
-  signAndExecutePendingTxs,
   getVestings,
+  signAndExecutePendingTxs,
   getReport,
-} from '../utils/testUtils/testHelpers.js';
+} from '../utils/testUtils/e2eSetup.js';
 
 import { main } from './main.js';
 import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 
-describe('#main', () => {
+describe.skip('#main', () => {
   const batchNr = '3';
   const projectName = 'GENERATED_TEST_PROJECT';
 

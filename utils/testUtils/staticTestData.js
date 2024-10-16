@@ -15,7 +15,7 @@ export const batchConfig = {
     INDIVIDUAL_2: '2',
   },
   IS_EARLY_ACCESS: false,
-  PRICE: '0.1',
+  PRICE: '10',
 };
 
 export const projectConfig = {
@@ -262,3 +262,73 @@ export const requestedModules = {
 
 export const restrictedPimFactory =
   '0xECEb3717bfF7D18ce6C9ca7F11C2833F249a4377';
+
+export const projectConfigWithWrapper = {
+  SAFE: '0x23A9afdA8301D2C4bBdA1f0bC1B990E8515647a1',
+  ORCHESTRATOR: '0xb6FDAf84C2302cfc2afFA8A5DCfBE2a0d4Df4346',
+  NFT: '0xa47f284a5be76c10b902446acb1aea9550f4c71d',
+};
+
+export const batchConfigWithWrapper = {
+  VESTING_DETAILS: {
+    START: '1729109380',
+    CLIFF: '60',
+    END: '1729109440',
+  },
+  TIMEFRAME: {
+    FROM_TIMESTAMP: '1729109320',
+    TO_TIMESTAMP: '1729109460',
+  },
+  LIMITS: {
+    INDIVIDUAL: '5000',
+    INDIVIDUAL_2: '500',
+    TOTAL: '15000',
+    TOTAL_2: '15500',
+  },
+  PRICE: '0.1',
+  IS_EARLY_ACCESS: false,
+};
+
+export const batchReportDataWithWrapper = {
+  aggregatedPreviousContributions: {},
+  totalContribution: 1531561862296063049728n,
+  totalValidContribution: 1531561862296063049728n,
+  totalInvalidContribution: 0n,
+  participants: {
+    '0x6747772f37a4f7cfdea180d38e8ad372516c9548': {
+      contribution: 926281572697310363648n,
+      transactions: [
+        {
+          transactionHash:
+            '0x3ae8aa7e96968767f316f6af8a806bd37c40d08f4f576bcd7de16e4f63958d40',
+          contribution: 926281572697310363648n,
+          invalidContribution: 0n,
+          validContribution: 926281572697310363648n,
+          invalidReason: undefined,
+        },
+      ],
+      invalidContribution: 0n,
+      validContribution: 926281572697310363648n,
+      participantLimit: 50000000000000000000000n,
+      issuanceAllocation: 40274062200000000000000n,
+    },
+    '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b': {
+      contribution: 605280289598752686080n,
+      transactions: [
+        {
+          transactionHash:
+            '0x873905857c55809683694626f1f87b5c3a4cb78ec06bf0b38aae5fe41dbb825d',
+          contribution: 605280289598752686080n,
+          invalidContribution: 0n,
+          validContribution: 605280289598752686080n,
+          invalidReason: undefined,
+        },
+      ],
+      invalidContribution: 0n,
+      validContribution: 605280289598752686080n,
+      participantLimit: 50000000000000000000000n,
+      issuanceAllocation: 26317155300000000000000n,
+    },
+  },
+  additionalIssuance: 66591217695239318137954n,
+};

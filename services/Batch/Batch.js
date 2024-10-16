@@ -291,20 +291,6 @@ export class Batch {
     );
   }
 
-  getApplicableTotalLimit(batchConfig) {
-    if (batchConfig.IS_EARLY_ACCESS === true) {
-      return this.denominatedInCollateral(
-        batchConfig.LIMITS.TOTAL,
-        batchConfig.PRICE
-      );
-    } else if (batchConfig.IS_EARLY_ACCESS === false) {
-      return this.denominatedInCollateral(
-        batchConfig.LIMITS.TOTAL_2,
-        batchConfig.PRICE
-      );
-    }
-  }
-
   getApplicableIndividualLimit(participant) {
     // if it's an early access round, return the adjustedIndividualLimit
     // which is based on the defined individual limti per batch and all contributions

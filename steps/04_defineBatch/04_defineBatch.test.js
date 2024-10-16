@@ -5,10 +5,9 @@ import assert from 'node:assert';
 import { defineBatch } from './04_defineBatch.js';
 import { Queries } from '../../services/Queries/Queries.js';
 import {
-  batchConfig,
-  batchReportData,
-  projectConfig,
-  allowlist,
+  batchConfigWithWrapper,
+  batchReportDataWithWrapper,
+  projectConfigWithWrapper,
 } from '../../utils/testUtils/staticTestData.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { getAnkrRpcUrl } from '../../utils/helpers.js';
@@ -29,10 +28,10 @@ describe('#defineBatch', () => {
       backendUrl: BACKEND_URL,
     });
 
-    await queryService.setup(projectConfig.ORCHESTRATOR);
+    await queryService.setup(projectConfigWithWrapper.ORCHESTRATOR);
 
     batchService = new Batch({
-      batchConfig,
+      batchConfig: batchConfigWithWrapper,
     });
   });
 
@@ -40,10 +39,13 @@ describe('#defineBatch', () => {
     await defineBatch({
       queryService,
       batchService,
-      projectConfig,
-      batchConfig,
+      projectConfig: projectConfigWithWrapper,
+      batchConfig: batchConfigWithWrapper,
     });
 
-    assert.deepStrictEqual(batchService.data, batchReportData);
+    assert.deepStrictEqual(
+      batchService.data,
+      batchReportDataWithWrapper
+    );
   });
 });
