@@ -7,7 +7,7 @@ import {
   batchConfig,
   projectConfig,
 } from '../../utils/testUtils/staticTestData.js';
-import { getDollarDenominated } from '../../utils/testUtils/testHelpers.js';
+import { inDollar } from '../../utils/testUtils/testHelpers.js';
 
 describe('#instantiateServices', () => {
   let queryService,
@@ -75,19 +75,19 @@ describe('#instantiateServices', () => {
   it('instantiates the batch service', () => {
     assert.deepEqual(Object.keys(batchService), ['config', 'data']);
     assert.deepStrictEqual(batchService.config, {
-      individualLimit: getDollarDenominated(
+      individualLimit: inDollar(
         batchConfig.LIMITS.INDIVIDUAL,
         batchConfig.PRICE
       ),
-      individualLimit2: getDollarDenominated(
+      individualLimit2: inDollar(
         batchConfig.LIMITS.INDIVIDUAL_2,
         batchConfig.PRICE
       ),
-      totalLimit: getDollarDenominated(
+      totalLimit: inDollar(
         batchConfig.LIMITS.TOTAL,
         batchConfig.PRICE
       ),
-      totalLimit2: getDollarDenominated(
+      totalLimit2: inDollar(
         batchConfig.LIMITS.TOTAL_2,
         batchConfig.PRICE
       ),

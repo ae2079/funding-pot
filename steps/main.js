@@ -36,7 +36,11 @@ export const main = async (projectName, batchNr) => {
     transactionBuilderService,
     batchService,
     queryService,
-  } = await instantiateServices(projectConfig, batchConfig);
+  } = await instantiateServices(
+    projectConfig,
+    batchConfig,
+    batchReports
+  );
 
   // define batch (= contributions, eligibility, received allocations, vesting details etc.)
   console.info(`4️⃣ Defining batch...`);
@@ -47,6 +51,8 @@ export const main = async (projectName, batchNr) => {
     batchConfig,
     allowlist,
   });
+
+  console.dir(batchService, { depth: null });
 
   if (batchService.data.totalValidContribution > 0n) {
     // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API

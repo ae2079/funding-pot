@@ -1,144 +1,157 @@
 {
-  "projectName": "STATIC_TEST_PROJECT_2",
+  "projectName": "GENERATED_TEST_PROJECT",
   "batchNr": "1",
   "batch": {
-    "totalValidContribution": "14741262490730560512",
-    "totalInvalidContribution": "0",
-    "participants": {
-      "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
-        "contribution": "5593079733874059264",
-        "permitted": true,
-        "validContribution": "5593079733874059264",
-        "issuanceAllocation": "1207629700000000000000"
+    "data": {
+      "aggregatedPreviousContributions": {
+        "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
+          "inCollateral": "1098329255633536811008",
+          "inDollar": 109.83292556335368
+        },
+        "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b": {
+          "inCollateral": "319259282675352666112",
+          "inDollar": 31.92592826753527
+        }
       },
-      "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b": {
-        "contribution": "9148182756856501248",
-        "permitted": true,
-        "validContribution": "9148182756856501248",
-        "issuanceAllocation": "1975229800000000000000"
-      }
+      "totalContribution": {
+        "inCollateral": "1849954917130398990336",
+        "inDollar": 184.99549171303988
+      },
+      "totalValidContribution": {
+        "inCollateral": "1849954917130398990336",
+        "inDollar": 184.99549171303988
+      },
+      "totalInvalidContribution": {
+        "inCollateral": "0",
+        "inDollar": 0
+      },
+      "participants": {
+        "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b": {
+          "contribution": {
+            "inCollateral": "1307184100822240788480",
+            "inDollar": 130.71841008222407
+          },
+          "transactions": [
+            {
+              "transactionHash": "0xde340aa3a67b2df27eab7c9385e6c9df0c763e487f8aa26400b5173b7fe9a1f3",
+              "contribution": "474121762656755056640",
+              "invalidContribution": "0",
+              "validContribution": "474121762656755056640"
+            },
+            {
+              "transactionHash": "0x4bfbbbf55d128c5fad9378f0f3628c766fb8ab23156ffbcb1f7b7dab4a06b2f8",
+              "contribution": "833062338165485731840",
+              "invalidContribution": "0",
+              "validContribution": "833062338165485731840"
+            }
+          ],
+          "invalidContribution": {
+            "inCollateral": "0",
+            "inDollar": 0,
+            "toDollar": null
+          },
+          "validContribution": {
+            "inCollateral": "1307184100822240788480",
+            "inDollar": 130.71841008222407
+          },
+          "participantLimit": "50000000000000000000000",
+          "issuanceAllocation": "0"
+        },
+        "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
+          "contribution": {
+            "inCollateral": "542770816308158201856",
+            "inDollar": 54.277081630815815
+          },
+          "transactions": [
+            {
+              "transactionHash": "0x2df483bf31f5d42ac52d9ec14858794b29bb071a5d8cc5d8e0c8f754dae53c3a",
+              "contribution": "542770816308158201856",
+              "invalidContribution": "0",
+              "validContribution": "542770816308158201856"
+            }
+          ],
+          "invalidContribution": {
+            "inCollateral": "0",
+            "inDollar": 0
+          },
+          "validContribution": {
+            "inCollateral": "542770816308158201856",
+            "inDollar": 54.277081630815815
+          },
+          "participantLimit": "50000000000000000000000",
+          "issuanceAllocation": "0"
+        }
+      },
+      "additionalIssuance": "59158492606565648800969"
     },
-    "exAnteSupply": "200002999999999999998676",
-    "exAnteSpotPrice": "4444",
-    "issuanceTokenCap": "4000060000000000000000",
-    "additionalIssuance": "3182859609155890457958"
+    "config": {
+      "limits": {
+        "totalLimit": {
+          "inDollar": "15000",
+          "inCollateral": "148582411461691110522880"
+        },
+        "totalLimit2": {
+          "inDollar": "15500",
+          "inCollateral": "153582411461691110522880"
+        },
+        "individualLimit": {
+          "inDollar": "5000",
+          "inCollateral": "50000000000000000000000"
+        },
+        "individualLimit2": {
+          "inDollar": "500",
+          "inCollateral": "5000000000000000000000"
+        }
+      },
+      "price": "0.1",
+      "isEarlyAccess": false
+    }
   },
   "safe": {
-    "proposedTransactions": [
-      {
-        "safeTxHash": "0x97b39286447d2352347a9bdb734abd29626227b500f0b1b32f30b50ac99a3649"
-      }
-    ]
+    "proposedTransactions": []
   },
   "transactions": {
-    "readable": [
-      [
-        {
-          "to": "0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80",
-          "functionSignature": "approve(address,uint256)",
-          "inputValues": [
-            "0xcc718b67522ac90116229e771b36daFFF3A5339f",
-            "14741262490730560512"
-          ]
-        },
-        {
-          "to": "0xcc718b67522ac90116229e771b36daFFF3A5339f",
-          "functionSignature": "buy(uint256,uint256)",
-          "inputValues": ["14741262490730560512", "1"]
-        },
-        {
-          "to": "0x9D7fa19DD84D1Db41fcAb02Bf0D2D743F6B2fa72",
-          "functionSignature": "transfer(address,uint256)",
-          "inputValues": [
-            "0x8823597fa1b50E7408E0497F9917B962A208ee32",
-            "3182859609155890457958"
-          ]
-        },
-        {
-          "to": "0x8823597fa1b50E7408E0497F9917B962A208ee32",
-          "functionSignature": "pushPayment(address,address,uint256,uint256,uint256,uint256)",
-          "inputValues": [
-            "0x6747772f37a4f7cfdea180d38e8ad372516c9548",
-            "0x9D7fa19DD84D1Db41fcAb02Bf0D2D743F6B2fa72",
-            "1207629700000000000000",
-            "1726492392",
-            "60",
-            "1726492452"
-          ]
-        },
-        {
-          "to": "0x8823597fa1b50E7408E0497F9917B962A208ee32",
-          "functionSignature": "pushPayment(address,address,uint256,uint256,uint256,uint256)",
-          "inputValues": [
-            "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b",
-            "0x9D7fa19DD84D1Db41fcAb02Bf0D2D743F6B2fa72",
-            "1975229800000000000000",
-            "1726492392",
-            "60",
-            "1726492452"
-          ]
-        }
-      ]
-    ],
-    "encoded": [
-      [
-        {
-          "to": "0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80",
-          "value": "0",
-          "data": "0x095ea7b3000000000000000000000000cc718b67522ac90116229e771b36dafff3a5339f000000000000000000000000000000000000000000000000cc937c21fcc8fc00"
-        },
-        {
-          "to": "0xcc718b67522ac90116229e771b36daFFF3A5339f",
-          "value": "0",
-          "data": "0xd6febde8000000000000000000000000000000000000000000000000cc937c21fcc8fc000000000000000000000000000000000000000000000000000000000000000001"
-        },
-        {
-          "to": "0x9D7fa19DD84D1Db41fcAb02Bf0D2D743F6B2fa72",
-          "value": "0",
-          "data": "0xa9059cbb0000000000000000000000008823597fa1b50e7408e0497f9917b962a208ee320000000000000000000000000000000000000000000000ac8b0cdf03ab7e2d66"
-        },
-        {
-          "to": "0x8823597fa1b50E7408E0497F9917B962A208ee32",
-          "value": "0",
-          "data": "0x8028b82f0000000000000000000000006747772f37a4f7cfdea180d38e8ad372516c95480000000000000000000000009d7fa19dd84d1db41fcab02bf0d2d743f6b2fa72000000000000000000000000000000000000000000000041773a8dda878c40000000000000000000000000000000000000000000000000000000000066e82ee8000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000066e82f24"
-        },
-        {
-          "to": "0x8823597fa1b50E7408E0497F9917B962A208ee32",
-          "value": "0",
-          "data": "0x8028b82f000000000000000000000000a6e12ede427516a56a5f6ab6e06dd335075eb04b0000000000000000000000009d7fa19dd84d1db41fcab02bf0d2d743f6b2fa7200000000000000000000000000000000000000000000006b13d1ede24dde80000000000000000000000000000000000000000000000000000000000066e82ee8000000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000066e82f24"
-        }
-      ]
-    ]
+    "readable": [],
+    "encoded": []
   },
   "queries": {
     "addresses": {
-      "orchestrator": "0x26E0A972bdCA655b30D39CceC2133c3B7140b7ee",
-      "bondingCurve": "0xcc718b67522ac90116229e771b36daFFF3A5339f",
+      "orchestrator": "0xcC52184fAD70B8e61D35b81125fB44468a4d5b36",
+      "bondingCurve": "0xCe9ddf4706b3879422dECf64e1De930A802AE07d",
       "collateralToken": "0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80",
-      "issuanceToken": "0x9D7fa19DD84D1Db41fcAb02Bf0D2D743F6B2fa72",
-      "paymentRouter": "0x8823597fa1b50E7408E0497F9917B962A208ee32"
+      "mintWrapper": "0xD0521B01C7B42e93C50926258171D04D519cFFC8",
+      "issuanceToken": "0x92c5A9BFa2B653Ae22Af7056D1B5fA4Bcb5E501F",
+      "paymentRouter": "0xa32b0760BfA48F6429b98B48E4c5b683597e8de4"
     },
     "timeframe": {
-      "fromTimestamp": "1726492332",
-      "toTimestamp": "1726492468"
+      "fromTimestamp": "1729119946",
+      "toTimestamp": "1729120080"
     },
-    "inflows": {
-      "0x6747772f37a4f7cfdea180d38e8ad372516c9548": {
-        "contribution": "5593079733874059264",
-        "permitted": true,
-        "validContribution": "5593079733874059264",
-        "issuanceAllocation": "1207629700000000000000"
+    "inflows": [
+      {
+        "participant": "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b",
+        "contribution": "474121762656755056640",
+        "timestamp": 1729119946,
+        "transactionHash": "0xde340aa3a67b2df27eab7c9385e6c9df0c763e487f8aa26400b5173b7fe9a1f3"
       },
-      "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b": {
-        "contribution": "9148182756856501248",
-        "permitted": true,
-        "validContribution": "9148182756856501248",
-        "issuanceAllocation": "1975229800000000000000"
+      {
+        "participant": "0x6747772f37a4f7cfdea180d38e8ad372516c9548",
+        "contribution": "542770816308158201856",
+        "timestamp": 1729120014,
+        "transactionHash": "0x2df483bf31f5d42ac52d9ec14858794b29bb071a5d8cc5d8e0c8f754dae53c3a"
+      },
+      {
+        "participant": "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b",
+        "contribution": "833062338165485731840",
+        "timestamp": 1729120022,
+        "transactionHash": "0x4bfbbbf55d128c5fad9378f0f3628c766fb8ab23156ffbcb1f7b7dab4a06b2f8"
       }
-    },
-    "vestedBalances": {},
-    "issuanceSupply": "200002999999999999998676",
-    "spotPrice": "4444",
-    "amountOut": "3182859609155890457958"
+    ],
+    "nftHolders": [
+      "0x6747772f37a4f7cfdea180d38e8ad372516c9548",
+      "0xa6e12ede427516a56a5f6ab6e06dd335075eb04b",
+      "0xcb1edf0e617c0fab6408701d58b746451ee6ce2f"
+    ],
+    "amountOut": "59158492606565648800969"
   }
 }

@@ -13,7 +13,7 @@ import {
 import { main } from './main.js';
 import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 
-describe.skip('#main', () => {
+describe('#main', () => {
   const batchNr = '3';
   const projectName = 'GENERATED_TEST_PROJECT';
 

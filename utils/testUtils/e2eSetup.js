@@ -440,8 +440,6 @@ export const mintMockTokens = async (
     address: walletClient.account.address,
   });
 
-  console.log(nonce);
-
   const hash = await tokenInstance.write.mint([to, amount], {
     nonce: nonce,
   });
