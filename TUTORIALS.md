@@ -102,7 +102,9 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 
 _As the **funding pot multisig**, I want to add a grant to the deployment factory, so that it can be used by the grant-receiving project._
 
-1. For a given project, get the address of the `LM_PC_PaymentRouter_v1`; for this you need the orchestrator address
+#### Step 1: Send issuance tokens to payment router
+
+1. For a given project, get the address of the `LM_PC_PaymentRouter_v1`; for this you need its orchestrator address
 
 Option 1: via BaseScan
 
@@ -122,6 +124,11 @@ e) copy the address shown under `modules`
 
   <img width="1710" alt="Screenshot 2024-10-16 at 00 45 06" src="https://github.com/user-attachments/assets/e05d09b7-8cbf-4f28-ac91-70825363fed7">
 
+2. Send all issuance tokens (that are 
+
+#### Step 2: Create vesting transactions
+
+1. For a given project, get the address of the `LM_PC_PaymentRouter_v1` and paste it into the transaction builder.
 2. Paste address into Safe UI's transaction builder
 3. Paste the following ABI into the ABI field
 
