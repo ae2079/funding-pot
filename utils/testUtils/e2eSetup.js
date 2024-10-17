@@ -9,9 +9,7 @@ import {
   toHex,
   decodeEventLog,
   parseUnits,
-  formatUnits,
 } from 'viem';
-import * as chains from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
@@ -193,13 +191,13 @@ export const getBatchConfig = async (safe) => {
     LIMITS: {},
   };
 
-  const minContribution = 1_000_000_000_000_000_000;
-  const maxContribution = 1000_000_000_000_000_000_000;
-  const individualLimit = '5000';
-  const individualLimit2 = '500';
-  const totalLimit = '15000';
-  const totalLimit2 = '15500';
-  const price = '0.1';
+  const minContribution = 10_000_000_000_000_000_000;
+  const maxContribution = 10_000_000_000_000_000_000_000;
+  const individualLimit = '15000';
+  const individualLimit2 = '0';
+  const totalLimit = '300000';
+  const totalLimit2 = '0';
+  const price = '0.37';
 
   const { owner, delegate } = clients;
 
@@ -217,7 +215,7 @@ export const getBatchConfig = async (safe) => {
   batchConfig.LIMITS.TOTAL_2 = totalLimit2;
   batchConfig.PRICE = price;
 
-  batchConfig.IS_EARLY_ACCESS = false;
+  batchConfig.IS_EARLY_ACCESS = true;
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
@@ -439,8 +437,6 @@ export const mintMockTokens = async (
   const nonce = await publicClient.getTransactionCount({
     address: walletClient.account.address,
   });
-
-  console.log(nonce);
 
   const hash = await tokenInstance.write.mint([to, amount], {
     nonce: nonce,

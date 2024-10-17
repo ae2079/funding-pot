@@ -58,7 +58,7 @@ const loadbatchReports = (projectName, batch) => {
   } catch (err) {
     console.error('ERROR - could not read batchReports:', err);
   }
-  return;
+  return batchReports;
 };
 
 const getBasePath = (dataType) =>

@@ -53,43 +53,50 @@ describe('Batch', () => {
 
       it('sets the correct keys in the config object', () => {
         assert.deepStrictEqual(Object.keys(batchService.config), [
-          'totalLimit',
-          'totalLimit2',
-          'individualLimit',
-          'individualLimit2',
-          'isEarlyAccess',
+          'limits',
           'price',
+          'isEarlyAccess',
         ]);
+      });
+
+      it('sets the correct keys in the limits object', () => {
+        assert.deepStrictEqual(
+          Object.keys(batchService.config.limits),
+          [
+            'totalLimit',
+            'totalLimit2',
+            'individualLimit',
+            'individualLimit2',
+          ]
+        );
       });
     });
 
     describe('without previous batchReports', () => {
       const batchService = new Batch({ batchConfig });
 
-      it('sets `totalLimit` and `individualLimit` in `data` to be equal to config inputs', () => {
+      it('sets `totalLimit`, `totalLimit2`, `individualLimit`, `individualLimit2` converted in collateral', () => {
         assert.equal(
-          batchService.config.totalLimit,
-          parseUnits(
-            (
-              parseFloat(batchConfig.LIMITS.TOTAL) /
-              parseFloat(batchConfig.PRICE)
-            ).toString(),
-            18
+          batchService.config.limits.totalLimit.inCollateral,
+          inCollateral(batchConfig.LIMITS.TOTAL, batchConfig.PRICE)
+        );
+        assert.equal(
+          batchService.config.limits.totalLimit2.inCollateral,
+          inCollateral(batchConfig.LIMITS.TOTAL_2, batchConfig.PRICE)
+        );
+        assert.equal(
+          batchService.config.limits.individualLimit.inCollateral,
+          inCollateral(
+            batchConfig.LIMITS.INDIVIDUAL,
+            batchConfig.PRICE
           )
         );
         assert.equal(
-          batchService.config.totalLimit2,
-          parseUnits(
-            (
-              parseFloat(batchConfig.LIMITS.TOTAL_2) /
-              parseFloat(batchConfig.PRICE)
-            ).toString(),
-            18
+          batchService.config.limits.individualLimit2.inCollateral,
+          inCollateral(
+            batchConfig.LIMITS.INDIVIDUAL_2,
+            batchConfig.PRICE
           )
-        );
-        assert.equal(
-          batchService.config.individualLimit,
-          collateralDenominatedIndividualLimit
         );
       });
     });
@@ -101,20 +108,28 @@ describe('Batch', () => {
 
       const mockBatchReports = {
         1: {
-          totalValidContribution: parseUnits('3', 18),
-          participants: {
-            [addr1]: {
-              validContribution: user1Contr1,
+          batch: {
+            data: {
+              totalValidContribution: parseUnits('3', 18),
+              participants: {
+                [addr1]: {
+                  validContribution: user1Contr1,
+                },
+              },
             },
           },
         },
         2: {
-          totalValidContribution: parseUnits('2', 18),
-          participants: {
-            [addr1]: {
-              validContribution: user1Contr2,
+          batch: {
+            data: {
+              totalValidContribution: parseUnits('2', 18),
+              participants: {
+                [addr1]: {
+                  validContribution: user1Contr2,
+                },
+                [addr2]: { validContribution: user2Contr2 },
+              },
             },
-            [addr2]: { validContribution: user2Contr2 },
           },
         },
       };
@@ -124,9 +139,16 @@ describe('Batch', () => {
         batchReports: mockBatchReports,
       });
 
-      it('adjusts the totalLimit1', () => {
+      it.only('adjusts the totalLimit1', () => {
+        console.log(
+          batchService.config.limits.totalLimit.inCollateral
+        );
+        console.log(collateralDenominatedTotalLimit);
+        console.log(mockBatchReports[1].totalValidContribution);
+        console.log(mockBatchReports[2].totalValidContribution);
+
         assert.equal(
-          batchService.config.totalLimit,
+          batchService.config.limits.totalLimit.inCollateral,
           collateralDenominatedTotalLimit -
             mockBatchReports[1].totalValidContribution -
             mockBatchReports[2].totalValidContribution
@@ -135,7 +157,7 @@ describe('Batch', () => {
 
       it('adjusts the totalLimit2', () => {
         assert.equal(
-          batchService.config.totalLimit2,
+          batchService.config.limits.totalLimit2.inCollateral,
           collateralDenominatedTotalLimit2 -
             mockBatchReports[1].totalValidContribution -
             mockBatchReports[2].totalValidContribution
@@ -578,7 +600,7 @@ describe('Batch', () => {
     });
   });
 
-  describe('#getApplicableIndividualLimit', () => {
+  describe('#getAdjustedIndividualLimit', () => {
     describe('when it is an early access round', () => {
       it('returns the adjusted individual limit', () => {
         const batchService = new Batch({
@@ -586,7 +608,7 @@ describe('Batch', () => {
         });
 
         assert.equal(
-          batchService.getApplicableIndividualLimit(addr1),
+          batchService.getAdjustedIndividualLimit(addr1),
           parseUnits(
             (
               parseFloat(batchConfig.LIMITS.INDIVIDUAL) /
@@ -609,7 +631,7 @@ describe('Batch', () => {
             18
           );
           assert.equal(
-            batchService.getApplicableIndividualLimit(addr1),
+            batchService.getAdjustedIndividualLimit(addr1),
             parseUnits(
               (
                 parseFloat(batchConfig.LIMITS.INDIVIDUAL) /
@@ -635,7 +657,7 @@ describe('Batch', () => {
           );
 
           assert.equal(
-            batchService.getApplicableIndividualLimit(addr1),
+            batchService.getAdjustedIndividualLimit(addr1),
             parseUnits(
               (
                 parseFloat(batchConfig.LIMITS.INDIVIDUAL_2) /

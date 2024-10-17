@@ -1,16 +1,19 @@
 {
-  "TIMEFRAME": {
-    "FROM_TIMESTAMP": 100,
-    "TO_TIMESTAMP": 200
-  },
   "VESTING_DETAILS": {
-    "START": 0,
-    "CLIFF": 0,
-    "END": 0
+    "START": "1729125502",
+    "CLIFF": "60",
+    "END": "1729125562"
+  },
+  "TIMEFRAME": {
+    "FROM_TIMESTAMP": "1729125442",
+    "TO_TIMESTAMP": "1729125580"
   },
   "LIMITS": {
-    "TOTAL": "500000",
-    "INDIVIDUAL": "5000"
+    "INDIVIDUAL": "10000",
+    "INDIVIDUAL_2": "0",
+    "TOTAL": "200000",
+    "TOTAL_2": "0"
   },
+  "PRICE": "0.37",
   "IS_EARLY_ACCESS": true
 }

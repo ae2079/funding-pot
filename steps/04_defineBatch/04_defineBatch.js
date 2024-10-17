@@ -35,11 +35,12 @@ export const defineBatch = async ({
 
   // no valid contributions => no allocations
   // => no batch buy => no vestings
-  if (batchService.data.totalValidContribution === 0n) return;
+  if (batchService.data.totalValidContribution.inCollateral === 0n)
+    return;
 
   // get amountOut based on aggregate valid contributions
   const additionalIssuance = await queryService.getAmountOut(
-    batchService.data.totalValidContribution
+    batchService.data.totalValidContribution.inCollateral
   );
 
   // calculate allocations
