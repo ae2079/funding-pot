@@ -10,30 +10,22 @@ export class Batch {
       limits: {
         totalLimit: {
           inDollar: batchConfig.LIMITS.TOTAL,
-          inCollateral: this.denominatedInCollateral(
-            batchConfig.LIMITS.TOTAL,
-            batchConfig.PRICE
-          ),
         },
         totalLimit2: {
           inDollar: batchConfig.LIMITS.TOTAL_2,
-          inCollateral: this.denominatedInCollateral(
-            batchConfig.LIMITS.TOTAL_2,
-            batchConfig.PRICE
-          ),
         },
         individualLimit: {
-          inDollar: batchConfig.LIMITS.INDIVIDUAL,
-          inCollateral: this.denominatedInCollateral(
+          inDollar: parseFloat(batchConfig.LIMITS.INDIVIDUAL),
+          inCollateral: this.toCollateral(
             batchConfig.LIMITS.INDIVIDUAL,
             batchConfig.PRICE
           ),
         },
         individualLimit2: {
-          inDollar: batchConfig.LIMITS.INDIVIDUAL_2,
+          inDollar: parseFloat(batchConfig.LIMITS.INDIVIDUAL_2),
           inCollateral:
             batchConfig.LIMITS.INDIVIDUAL_2 &&
-            this.denominatedInCollateral(
+            this.toCollateral(
               batchConfig.LIMITS.INDIVIDUAL_2,
               batchConfig.PRICE
             ),
@@ -50,12 +42,10 @@ export class Batch {
     // we need to consider how much was already contributed in previous batches
     for (const reportNr in batchReports) {
       const report = batchReports[reportNr];
-      this.config.limits.totalLimit.inCollateral -= BigInt(
-        report.batch.data.totalValidContribution.inCollateral
-      );
-      this.config.limits.totalLimit2.inCollateral -= BigInt(
-        report.batch.data.totalValidContribution.inCollateral
-      );
+      this.config.limits.totalLimit.inDollar -=
+        report.batch.data.totalValidContribution.inDollar;
+      this.config.limits.totalLimit2.inDollar -=
+        report.batch.data.totalValidContribution.inDollar;
 
       for (const address in report.batch.data.participants) {
         const contribution = report.batch.data.participants[address];
@@ -78,6 +68,14 @@ export class Batch {
       }
     }
 
+    this.config.limits.totalLimit.inCollateral = this.toCollateral(
+      this.config.limits.totalLimit.inDollar,
+      this.config.price
+    );
+    this.config.limits.totalLimit2.inCollateral = this.toCollateral(
+      this.config.limits.totalLimit2.inDollar,
+      this.config.price
+    );
     this.data = { aggregatedPreviousContributions };
   }
 
@@ -134,7 +132,8 @@ export class Batch {
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
       const individualDiff =
-        adjustedIndividualLimit - (prevValid + contribution);
+        adjustedIndividualLimit.inCollateral -
+        (prevValid + contribution);
 
       // means that the individual cap has been exceeded
       if (individualDiff < 0n) {
@@ -336,6 +335,62 @@ export class Batch {
       });
   }
 
+  getAdjustedIndividualLimit(participant) {
+    // if it's an early access round, return the adjustedIndividualLimit
+    // which is based on the defined individual limti per batch and all contributions
+    // that have been made previously by the participant
+    if (this.config.isEarlyAccess) {
+      // has the participant already contributed?
+      const previousContribution =
+        this.data.aggregatedPreviousContributions[participant];
+
+      if (previousContribution) {
+        const dollarAmount = previousContribution.inDollar;
+        const inDollar =
+          this.config.limits.individualLimit.inDollar - dollarAmount;
+        const inCollateral = this.toCollateral(
+          inDollar,
+          this.config.price
+        );
+        return { inDollar, inCollateral };
+      } else {
+        return {
+          inCollateral: this.toCollateral(
+            this.config.limits.individualLimit.inDollar,
+            this.config.price
+          ),
+          inDollar: this.config.limits.individualLimit.inDollar,
+        };
+      }
+
+      // if it is not an early access round the rules are different
+    } else if (!this.config.isEarlyAccess) {
+      // if all total aggregated valid contribution is less than the total limit
+      // the individual can contribute up to `LIMIT` (=> can contribute more)
+      if (
+        this.data.totalValidContribution.inCollateral <
+        this.config.limits.totalLimit.inCollateral
+      ) {
+        return {
+          inDollar: this.config.limits.individualLimit.inDollar,
+          inCollateral: this.toCollateral(
+            this.config.limits.individualLimit.inDollar,
+            this.config.price
+          ),
+        };
+      } else {
+        // if the "soft total limit has been reached", the individual limit is lowered to `LIMIT_2`
+        return {
+          inCollateral: this.toCollateral(
+            this.config.limits.individualLimit2.inDollar,
+            this.config.price
+          ),
+          inDollar: this.config.limits.individualLimit2.inDollar,
+        };
+      }
+    }
+  }
+
   // STATIC
 
   bigIntToFloat(bigInt) {
@@ -364,35 +419,15 @@ export class Batch {
     );
   }
 
-  getAdjustedIndividualLimit(participant) {
-    // if it's an early access round, return the adjustedIndividualLimit
-    // which is based on the defined individual limti per batch and all contributions
-    // that have been made previously by the participant
-    if (this.config.isEarlyAccess) {
-      return this.data.aggregatedPreviousContributions[participant]
-        ? this.config.limits.individualLimit.inCollateral -
-            this.data.aggregatedPreviousContributions[participant]
-              .inCollateral
-        : this.config.individualLimit.individualLimit.inCollateral;
-      // if it is not an early access round the rules are different
-    } else if (!this.config.isEarlyAccess) {
-      // if all total aggregated valid contribution is less than the total limit
-      // the individual can contribute up to `LIMIT` (=> can contribute more)
-      if (
-        this.data.totalValidContribution.inCollateral <
-        this.config.limits.totalLimit.inCollateral
-      ) {
-        return this.config.limits.individualLimit.inCollateral;
-      } else {
-        // if the "soft total limit has been reached", the individual limit is lowered to `LIMIT_2`
-        return this.config.limits.individualLimit2.inCollateral;
-      }
-    }
-  }
-
   // HELPERS
   toDollar(amount, price) {
     const amountReadable = parseFloat(formatUnits(amount, 18));
     return amountReadable * price;
+  }
+
+  toCollateral(dollarAmount, price) {
+    const collateralAmountReadable =
+      parseFloat(dollarAmount) / parseFloat(price);
+    return parseUnits(collateralAmountReadable.toString(), 18);
   }
 }

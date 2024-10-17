@@ -54,7 +54,10 @@ export const main = async (projectName, batchNr) => {
 
   console.dir(batchService, { depth: null });
 
-  if (batchService.data.totalValidContribution > 0n) {
+  if (
+    batchService.data.totalValidContribution.inCollateral > 0n &&
+    !batchConfig.ONLY_REPORT
+  ) {
     // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
     console.info(`5️⃣ Proposing batch...`);
     await proposeBatch({

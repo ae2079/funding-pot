@@ -14,11 +14,11 @@ export const proposeBatch = async ({
   transactionBuilderService.approve(
     collateralToken,
     bondingCurve,
-    totalValidContribution
+    totalValidContribution.inCollateral
   );
 
   // add batch buy tx
-  transactionBuilderService.buy(totalValidContribution);
+  transactionBuilderService.buy(totalValidContribution.inCollateral);
 
   // send issuance tokens to payment router˚
   transactionBuilderService.transferTokens(

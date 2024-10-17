@@ -217,7 +217,7 @@ export const getBatchConfig = async (safe) => {
   batchConfig.LIMITS.TOTAL_2 = totalLimit2;
   batchConfig.PRICE = price;
 
-  batchConfig.IS_EARLY_ACCESS = false;
+  batchConfig.IS_EARLY_ACCESS = true;
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
