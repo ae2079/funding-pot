@@ -205,8 +205,9 @@ export class Batch {
       const { validContribution } = participants[address];
       if (!validContribution) continue;
 
-      const validContributionFloat =
-        this.bigIntToFloat(validContribution);
+      const validContributionFloat = this.bigIntToFloat(
+        validContribution.inCollateral
+      );
 
       const contributionShare =
         validContributionFloat / totalValidContributionFloat;

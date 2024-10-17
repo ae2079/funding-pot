@@ -52,8 +52,6 @@ export const main = async (projectName, batchNr) => {
     allowlist,
   });
 
-  console.dir(batchService, { depth: null });
-
   if (
     batchService.data.totalValidContribution.inCollateral > 0n &&
     !batchConfig.ONLY_REPORT
