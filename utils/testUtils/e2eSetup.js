@@ -191,12 +191,12 @@ export const getBatchConfig = async (safe) => {
     LIMITS: {},
   };
 
-  const minContribution = 10_000_000_000_000_000_000;
-  const maxContribution = 10_000_000_000_000_000_000_000;
-  const individualLimit = '15000';
-  const individualLimit2 = '0';
+  const minContribution = 10_000_000_000_000_000;
+  const maxContribution = 10_000_000_000_000_000_000;
+  const individualLimit = '5000';
+  const individualLimit2 = '500';
   const totalLimit = '300000';
-  const totalLimit2 = '0';
+  const totalLimit2 = '305000';
   const price = '0.37';
 
   const { owner, delegate } = clients;
