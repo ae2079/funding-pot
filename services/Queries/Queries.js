@@ -76,37 +76,13 @@ export class Queries {
 
   // QUERIES
 
-  async getTimeframe({ configuration, safe }) {
+  async getTimeframe({ configuration }) {
     const timeframe = {};
-
-    if (configuration && configuration.FROM_TIMESTAMP) {
-      timeframe.fromTimestamp = configuration.FROM_TIMESTAMP;
-    } else {
-      timeframe.fromTimestamp = (
-        await this.getLastPurchaseBlock(safe)
-      ).toString();
-    }
-
-    if (configuration && configuration.TO_TIMESTAMP) {
-      timeframe.toTimestamp = configuration.TO_TIMESTAMP;
-    } else {
-      timeframe.toTimestamp = (
-        await this.getCurrentBlockNumber()
-      ).toString();
-    }
-
+    timeframe.fromTimestamp = configuration.FROM_TIMESTAMP;
+    timeframe.toTimestamp = configuration.TO_TIMESTAMP;
     this.queries.timeframe = timeframe;
 
     return this.queries.timeframe;
-  }
-
-  async getLastPurchaseBlock(multisig) {
-    const {
-      Swap: [lastBuy],
-    } = await this.indexerConnector(
-      queryBuilder.indexer.lastBuyBlocknumber(multisig, this.chainId)
-    );
-    return lastBuy.blockTimestamp;
   }
 
   async getCurrentBlockNumber() {
@@ -142,13 +118,28 @@ export class Queries {
     const timerKey = '  ⏱️ Getting inflows (ANKR API)';
     console.time(timerKey);
 
-    const transactions = await this.ankrProvider.getTokenTransfers({
-      address: recipient,
-      fromTimestamp,
-      toTimestamp,
-      blockchain: this.networkIdString,
-      pageSize: 10000,
-    });
+    let transactions;
+
+    let attempts = 0;
+    for (let i = 0; i < 10; i++) {
+      try {
+        transactions = await this.ankrProvider.getTokenTransfers({
+          address: recipient,
+          fromTimestamp,
+          toTimestamp,
+          blockchain: this.networkIdString,
+          pageSize: 10000,
+        });
+        break;
+      } catch (e) {
+        if (e.data.includes('context deadline exceeded')) {
+          console.error('  ❌ Ankr API error, retrying...');
+          attempts++;
+        } else {
+          throw e;
+        }
+      }
+    }
 
     const inflows = transactions.transfers
       .filter(
@@ -200,13 +191,29 @@ export class Queries {
   }
 
   async getNftHolders(token) {
+    let holders;
+
     const timerKey = '  ⏱️ Getting NFT holders (ANKR API)';
     console.time(timerKey);
 
-    const { holders } = await this.ankrProvider.getNFTHolders({
-      blockchain: this.networkIdString,
-      contractAddress: token,
-    });
+    let attempts = 0;
+    for (let i = 0; i < 10; i++) {
+      try {
+        ({ holders } = await this.ankrProvider.getNFTHolders({
+          blockchain: this.networkIdString,
+          contractAddress: token,
+        }));
+        break;
+      } catch (e) {
+        if (e.data.includes('context deadline exceeded')) {
+          console.error('  ❌ Ankr API error, retrying...');
+          attempts++;
+        } else {
+          throw e;
+        }
+      }
+    }
+
     this.queries.nftHolders = holders.map((h) => h.toLowerCase());
     console.timeEnd(timerKey);
     return this.queries.nftHolders;

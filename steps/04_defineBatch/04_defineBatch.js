@@ -12,7 +12,6 @@ export const defineBatch = async ({
   const { fromTimestamp, toTimestamp } =
     await queryService.getTimeframe({
       configuration: TIMEFRAME,
-      address: SAFE,
     });
 
   // get inflows

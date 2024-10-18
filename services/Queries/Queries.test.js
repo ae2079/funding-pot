@@ -41,25 +41,6 @@ describe('Queries', () => {
     });
   });
 
-  describe('#getLastPurchaseBlock', () => {
-    const mockMulitSigAddress =
-      '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
-
-    const queryService = new Queries({
-      indexerUrl: process.env.INDEXER_URL,
-      rpcUrl: process.env.RPC_URL,
-      chainId: process.env.CHAIN_ID,
-      backendUrl: process.env.BACKEND_URL,
-    });
-
-    it('should return the blocknumber of the BUY', async () => {
-      const fromTimestamp = await queryService.getLastPurchaseBlock(
-        mockMulitSigAddress
-      );
-      assert.equal(fromTimestamp, 1728988940);
-    });
-  });
-
   describe('#getCurrentBlockNumber', () => {
     const queryService = new Queries({
       indexerUrl: process.env.INDEXER_URL,
@@ -168,21 +149,6 @@ describe('Queries', () => {
     queryService.queries.addresses = {
       orchestrator: projectConfig.ORCHESTRATOR,
     };
-    const mockSafe = '0x6747772f37a4F7CfDEA180D38e8ad372516c9548';
-
-    describe('with no configuration', () => {
-      it('returns the timeframe from the last purchase block to the current block', async () => {
-        const timeframe = await queryService.getTimeframe({
-          configuration: undefined,
-          safe: mockSafe,
-        });
-        assert.equal(timeframe.fromTimestamp, '1728988940');
-        assert.equal(
-          timeframe.toTimestamp > timeframe.fromTimestamp,
-          true
-        );
-      });
-    });
 
     describe('with configuration', () => {
       const configuration = {
@@ -193,7 +159,6 @@ describe('Queries', () => {
       it('returns the timeframe from the last purchase block to the current block', async () => {
         const timeframe = await queryService.getTimeframe({
           configuration: configuration,
-          safe: mockSafe,
         });
         assert.equal(timeframe.fromTimestamp, '1725654505');
         assert.equal(timeframe.toTimestamp, '1725655119');

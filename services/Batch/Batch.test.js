@@ -140,13 +140,6 @@ describe('Batch', () => {
       });
 
       it('adjusts the totalLimit1', () => {
-        console.log(
-          batchService.config.limits.totalLimit.inCollateral
-        );
-        console.log(collateralDenominatedTotalLimit);
-        console.log(mockBatchReports[1].totalValidContribution);
-        console.log(mockBatchReports[2].totalValidContribution);
-
         assert.equal(
           batchService.config.limits.totalLimit.inCollateral,
           collateralDenominatedTotalLimit -
