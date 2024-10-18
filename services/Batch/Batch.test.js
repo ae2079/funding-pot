@@ -139,7 +139,7 @@ describe('Batch', () => {
         batchReports: mockBatchReports,
       });
 
-      it.only('adjusts the totalLimit1', () => {
+      it('adjusts the totalLimit1', () => {
         console.log(
           batchService.config.limits.totalLimit.inCollateral
         );

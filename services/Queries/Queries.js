@@ -36,6 +36,9 @@ export class Queries {
   }
 
   async setup(orchestratorAddress) {
+    const timerKey = '  ⏱️ Getting relevant addresses (RPC)';
+    console.time(timerKey);
+
     const orchestrator = getContract({
       address: orchestratorAddress,
       client: this.publicClient,
@@ -67,6 +70,8 @@ export class Queries {
         this.queries.addresses.paymentRouter = module;
       }
     }
+
+    console.timeEnd(timerKey);
   }
 
   // QUERIES
@@ -111,20 +116,32 @@ export class Queries {
   }
 
   async getAmountOut(collateralIn) {
+    const timerKey = '  ⏱️ Getting purchase amount (RPC)';
+    console.time(timerKey);
+
     this.queries.amountOut =
       await this.bondingCurve.read.calculatePurchaseReturn([
         collateralIn,
       ]);
+    console.timeEnd(timerKey);
     return this.queries.amountOut;
   }
 
   async getIssuanceSupply() {
+    const timerKey = '  ⏱️ Getting issuance supply (RPC)';
+    console.time(timerKey);
+
     this.queries.issuanceSupply =
       await this.bondingCurve.read.getVirtualIssuanceSupply();
+    console.timeEnd(timerKey);
+
     return this.queries.issuanceSupply;
   }
 
   async getInflows(token, recipient, fromTimestamp, toTimestamp) {
+    const timerKey = '  ⏱️ Getting inflows (ANKR API)';
+    console.time(timerKey);
+
     const transactions = await this.ankrProvider.getTokenTransfers({
       address: recipient,
       fromTimestamp,
@@ -159,55 +176,50 @@ export class Queries {
       .sort((a, b) => a.timestamp - b.timestamp);
 
     this.queries.inflows = inflows;
+
+    console.timeEnd(timerKey);
     return this.queries.inflows;
   }
 
   async getIssuanceToken() {
+    const timerKey = '  ⏱️ Getting issuance token (RPC)';
+    console.time(timerKey);
     this.queries.issuanceToken =
       await this.bondingCurve.read.getIssuanceToken();
+    console.timeEnd(timerKey);
     return this.queries.issuanceToken;
   }
 
   async getSpotPrice() {
+    const timerKey = '  ⏱️ Getting spot price (RPC)';
+    console.time(timerKey);
     this.queries.spotPrice =
       await this.bondingCurve.read.getStaticPriceForBuying();
+    console.timeEnd(timerKey);
     return this.queries.spotPrice;
   }
 
-  async getBalances() {
-    const { LinearVesting: vestings } = await this.indexerConnector(
-      queryBuilder.indexer.vestings(
-        this.chainId,
-        this.queries.addresses.orchestrator
-      )
-    );
-
-    const vestedBalances = vestings.reduce((acc, vesting) => {
-      if (!acc[vesting.recipient]) {
-        acc[vesting.recipient] = BigInt(vesting.amountRaw);
-      } else {
-        acc[vesting.recipient] += BigInt(vesting.amountRaw);
-      }
-      return acc;
-    }, {});
-
-    this.queries.vestedBalances = keysToLowerCase(vestedBalances);
-    return this.queries.vestedBalances;
-  }
-
   async getNftHolders(token) {
+    const timerKey = '  ⏱️ Getting NFT holders (ANKR API)';
+    console.time(timerKey);
+
     const { holders } = await this.ankrProvider.getNFTHolders({
       blockchain: this.networkIdString,
       contractAddress: token,
     });
     this.queries.nftHolders = holders.map((h) => h.toLowerCase());
+    console.timeEnd(timerKey);
     return this.queries.nftHolders;
   }
 
   async getAllowlist() {
+    const timerKey = '  ⏱️ Getting allowlist (QACC API)';
+    console.time(timerKey);
+
     const {
       batchMintingEligibleUsers: { users },
     } = await this.backendConnector(queryBuilder.backend.allowlist());
+    console.timeEnd(timerKey);
     return users;
   }
 
@@ -217,7 +229,6 @@ export class Queries {
       client: this.publicClient,
       abi: abis.mintWrapperAbi,
     });
-
     return await mintWrapper.read.issuanceToken();
   }
 

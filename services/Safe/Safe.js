@@ -41,7 +41,13 @@ export class Safe {
       });
     }
 
-    for (const batchTxs of txs) {
+    for (let i = 0; i < txs.length; i++) {
+      const batchTxs = txs[i];
+      const timerKey = `  ⏱️ Proposing multisend batch ${
+        i + 1
+      } to Safe`;
+      console.time(timerKey);
+
       const nonce = await this.apiKit.getNextNonce(this.safeAddress);
       const safeTransaction =
         await this.protocolKit.createTransaction({
@@ -64,6 +70,7 @@ export class Safe {
       });
 
       this.safeTransactions.push({ safeTxHash });
+      console.timeEnd(timerKey);
     }
   }
 

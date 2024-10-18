@@ -158,28 +158,6 @@ describe('Queries', () => {
     });
   });
 
-  describe('#getBalances', () => {
-    const queryService = new Queries({
-      indexerUrl: process.env.INDEXER_URL,
-      rpcUrl: process.env.RPC_URL,
-      chainId: process.env.CHAIN_ID,
-      backendUrl: process.env.BACKEND_URL,
-    });
-    queryService.queries.addresses = {
-      orchestrator: projectConfig.ORCHESTRATOR,
-    };
-
-    it('gets aggregate vestings', async () => {
-      const vestings = await queryService.getBalances();
-
-      assert.deepStrictEqual(vestings, {
-        '0xcb1edf0e617c0fab6408701d58b746451ee6ce2f': 28n,
-        '0xb4f8d886e9e831b6728d16ed7f3a6c27974abaa4': 82n,
-        '0xcacc010ec451cb33a7ae7cba14de0a49293c2877': 7n,
-      });
-    });
-  });
-
   describe('#getTimeframe', () => {
     const queryService = new Queries({
       indexerUrl: process.env.INDEXER_URL,
