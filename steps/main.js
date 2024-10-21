@@ -52,10 +52,7 @@ export const main = async (projectName, batchNr) => {
     allowlist,
   });
 
-  if (
-    batchService.data.totalValidContribution.inCollateral > 0n &&
-    !batchConfig.ONLY_REPORT
-  ) {
+  if (batchService.data.totalValidContribution.inCollateral > 0n) {
     // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
     console.info(`5️⃣ Proposing batch...`);
     await proposeBatch({
@@ -63,6 +60,7 @@ export const main = async (projectName, batchNr) => {
       queryService,
       transactionBuilderService,
       safeService,
+      skipPropose: batchConfig.ONLY_REPORT,
     });
   }
 
@@ -73,6 +71,9 @@ export const main = async (projectName, batchNr) => {
     safeService,
     transactionBuilderService,
     queryService,
+    projectConfig,
+    batchConfig,
+    batchReports,
   });
 
   console.info(`🏁 Batch execution complete!`);

@@ -3,6 +3,7 @@ import {
   http,
   getContract,
   parseUnits,
+  getAddress,
 } from 'viem';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 
@@ -199,10 +200,11 @@ export class Queries {
     let attempts = 0;
     for (let i = 0; i < 10; i++) {
       try {
-        ({ holders } = await this.ankrProvider.getNFTHolders({
+        const x = await this.ankrProvider.getNFTHolders({
           blockchain: this.networkIdString,
-          contractAddress: token,
-        }));
+          contractAddress: getAddress(token),
+        });
+        ({ holders } = x);
         break;
       } catch (e) {
         if (e.data.includes('context deadline exceeded')) {

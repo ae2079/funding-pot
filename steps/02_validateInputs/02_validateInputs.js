@@ -121,6 +121,10 @@ const validatebatchReports = ({ batchReports, batchNr }) => {
 
   const reportNumbers = Object.keys(batchReports);
 
+  if (reportNumbers.includes(batchNr.toString())) {
+    throw new Error(`Report already exists for batchNr ${batchNr}`);
+  }
+
   if (batchNr - reportNumbers.length > 1)
     throw new Error(
       `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous batchReports`

@@ -15,6 +15,9 @@ export const storeReport = async (
     safeService,
     transactionBuilderService,
     queryService,
+    projectConfig,
+    batchConfig,
+    batchReports,
   }
 ) => {
   const report = {
@@ -29,6 +32,11 @@ export const storeReport = async (
       encoded: transactionBuilderService.getEncodedTxBatches(),
     },
     queries: queryService.queries,
+    inputs: {
+      projectConfig,
+      batchConfig,
+    },
+    batchReports,
   };
 
   const basePath = path.join(

@@ -169,7 +169,7 @@ To run the script for one project use the following command:
 
 The following command will run the script for the 3rd batch of the project `FUNKY_FOXES`:
 
-`npm run project "FUNKY_FOXES" 3`
+`npm run project 3 "FUNKY_FOXES"`
 
 ### Checking the script's output
 

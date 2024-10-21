@@ -3,6 +3,7 @@ export const proposeBatch = async ({
   batchService,
   transactionBuilderService,
   safeService,
+  skipPropose = false,
 }) => {
   const { totalValidContribution, additionalIssuance } =
     batchService.data;
@@ -35,6 +36,8 @@ export const proposeBatch = async ({
 
   // get encoded tx batches from transaction service
   const txBatches = transactionBuilderService.getEncodedTxBatches();
+
+  if (skipPropose) return;
 
   // propose tx batches
   await safeService.proposeTxs(txBatches);

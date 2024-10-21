@@ -210,10 +210,7 @@ export const batchReportData = {
   additionalIssuance: 48700550011355454828n,
 };
 
-export const nftHolders = [
-  '0x6747772f37a4f7cfdea180d38e8ad372516c9548',
-  '0xa6e12ede427516a56a5f6ab6e06dd335075eb04b',
-];
+export const nftHolders = [addresses.addr1, addresses.addr2];
 
 export const mockCollateralToken =
   '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80';

@@ -1,3 +1,4 @@
+import assert from 'node:assert';
 import { parseUnits } from 'viem';
 import * as chains from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
@@ -59,3 +60,11 @@ export const inCollateral = (tokenAmount, unitPrice) => {
     18
   );
 };
+
+export function assertAlmostEqual(actual, expected, epsilon = 1e-9) {
+  const diff = Math.abs(actual - expected);
+  assert(
+    diff < epsilon,
+    `Expected ${actual} to be close to ${expected} (within ${epsilon})`
+  );
+}
