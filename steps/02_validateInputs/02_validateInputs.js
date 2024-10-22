@@ -118,7 +118,6 @@ const validateConfigs = ({
 
 const validatebatchReports = ({ batchReports, batchNr }) => {
   const reportNumbers = Object.keys(batchReports);
-
   const reportAlreadyExists = reportNumbers.includes(
     batchNr.toString()
   );

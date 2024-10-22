@@ -41,9 +41,6 @@ const loadbatchReports = (projectName, batch) => {
 
   const batchReports = {};
 
-  // for the first batch dont search for previous reports
-  if (batch == 1) return { batchReports };
-
   try {
     const files = fs.readdirSync(batchReportsPath);
     files.forEach((file) => {
@@ -52,13 +49,10 @@ const loadbatchReports = (projectName, batch) => {
       const key = path.basename(file, '.json');
       batchReports[key] = JSON.parse(report);
     });
-    if (Object.keys(batchReports).length > 0) {
-      return { batchReports };
-    }
   } catch (err) {
-    console.error('ERROR - could not read batchReports:', err);
+    console.info('❗ No previous reports found');
   }
-  return batchReports;
+  return { batchReports };
 };
 
 const getBasePath = (dataType) =>

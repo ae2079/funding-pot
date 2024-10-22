@@ -37,7 +37,10 @@ export const proposeBatch = async ({
   // get encoded tx batches from transaction service
   const txBatches = transactionBuilderService.getEncodedTxBatches();
 
-  if (skipPropose) return;
+  if (skipPropose) {
+    console.log('❗ Not proposing because ONLY_REPORT flag is set');
+    return;
+  }
 
   // propose tx batches
   await safeService.proposeTxs(txBatches);
