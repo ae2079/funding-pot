@@ -17,7 +17,7 @@ export const main = async (projectName, batchNr) => {
 
   // checks if all required inputs are set in configs
   console.info(`2️⃣ Validating inputs...`);
-  validateInputs({
+  const { skip } = validateInputs({
     batchNr,
     projectsConfig,
     projectName,
@@ -25,6 +25,13 @@ export const main = async (projectName, batchNr) => {
     allowlist,
     batchReports,
   });
+
+  if (skip) {
+    console.info(
+      `🚫 Report already exist, skipping project batch...`
+    );
+    return;
+  }
 
   // deconstruct project config
   const projectConfig = projectsConfig[projectName];

@@ -13,7 +13,9 @@ export const validateInputs = ({
     projectName,
     batchConfig,
   });
-  validatebatchReports({ batchNr, batchReports });
+  const { skip } = validatebatchReports({ batchNr, batchReports });
+
+  return { skip };
 };
 
 const validateEnvVars = () => {
@@ -121,10 +123,6 @@ const validatebatchReports = ({ batchReports, batchNr }) => {
 
   const reportNumbers = Object.keys(batchReports);
 
-  if (reportNumbers.includes(batchNr.toString())) {
-    throw new Error(`Report already exists for batchNr ${batchNr}`);
-  }
-
   if (batchNr - reportNumbers.length > 1)
     throw new Error(
       `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous batchReports`
@@ -135,6 +133,8 @@ const validatebatchReports = ({ batchReports, batchNr }) => {
       throw new Error(`Report missing for batchNr ${i}`);
     }
   }
+
+  return { skip: reportNumbers.includes(batchNr.toString()) };
 };
 
 const throwConfigError = (msg, { projectName }) => {
