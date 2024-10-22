@@ -117,11 +117,19 @@ const validateConfigs = ({
 };
 
 const validatebatchReports = ({ batchReports, batchNr }) => {
-  if (batchNr == 1) return;
+  const reportNumbers = Object.keys(batchReports);
+
+  const reportAlreadyExists = reportNumbers.includes(
+    batchNr.toString()
+  );
+
+  if (reportAlreadyExists) {
+    return { skip: true };
+  }
+
+  if (batchNr == 1) return { skip: false };
 
   if (!batchReports) throw new Error('batchReports missing');
-
-  const reportNumbers = Object.keys(batchReports);
 
   if (batchNr - reportNumbers.length > 1)
     throw new Error(
@@ -134,7 +142,7 @@ const validatebatchReports = ({ batchReports, batchNr }) => {
     }
   }
 
-  return { skip: reportNumbers.includes(batchNr.toString()) };
+  return { skip: false };
 };
 
 const throwConfigError = (msg, { projectName }) => {
