@@ -23,7 +23,10 @@ export const defineBatch = async ({
   );
 
   // get nft holders
-  const nftHolders = await queryService.getNftHolders(NFT);
+  const nftHolders = await queryService.getNftHoldersForInflows(
+    NFT,
+    inflows
+  );
 
   // get allowlist
   const allowlist = await queryService.getAllowlist();

@@ -102,17 +102,17 @@ export class Batch {
 
       // if the inflow is not on the allowlist, everything is invalid contribution
       // OR if it's an early access batch and the participant is not an NFT holder
-      // if (
-      //   !allowlist.includes(participant) ||
-      //   (this.config.isEarlyAccess &&
-      //     !nftHolders.includes(participant))
-      // ) {
-      //   this.manageContribution(inflow, {
-      //     invalidContribution: contribution,
-      //     invalidReason: 'not on allowlist',
-      //   });
-      //   continue;
-      // }
+      if (
+        !allowlist.includes(participant) ||
+        (this.config.isEarlyAccess &&
+          !nftHolders.includes(participant))
+      ) {
+        this.manageContribution(inflow, {
+          invalidContribution: contribution,
+          invalidReason: 'not on allowlist',
+        });
+        continue;
+      }
 
       const p = this.data.participants[participant];
       const prevValid =

@@ -130,17 +130,6 @@ const validatebatchReports = ({ batchReports, batchNr }) => {
 
   if (!batchReports) throw new Error('batchReports missing');
 
-  if (batchNr - reportNumbers.length > 1)
-    throw new Error(
-      `Current batch nr is ${batchNr}, but there are only ${reportNumbers.length} previous batchReports`
-    );
-
-  for (let i = 1; i <= reportNumbers.length; i++) {
-    if (!reportNumbers.includes(i.toString())) {
-      throw new Error(`Report missing for batchNr ${i}`);
-    }
-  }
-
   return { skip: false };
 };
 

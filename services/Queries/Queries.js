@@ -221,6 +221,29 @@ export class Queries {
     return this.queries.nftHolders;
   }
 
+  async getNftHoldersForInflows(token, inflows) {
+    const timerKey = '  ⏱️ Getting NFT holders (RPC)';
+    console.time(timerKey);
+    const candidates = inflows.map((i) => i.participant);
+    const holders = [];
+
+    const nftContract = getContract({
+      address: token,
+      client: this.publicClient,
+      abi: abis.nftAbi,
+    });
+
+    for (const candidate of candidates) {
+      const balance = await nftContract.read.balanceOf([candidate]);
+      if (balance > 0) {
+        holders.push(candidate);
+      }
+    }
+    console.timeEnd(timerKey);
+    this.queries.nftHolders = [...new Set(holders)];
+    return this.queries.nftHolders;
+  }
+
   async getAllowlist() {
     const timerKey = '  ⏱️ Getting allowlist (QACC API)';
     console.time(timerKey);

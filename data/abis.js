@@ -4959,4 +4959,25 @@ export default {
       ],
     },
   ],
+  nftAbi: [
+    {
+      inputs: [
+        {
+          internalType: 'address',
+          name: 'owner',
+          type: 'address',
+        },
+      ],
+      name: 'balanceOf',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: 'balance',
+          type: 'uint256',
+        },
+      ],
+      stateMutability: 'view',
+      type: 'function',
+    },
+  ],
 };
