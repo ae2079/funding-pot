@@ -142,7 +142,7 @@ e) copy the address shown under `modules`
 
 #### Step 2: Create vesting transactions
 
-1. For a given project, get the address of the `LM_PC_PaymentRouter_v1` and paste it into the transaction builder. **DONT USE ORCHESTRATOR ADDRESS!**
+1. For a given project, get the address of the `LM_PC_PaymentRouter_v1` and paste it into the transaction builder. **THIS IS THE SAME ADDRESS THAT YOU GOT IN THE PREVIOUS STEP. DONT USE ORCHESTRATOR ADDRESS!**
 2. Paste address into Safe UI's transaction builder
 3. Paste the following ABI into the ABI field
 
