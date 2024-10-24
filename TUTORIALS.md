@@ -52,13 +52,15 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 2. Choose `approve` and enter the parameters (if you pasted the JSON into the field, `approve` will already be selected):
 
 - `spender`: the address of the deployment factory (`Restricted_PIM_Factory_v1` can be obtained [here per chain id](https://github.com/InverterNetwork/deployments/blob/main/deployments/v1.0.0.json))
-- `amount`: the initial collateral supply
+- `amount`: the initial collateral supply (**don't forget to add decimals if they are not there yet, e.g. using https://eth-converter.com/**)
 
   <img width="1710" alt="Screenshot 2024-10-16 at 00 23 39" src="https://github.com/user-attachments/assets/230f8a06-4a31-4fe3-8ecb-89b6ef29ecd9">
 
-3. Add transaction
+3. Add transaction to batch
 
 #### Step 2: Add funding to factory
+
+0. Add additional transaction
 
 1. Paste address of deployment factory (`Restricted_PIM_Factory_v1` can be obtained [here per chain id](https://github.com/InverterNetwork/deployments/blob/main/deployments/v1.0.0.json)); Pasting the address should trigger the UI to change and display the different functions in the bottom of the page; If not paste the following block into the ABI section.
 
