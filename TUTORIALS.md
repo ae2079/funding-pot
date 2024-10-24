@@ -60,7 +60,7 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 
 #### Step 2: Add funding to factory
 
-0. Add additional transaction
+NEW TRANSACTION
 
 1. Paste address of deployment factory (`Restricted_PIM_Factory_v1` can be obtained [here per chain id](https://github.com/InverterNetwork/deployments/blob/main/deployments/v1.0.0.json)); Pasting the address should trigger the UI to change and display the different functions in the bottom of the page; If not paste the following block into the ABI section.
 
