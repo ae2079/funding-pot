@@ -49,7 +49,7 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 ]
 ```
 
-2. Choose `approve` and enter the parameters:
+2. Choose `approve` and enter the parameters (if you pasted the JSON into the field, `approve` will already be selected):
 
 - `spender`: the address of the deployment factory (`Restricted_PIM_Factory_v1` can be obtained [here per chain id](https://github.com/InverterNetwork/deployments/blob/main/deployments/v1.0.0.json))
 - `amount`: the initial collateral supply
