@@ -138,11 +138,7 @@ e) copy the address shown under `modules`
 
   <img width="1710" alt="Screenshot 2024-10-16 at 00 45 06" src="https://github.com/user-attachments/assets/e05d09b7-8cbf-4f28-ac91-70825363fed7">
 
-<<<<<<< Updated upstream
 2. Send all issuance tokens to this address; **DONT SEND TOKENS TO ORCHESTRATOR!**
-=======
-2. Send all issuance tokens (that are
->>>>>>> Stashed changes
 
 #### Step 2: Create vesting transactions
 
