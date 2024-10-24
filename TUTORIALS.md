@@ -68,7 +68,17 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
   "name": "addFunding",
   "inputs": [
     {
-      "name": "actor",
+      "name": "deployer",
+      "type": "address",
+      "internalType": "address"
+    },
+    {
+      "name": "beneficiary",
+      "type": "address",
+      "internalType": "address"
+    },
+    {
+      "name": "admin",
       "type": "address",
       "internalType": "address"
     },
@@ -92,7 +102,9 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 
 2. Choose `addFunding` and fill the parameters
 
-   - `actor`: is the address of the **funding pot multisig** of the project that is meant to consume the funding
+   - `deployer`: the allowlisted EOA that can deploy for this project
+   - `beneficiary`: is the address of the **funding pot multisig** of the project that is meant to consume the funding
+   - `admin`: the address of the workflow admin multisig
    - `token`: is the address of the collateral token **POL**
    - `amount`: is the initial collateral supply; don't forget to convert into the correct units; POL is using 18 decimals so you can convert from ETH into WEI via [this](https://eth-converter.com/) tool
 
@@ -124,7 +136,11 @@ e) copy the address shown under `modules`
 
   <img width="1710" alt="Screenshot 2024-10-16 at 00 45 06" src="https://github.com/user-attachments/assets/e05d09b7-8cbf-4f28-ac91-70825363fed7">
 
+<<<<<<< Updated upstream
 2. Send all issuance tokens to this address; **DONT SEND TOKENS TO ORCHESTRATOR!**
+=======
+2. Send all issuance tokens (that are
+>>>>>>> Stashed changes
 
 #### Step 2: Create vesting transactions
 
