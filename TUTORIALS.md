@@ -18,7 +18,7 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 
 #### Step 1: Approve spending of POL by factory
 
-1. Paste the token address into the address field; this should trigger the UI to display available functions in the bottom of the page; if not paste the following into the `Enter ABI` field:
+1. Paste the collateral token address into the address field; this should trigger the UI to display available functions in the bottom of the page; if not paste the following into the `Enter ABI` field:
 
 ```
 [
@@ -63,7 +63,7 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
 1. Paste address of deployment factory (`Restricted_PIM_Factory_v1` can be obtained [here per chain id](https://github.com/InverterNetwork/deployments/blob/main/deployments/v1.0.0.json)); Pasting the address should trigger the UI to change and display the different functions in the bottom of the page; If not paste the following block into the ABI section.
 
 ```
-{
+[{
   "type": "function",
   "name": "addFunding",
   "inputs": [
@@ -95,7 +95,7 @@ _As the **grant multisig**, I want to add a grant to the deployment factory, so 
   ],
   "outputs": [],
   "stateMutability": "nonpayable"
-}
+}]
 ```
 
 <img width="1709" alt="Screenshot 2024-10-16 at 00 11 34" src="https://github.com/user-attachments/assets/5b8576bb-653a-4f69-84d0-81e51888313d">
