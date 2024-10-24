@@ -193,7 +193,7 @@ e) copy the address shown under `modules`
 
 - `address`: project multisig meant to receive vested tokens
 - `paymentToken`: the ABC token for the respective project
-- `amount`: amount of tokens to be vested
+- `amount`: amount of tokens to be vested; **ADD DECIMALS**
 - `start`: the unix timestamp (seconds, not miliseconds!)
 - `cliff`: the **time period until the cliff starts in seconds**
 - `end`: the end of the vesting period in unix timestamp (seconds)
