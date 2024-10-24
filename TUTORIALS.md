@@ -120,7 +120,7 @@ _As the **funding pot multisig**, I want to create a vesting for the initial ABC
 
 1. For a given project, get the address of the `LM_PC_PaymentRouter_v1`; for this you need its orchestrator address.
 
-Option 1: via BaseScan
+Option 1: via PolygonScan
 
 a) Search for orchestrator address
 
