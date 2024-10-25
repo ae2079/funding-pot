@@ -191,7 +191,7 @@ e) copy the address shown under `modules`
 
 4. Fill the parameters:
 
-- `address`: project multisig meant to receive vested tokens
+- `address`: the address meant to receive vested tokens (e.g. project multisig, investors etc.)
 - `paymentToken`: the ABC token for the respective project
 - `amount`: amount of tokens to be vested; **ADD DECIMALS**
 - `start`: the unix timestamp (seconds, not miliseconds!)
