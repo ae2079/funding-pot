@@ -196,6 +196,7 @@ The following command will run the script for the 3rd batch for all projects def
 - the `data/production/input/projects.json` file is set
 - all environment variables are set that are also required for the funding pot script
 - your `DELEGATE`private key (set in `.env`) is delegate of the project's funding pot multisig
+- the total amount of vesting tokens has been sent to the payment router
 
 ### Necessary steps
 
