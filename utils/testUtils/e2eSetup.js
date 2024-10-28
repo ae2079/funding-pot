@@ -14,7 +14,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
-import { Inverter, getModule } from '@inverter-network/sdk';
+import { Inverter } from '@inverter-network/sdk';
 
 import {
   projectConfig,

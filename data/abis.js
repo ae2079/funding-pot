@@ -4484,7 +4484,17 @@ export default {
       name: 'addFunding',
       inputs: [
         {
-          name: 'actor',
+          name: 'deployer',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'beneficiary',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'admin',
           type: 'address',
           internalType: 'address',
         },
@@ -4748,12 +4758,17 @@ export default {
       name: 'fundings',
       inputs: [
         {
-          name: 'sponsor',
+          name: 'deployer',
           type: 'address',
           internalType: 'address',
         },
         {
-          name: 'actor',
+          name: 'beneficiary',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'admin',
           type: 'address',
           internalType: 'address',
         },
@@ -4768,6 +4783,11 @@ export default {
           name: 'amount',
           type: 'uint256',
           internalType: 'uint256',
+        },
+        {
+          name: 'sponsor',
+          type: 'address',
+          internalType: 'address',
         },
       ],
       stateMutability: 'view',
@@ -4808,7 +4828,17 @@ export default {
       name: 'withdrawFunding',
       inputs: [
         {
-          name: 'actor',
+          name: 'deployer',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'beneficiary',
+          type: 'address',
+          internalType: 'address',
+        },
+        {
+          name: 'admin',
           type: 'address',
           internalType: 'address',
         },
@@ -4837,15 +4867,27 @@ export default {
           internalType: 'address',
         },
         {
-          name: 'actor',
+          name: 'deployer',
           type: 'address',
           indexed: true,
           internalType: 'address',
         },
         {
-          name: 'token',
+          name: 'beneficiary',
           type: 'address',
           indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'admin',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'token',
+          type: 'address',
+          indexed: false,
           internalType: 'address',
         },
         {
@@ -4868,15 +4910,27 @@ export default {
           internalType: 'address',
         },
         {
-          name: 'actor',
+          name: 'deployer',
           type: 'address',
           indexed: true,
           internalType: 'address',
         },
         {
-          name: 'token',
+          name: 'beneficiary',
           type: 'address',
           indexed: true,
+          internalType: 'address',
+        },
+        {
+          name: 'admin',
+          type: 'address',
+          indexed: false,
+          internalType: 'address',
+        },
+        {
+          name: 'token',
+          type: 'address',
+          indexed: false,
           internalType: 'address',
         },
         {
@@ -4938,6 +4992,11 @@ export default {
     { type: 'error', name: 'FailedInnerCall', inputs: [] },
     {
       type: 'error',
+      name: 'FundingAlreadyAddedByDifferentSponsor',
+      inputs: [],
+    },
+    {
+      type: 'error',
       name: 'InsufficientFunding',
       inputs: [
         {
@@ -4947,6 +5006,7 @@ export default {
         },
       ],
     },
+    { type: 'error', name: 'NotAuthorized', inputs: [] },
     {
       type: 'error',
       name: 'SafeERC20FailedOperation',

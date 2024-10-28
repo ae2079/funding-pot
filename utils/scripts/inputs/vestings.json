@@ -1,0 +1,29 @@
+{
+  "VESTING_DETAILS": {
+    "START": 1,
+    "END": 3,
+    "CLIFF": 1
+  },
+  "VESTINGS": {
+    "GENERATED_TEST_PROJECT": [
+      {
+        "recipient": "0x6747772f37a4F7CfDEA180D38e8ad372516c9548",
+        "amount": "420000000000000000000"
+      },
+      {
+        "recipient": "0xa6e12EDe427516a56a5F6ab6e06dD335075eb04b",
+        "amount": "69000000000000000000"
+      }
+    ],
+    "GENERATED_TEST_PROJECT_2": [
+      {
+        "recipient": "0x6747772f37a4F7CfDEA180D38e8ad372516c9548",
+        "amount": "420000000000000000000"
+      },
+      {
+        "recipient": "0xa6e12EDe427516a56a5F6ab6e06dD335075eb04b",
+        "amount": "69000000000000000000"
+      }
+    ]
+  }
+}
