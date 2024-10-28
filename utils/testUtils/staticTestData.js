@@ -258,7 +258,7 @@ export const requestedModules = {
 };
 
 export const restrictedPimFactory =
-  '0xECEb3717bfF7D18ce6C9ca7F11C2833F249a4377';
+  '0x1dF39e3A03FE64a3d55E34e80086864b123c9f1f';
 
 export const projectConfigWithWrapper = {
   SAFE: '0x23A9afdA8301D2C4bBdA1f0bC1B990E8515647a1',

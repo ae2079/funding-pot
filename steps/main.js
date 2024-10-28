@@ -12,8 +12,10 @@ export const main = async (projectName, batchNr) => {
 
   // load configs & batchReports
   console.info(`1️⃣ Loading configs...`);
-  const { projectsConfig, batchConfig, allowlist, batchReports } =
-    loadInputs(projectName, batchNr);
+  const { projectsConfig, batchConfig, batchReports } = loadInputs(
+    projectName,
+    batchNr
+  );
 
   // checks if all required inputs are set in configs
   console.info(`2️⃣ Validating inputs...`);
@@ -22,7 +24,6 @@ export const main = async (projectName, batchNr) => {
     projectsConfig,
     projectName,
     batchConfig,
-    allowlist,
     batchReports,
   });
 
@@ -56,7 +57,6 @@ export const main = async (projectName, batchNr) => {
     batchService,
     projectConfig,
     batchConfig,
-    allowlist,
   });
 
   if (batchService.data.totalValidContribution.inCollateral > 0n) {

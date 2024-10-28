@@ -16,9 +16,7 @@ const loadConfigs = (batch) => {
   const basePath = getBasePath('input');
 
   // load project config (= project-specific constants)
-  const projectsConfig = JSON.parse(
-    fs.readFileSync(path.join(__dirname, `${basePath}/projects.json`))
-  );
+  const projectsConfig = loadProjectsConfig();
 
   // load batch config (batch-specific constants such as allowlist, start & end block, vesting schedule)
   const batchConfig = JSON.parse(
@@ -57,3 +55,10 @@ const loadbatchReports = (projectName, batch) => {
 
 const getBasePath = (dataType) =>
   `../../data/${process.env.NODE_ENV}/${dataType}`;
+
+export const loadProjectsConfig = () => {
+  const basePath = getBasePath('input');
+  return JSON.parse(
+    fs.readFileSync(path.join(__dirname, `${basePath}/projects.json`))
+  );
+};

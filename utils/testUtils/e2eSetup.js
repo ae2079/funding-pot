@@ -163,7 +163,9 @@ export const deployWorkflowViaFactory = async (
     client: walletClient,
   });
   const tx2 = await factory.write.addFunding([
+    walletClient.account.address,
     safeAddress,
+    walletClient.account.address,
     mockCollateralToken,
     parseUnits(
       args.fundingManager.bondingCurveParams.initialCollateralSupply,
