@@ -189,6 +189,64 @@ The following command will run the script for the 3rd batch for all projects def
 
 `npm run all 3`
 
+## Running the vesting script
+
+### Pre-requisites
+
+- the `data/production/input/projects.json` file is set
+- all environment variables are set that are also required for the funding pot script
+- your `DELEGATE`private key (set in `.env`) is delegate of the project's funding pot multisig
+
+### Necessary steps
+
+1. set the `vestings.json` file under `/utils/scripts/inputs/vestings.json`
+
+NOTE: there is an example file set, which you need to overwrite.
+
+The following is an example. Note that all projects share the same vesting details and each key in in `VESTINGS` corresponds to a project name. These need to be the same project names as in the `projects.json` file. Associated with each project is an array of vestings, where the recipient is the address that will receive the vesting and the amount is the amount of tokens that will be vested.
+
+```json
+{
+  "VESTING_DETAILS": {
+    "START": 1,
+    "END": 3,
+    "CLIFF": 1
+  },
+  "VESTINGS": {
+    "GENERATED_TEST_PROJECT": [
+      {
+        "recipient": "0x6747772f37a4F7CfDEA180D38e8ad372516c9548",
+        "amount": "420000000000000000000"
+      },
+      {
+        "recipient": "0xa6e12EDe427516a56a5F6ab6e06dD335075eb04b",
+        "amount": "69000000000000000000"
+      }
+    ],
+    "GENERATED_TEST_PROJECT_2": [
+      {
+        "recipient": "0x6747772f37a4F7CfDEA180D38e8ad372516c9548",
+        "amount": "420000000000000000000"
+      },
+      {
+        "recipient": "0xa6e12EDe427516a56a5F6ab6e06dD335075eb04b",
+        "amount": "69000000000000000000"
+      }
+    ]
+  }
+}
+
+2. **per project** run the script with `npm run vestings <PROJECT_NAME>`
+
+```
+
+npm run vesting:project <project_name>
+
+```
+
+This will propose a transaction to the project safe. The command needs to be repeated for each project.
+
+
 ## Technical Specification
 
 In summary this project does three things:
@@ -207,10 +265,6 @@ In summary this project does three things:
 
 ## Implementation details
 
-### Assumptions
-
-- all rewards paid out to contributors remain fully vested over the lifetime of this script
-
 ### Structure
 
 #### Data
@@ -220,28 +274,30 @@ In summary this project does three things:
 - `output`: per batch and project, a JSON report will be generated in this folder
 
 ```
+
 .
 ├── README.md
 ├── config.js
 ├── data
-│   ├── abis.js
-│   └── test
-│       ├── input
-│       │   ├── allowlist.json
-│       │   ├── batches
-│       │   │   ├── 1.json
-│       │   │   ├── 2.json
-│       │   │   └── 3.json
-│       │   └── projects.json
-│       └── output
-│           ├── GENERATED_TEST_PROJECT
-│           │   ├── 1.json
-│           │   ├── 2.json
-│           │   └── 3.json
-│           ├── STATIC_TEST_PROJECT_1
-│           └── STATIC_TEST_PROJECT_2
-│               ├── 1.json
-│               └── 2.json
+│ ├── abis.js
+│ └── test
+│ ├── input
+│ │ ├── allowlist.json
+│ │ ├── batches
+│ │ │ ├── 1.json
+│ │ │ ├── 2.json
+│ │ │ └── 3.json
+│ │ └── projects.json
+│ └── output
+│ ├── GENERATED_TEST_PROJECT
+│ │ ├── 1.json
+│ │ ├── 2.json
+│ │ └── 3.json
+│ ├── STATIC_TEST_PROJECT_1
+│ └── STATIC_TEST_PROJECT_2
+│ ├── 1.json
+│ └── 2.json
+
 ```
 
 #### Services
@@ -254,24 +310,26 @@ The services are where the most of the logic sits. All services are classes that
 - `TransactionBuilder`: contains the logic for generating transaction batches
 
 ```
+
 ├── env.js
 ├── index.js
 ├── package-lock.json
 ├── package.json
 ├── services
-│   ├── Batch
-│   │   ├── Batch.js
-│   │   └── Batch.test.js
-│   ├── Queries
-│   │   ├── Queries.js
-│   │   ├── Queries.test.js
-│   │   └── queryBuilder.js
-│   ├── Safe
-│   │   ├── Safe.js
-│   │   └── Safe.test.js
-│   └── TransactionBuilder
-│       ├── TransactionBuilder.js
-│       └── TransactionBuilder.test.js
+│ ├── Batch
+│ │ ├── Batch.js
+│ │ └── Batch.test.js
+│ ├── Queries
+│ │ ├── Queries.js
+│ │ ├── Queries.test.js
+│ │ └── queryBuilder.js
+│ ├── Safe
+│ │ ├── Safe.js
+│ │ └── Safe.test.js
+│ └── TransactionBuilder
+│ ├── TransactionBuilder.js
+│ └── TransactionBuilder.test.js
+
 ```
 
 #### Steps
@@ -286,6 +344,7 @@ The steps tie the services together and bring an order into the execution flow.
 6. `storeReport`: services "log" their logic operations; this data is used to generate a `report` json file that describes the batch
 
 ```
+
 ├── steps
 │ ├── 01_loadInputs
 │ │ ├── 01_loadInputs.js
@@ -307,13 +366,15 @@ The steps tie the services together and bring an order into the execution flow.
 │ ├── main.e2e.test.js
 │ └── main.js
 └── utils
-    ├── helpers.js
-    ├── scripts
-    │ ├── addDelegate.js
-    │ └── resetTestFiles.js
-    └── testUtils
-    ├── staticTestData.js
-    ├── testHelpers.js
-    └── unitTestRunner.js
+├── helpers.js
+├── scripts
+│ ├── addDelegate.js
+│ └── resetTestFiles.js
+└── testUtils
+├── staticTestData.js
+├── testHelpers.js
+└── unitTestRunner.js
+
+```
 
 ```
