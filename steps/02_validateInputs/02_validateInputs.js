@@ -100,7 +100,7 @@ const validateConfigs = ({
       batchConfig,
     });
 
-  if (IS_EARLY_ACCESS === true) {
+  if (IS_EARLY_ACCESS === false) {
     if (!LIMITS.TOTAL_2) {
       throwConfigError('TOTAL_2 missing or empty', {
         projectName,
