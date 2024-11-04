@@ -9,11 +9,19 @@ export class Batch {
     this.config = {
       limits: {
         totalLimit: {
-          inDollar: batchConfig.LIMITS.TOTAL,
+          inCollateral: this.toCollateral(
+            batchConfig.LIMITS.TOTAL,
+            batchConfig.PRICE
+          ),
         },
-        totalLimit2: {
-          inDollar: batchConfig.LIMITS.TOTAL_2,
-        },
+        totalLimit2: isEarlyAccess
+          ? undefined
+          : {
+              inCollateral: this.toCollateral(
+                batchConfig.LIMITS.TOTAL_2,
+                batchConfig.PRICE
+              ),
+            },
         individualLimit: {
           inDollar: parseFloat(batchConfig.LIMITS.INDIVIDUAL),
           inCollateral: this.toCollateral(
@@ -21,15 +29,17 @@ export class Batch {
             batchConfig.PRICE
           ),
         },
-        individualLimit2: {
-          inDollar: parseFloat(batchConfig.LIMITS.INDIVIDUAL_2),
-          inCollateral:
-            batchConfig.LIMITS.INDIVIDUAL_2 &&
-            this.toCollateral(
-              batchConfig.LIMITS.INDIVIDUAL_2,
-              batchConfig.PRICE
-            ),
-        },
+        individualLimit2: isEarlyAccess
+          ? undefined
+          : {
+              inDollar: parseFloat(batchConfig.LIMITS.INDIVIDUAL_2),
+              inCollateral:
+                batchConfig.LIMITS.INDIVIDUAL_2 &&
+                this.toCollateral(
+                  batchConfig.LIMITS.INDIVIDUAL_2,
+                  batchConfig.PRICE
+                ),
+            },
       },
       price: batchConfig.PRICE,
       isEarlyAccess,
@@ -42,10 +52,15 @@ export class Batch {
     // we need to consider how much was already contributed in previous batches
     for (const reportNr in batchReports) {
       const report = batchReports[reportNr];
-      this.config.limits.totalLimit.inDollar -=
-        report.batch.data.totalValidContribution.inDollar;
-      this.config.limits.totalLimit2.inDollar -=
-        report.batch.data.totalValidContribution.inDollar;
+      this.config.limits.totalLimit.inCollateral -= BigInt(
+        report.batch.data.totalValidContribution.inCollateral
+      );
+
+      if (!isEarlyAccess) {
+        this.config.limits.totalLimit2.inCollateral -= BigInt(
+          report.batch.data.totalValidContribution.inCollateral
+        );
+      }
 
       for (const address in report.batch.data.participants) {
         const contribution = report.batch.data.participants[address];
@@ -68,14 +83,16 @@ export class Batch {
       }
     }
 
-    this.config.limits.totalLimit.inCollateral = this.toCollateral(
-      this.config.limits.totalLimit.inDollar,
+    this.config.limits.totalLimit.inDollar = this.toDollar(
+      this.config.limits.totalLimit.inCollateral,
       this.config.price
     );
-    this.config.limits.totalLimit2.inCollateral = this.toCollateral(
-      this.config.limits.totalLimit2.inDollar,
-      this.config.price
-    );
+    if (!isEarlyAccess) {
+      this.config.limits.totalLimit2.inDollar = this.toDollar(
+        this.config.limits.totalLimit.inCollateral,
+        this.config.price
+      );
+    }
     this.data = { aggregatedPreviousContributions };
   }
 
@@ -346,11 +363,12 @@ export class Batch {
         this.data.aggregatedPreviousContributions[participant];
 
       if (previousContribution) {
-        const dollarAmount = previousContribution.inDollar;
-        const inDollar =
-          this.config.limits.individualLimit.inDollar - dollarAmount;
-        const inCollateral = this.toCollateral(
-          inDollar,
+        const collateralAmount = previousContribution.inCollateral;
+        const inCollateral =
+          this.config.limits.individualLimit.inCollateral -
+          collateralAmount;
+        const inDollar = this.toDollar(
+          inCollateral,
           this.config.price
         );
         return { inDollar, inCollateral };
