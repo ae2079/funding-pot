@@ -5,7 +5,7 @@ export const defineBatch = async ({
   batchConfig,
 }) => {
   // get project & batch specific config
-  const { TIMEFRAME } = batchConfig;
+  const { TIMEFRAME, IS_EARLY_ACCESS } = batchConfig;
   const { SAFE, NFT } = projectConfig;
 
   // get timeframe
@@ -23,10 +23,9 @@ export const defineBatch = async ({
   );
 
   // get nft holders
-  const nftHolders = await queryService.getNftHoldersForInflows(
-    NFT,
-    inflows
-  );
+  const nftHolders = IS_EARLY_ACCESS
+    ? await queryService.getNftHoldersForInflows(NFT, inflows)
+    : [];
 
   // get allowlist
   const { privadoAllowlist, gitcoinAllowlist } =
