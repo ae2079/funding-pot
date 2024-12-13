@@ -224,6 +224,7 @@ The following is an example. Note that all projects share the same vesting detai
     ]
   }
 }
+```
 
 2. **per project** run the script with `npm run vestings <PROJECT_NAME>`
 
@@ -235,6 +236,58 @@ npm run vesting:project <project_name>
 
 This will propose a transaction to the project safe. The command needs to be repeated for each project.
 
+## Setting up Roles (claiming tributes)
+
+### E2E test
+
+**Prerequisites**:
+
+- you need to run the regular e2e test before running this e2e test (in order to generate claimable fees): `npm run test:e2e`
+- potentially you need to remove the data/test/output/GENERATED_TEST_PROJECT/3.json file to be able to re-run the regular e2e test
+
+Run the e2e test with roles: `npm run test:e2e:roles`.
+
+This will do the following:
+
+1. runs the roles script for the GENERATED_TEST_PROJECT
+
+NOTE:
+
+- uses the delegate PK as the feeClaimer
+- uses the owner PK as the feeRecipient
+
+2. confirms the transaction on the safe (NOTE: for simplicity this test is re-using the funding pot multisig as the workflow admin multisig)
+3. as fee claimer, claims the fees (aka tributes) to the feeRecipient
+
+### Running the script
+
+**Prerequisites**:
+
+- the address associated to your delegate PK (set in `.env`) has been set as delegate on the workflow admin multisig
+
+1. Set up the roles config in utils/scripts/inputs/roles.json
+
+The following is an example. Note that all projects share the same vesting details and each key in in `VESTINGS` corresponds to a project name. These need to be the same project names as in the `projects.json` file. There is one workflow admin for all projects. That is the workflow admin multisig set upon deployment as `initialAdmin`.Associated with each project is a `feeClaimer` and a `feeRecipient`. The `feeClaimer` is the address that will be able to claim the tributes from the safe. The `feeRecipient` is the address that will receive the tributes.
+
+```json
+{
+  "workflowAdmin": "0x...",
+  "projects": {
+    "GENERATED_TEST_PROJECT": {
+      "feeClaimer": "0x...",
+      "feeRecipient": "0x..."
+    },
+    "<PROJECT_NAME_2>": {
+      "feeClaimer": "0x...",
+      "feeRecipient": "0x..."
+    }
+  }
+}
+```
+
+2. **Per project** run the script with `npm run roles:project <PROJECT_NAME>`
+
+This will propose a transaction to the workflow admin safe. The transaction needs to be confirmed by the workflow admin multisig.
 
 ## Technical Specification
 
@@ -363,6 +416,8 @@ The steps tie the services together and bring an order into the execution flow.
 ├── staticTestData.js
 ├── testHelpers.js
 └── unitTestRunner.js
+
+```
 
 ```
 
