@@ -5,7 +5,7 @@ export const defineBatch = async ({
   batchConfig,
 }) => {
   // get project & batch specific config
-  const { TIMEFRAME } = batchConfig;
+  const { TIMEFRAME, IS_EARLY_ACCESS } = batchConfig;
   const { SAFE, NFT } = projectConfig;
 
   // get timeframe
@@ -23,17 +23,22 @@ export const defineBatch = async ({
   );
 
   // get nft holders
-  const nftHolders = await queryService.getNftHoldersForInflows(
-    NFT,
-    inflows
-  );
+  const nftHolders = IS_EARLY_ACCESS
+    ? await queryService.getNftHoldersForInflows(NFT, inflows)
+    : [];
 
   // get allowlist
-  const allowlist = await queryService.getAllowlist();
+  const { privadoAllowlist, gitcoinAllowlist } =
+    await queryService.getAllowlists();
 
   // based on allowlists and contribution limits per contributor
   // assess how much valid contributions they have
-  batchService.assessInflows(inflows, allowlist, nftHolders);
+  batchService.assessInflows(
+    inflows,
+    privadoAllowlist,
+    nftHolders,
+    gitcoinAllowlist
+  );
 
   // no valid contributions => no allocations
   // => no batch buy => no vestings

@@ -21,17 +21,24 @@ export class Queries {
   queries;
   backendUrl;
 
-  constructor({ rpcUrl, indexerUrl, chainId, backendUrl }) {
+  constructor({
+    rpcUrl,
+    indexerUrl,
+    chainId,
+    backendUrl,
+    advancedApiKey,
+  }) {
     this.backendUrl = backendUrl;
     this.indexerUrl = indexerUrl;
     this.chainId = chainId;
+
     this.publicClient = createPublicClient({
       chain: chainId,
       transport: http(rpcUrl),
     });
-    this.networkIdString = this.getNetworkIdString(rpcUrl);
+    this.networkIdString = this.getNetworkIdString(chainId);
     this.ankrProvider = new AnkrProvider(
-      this.getAdvancedApiEndpoint(rpcUrl)
+      this.getAdvancedApiEndpoint(advancedApiKey)
     );
     this.queries = { addresses: {} };
   }
@@ -255,13 +262,47 @@ export class Queries {
     return users;
   }
 
+  async getAllowlists() {
+    const timerKey = '  ⏱️ Getting allowlists (QACC API)';
+    console.time(timerKey);
+    const {
+      batchMintingEligibleUsersV2: { users },
+    } = await this.backendConnector(
+      queryBuilder.backend.allowlists()
+    );
+    console.timeEnd(timerKey);
+
+    const privadoAllowlist = [];
+    const gitcoinAllowlist = [];
+
+    for (const user of users) {
+      if (user.kycType === 'zkId') {
+        privadoAllowlist.push(user.address);
+      } else if (user.kycType === 'GTCPass') {
+        gitcoinAllowlist.push(user.address);
+      }
+    }
+
+    this.queries.allowlists = {
+      privadoAllowlist,
+      gitcoinAllowlist,
+    };
+
+    return this.queries.allowlists;
+  }
+
   async getIssuanceTokenFromWrapper() {
     const mintWrapper = getContract({
       address: this.queries.addresses.mintWrapper,
       client: this.publicClient,
       abi: abis.mintWrapperAbi,
     });
-    return await mintWrapper.read.issuanceToken();
+
+    try {
+      return await mintWrapper.read.issuanceToken();
+    } catch (e) {
+      return this.queries.addresses.mintWrapper;
+    }
   }
 
   /* 
@@ -303,15 +344,17 @@ export class Queries {
     UTILS
   */
 
-  getNetworkIdString(rpcUrl) {
-    const [, , , networkIdString] = rpcUrl.split('/');
-    return networkIdString;
+  getNetworkIdString(chainId) {
+    if (chainId == 11155111) {
+      return 'eth_sepolia';
+    } else if (chainId == 84532) {
+      return 'base_sepolia';
+    } else if (chainId == 1101) {
+      return 'zkevm_sepolia';
+    }
   }
 
-  getAdvancedApiEndpoint(rpcUrl) {
-    const dissembled = rpcUrl.split('/');
-    dissembled[3] = 'multichain';
-    const reassembled = dissembled.join('/');
-    return reassembled;
+  getAdvancedApiEndpoint(apiKey) {
+    return `https://rpc.ankr.com/multichain/${apiKey}`;
   }
 }

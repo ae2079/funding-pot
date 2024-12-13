@@ -34,7 +34,7 @@ const baseConfig = {
   chain: getChain(process.env.CHAIN_ID),
   transport: http(process.env.RPC_URL),
 };
-const clients = {
+export const clients = {
   owner: {
     publicClient: createPublicClient({
       ...baseConfig,
@@ -198,7 +198,6 @@ export const getBatchConfig = async (safe) => {
   const individualLimit = '5000';
   const individualLimit2 = '500';
   const totalLimit = '300000';
-  const totalLimit2 = '305000';
   const price = '0.37';
 
   const { owner, delegate } = clients;
@@ -214,7 +213,6 @@ export const getBatchConfig = async (safe) => {
   batchConfig.LIMITS.INDIVIDUAL = individualLimit;
   batchConfig.LIMITS.INDIVIDUAL_2 = individualLimit2;
   batchConfig.LIMITS.TOTAL = totalLimit;
-  batchConfig.LIMITS.TOTAL_2 = totalLimit2;
   batchConfig.PRICE = price;
 
   batchConfig.IS_EARLY_ACCESS = false;

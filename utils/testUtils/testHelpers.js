@@ -21,7 +21,10 @@ export const createAllowlist = () => {
   const ownerAccount = privateKeyToAccount(process.env.PK);
   const delegateAccount = privateKeyToAccount(process.env.DELEGATE);
 
-  const allowlist = [ownerAccount.address, delegateAccount.address];
+  const allowlist = [
+    { address: ownerAccount.address, kycType: 'zkId' },
+    { address: delegateAccount.address, kycType: 'GTCPass' },
+  ];
 
   return allowlist;
 };
@@ -33,11 +36,14 @@ export const mockAllowlist = ({ type }) => {
       return {
         json: async () => ({
           data: {
-            batchMintingEligibleUsers: {
+            batchMintingEligibleUsersV2: {
               users:
                 type === 'static'
                   ? allowlist
-                  : createAllowlist().map((a) => a.toLowerCase()),
+                  : createAllowlist().map((a) => ({
+                      address: a.address.toLowerCase(),
+                      kycType: a.kycType,
+                    })),
             },
           },
         }),

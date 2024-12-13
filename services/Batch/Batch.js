@@ -14,14 +14,6 @@ export class Batch {
             batchConfig.PRICE
           ),
         },
-        totalLimit2: isEarlyAccess
-          ? undefined
-          : {
-              inCollateral: this.toCollateral(
-                batchConfig.LIMITS.TOTAL_2,
-                batchConfig.PRICE
-              ),
-            },
         individualLimit: {
           inDollar: parseFloat(batchConfig.LIMITS.INDIVIDUAL),
           inCollateral: this.toCollateral(
@@ -56,12 +48,6 @@ export class Batch {
         report.batch.data.totalValidContribution.inCollateral
       );
 
-      if (!isEarlyAccess) {
-        this.config.limits.totalLimit2.inCollateral -= BigInt(
-          report.batch.data.totalValidContribution.inCollateral
-        );
-      }
-
       for (const address in report.batch.data.participants) {
         const contribution = report.batch.data.participants[address];
         if (!contribution.validContribution) continue;
@@ -87,16 +73,15 @@ export class Batch {
       this.config.limits.totalLimit.inCollateral,
       this.config.price
     );
-    if (!isEarlyAccess) {
-      this.config.limits.totalLimit2.inDollar = this.toDollar(
-        this.config.limits.totalLimit.inCollateral,
-        this.config.price
-      );
-    }
     this.data = { aggregatedPreviousContributions };
   }
 
-  assessInflows(inflows, allowlist, nftHolders) {
+  assessInflows(
+    inflows,
+    privadoAllowlist,
+    nftHolders,
+    gitcoinAllowlist
+  ) {
     this.data.totalContribution = { inCollateral: 0n, inDollar: 0 };
     this.data.totalValidContribution = {
       inCollateral: 0n,
@@ -120,7 +105,8 @@ export class Batch {
       // if the inflow is not on the allowlist, everything is invalid contribution
       // OR if it's an early access batch and the participant is not an NFT holder
       if (
-        !allowlist.includes(participant) ||
+        (!privadoAllowlist.includes(participant) &&
+          !gitcoinAllowlist.includes(participant)) ||
         (this.config.isEarlyAccess &&
           !nftHolders.includes(participant))
       ) {
@@ -143,8 +129,11 @@ export class Batch {
 
       // todo: get applicable individual limit
       // get individual limit considering potential previous contributions
-      const adjustedIndividualLimit =
-        this.getAdjustedIndividualLimit(participant);
+      const adjustedIndividualLimit = this.getAdjustedIndividualLimit(
+        participant,
+        privadoAllowlist,
+        gitcoinAllowlist
+      );
 
       // difference between individual cap and own contribution
       // if negative, means that the individual cap has been exceeded
@@ -164,9 +153,7 @@ export class Batch {
       // difference between total cap and own contribution
       // if negative, means that the total cap has been exceeded
       const totalDiff =
-        (this.config.isEarlyAccess
-          ? this.config.limits.totalLimit.inCollateral
-          : this.config.limits.totalLimit2.inCollateral) -
+        this.config.limits.totalLimit.inCollateral -
         this.data.totalValidContribution.inCollateral -
         (prevValid + contribution);
 
@@ -353,7 +340,11 @@ export class Batch {
       });
   }
 
-  getAdjustedIndividualLimit(participant) {
+  getAdjustedIndividualLimit(
+    participant,
+    privadoAllowlist,
+    gitcoinAllowlist
+  ) {
     // if it's an early access round, return the adjustedIndividualLimit
     // which is based on the defined individual limti per batch and all contributions
     // that have been made previously by the participant
@@ -381,15 +372,9 @@ export class Batch {
           inDollar: this.config.limits.individualLimit.inDollar,
         };
       }
-
       // if it is not an early access round the rules are different
     } else if (!this.config.isEarlyAccess) {
-      // if all total aggregated valid contribution is less than the total limit
-      // the individual can contribute up to `LIMIT` (=> can contribute more)
-      if (
-        this.data.totalValidContribution.inCollateral <
-        this.config.limits.totalLimit.inCollateral
-      ) {
+      if (privadoAllowlist.includes(participant)) {
         return {
           inDollar: this.config.limits.individualLimit.inDollar,
           inCollateral: this.toCollateral(
@@ -397,14 +382,13 @@ export class Batch {
             this.config.price
           ),
         };
-      } else {
-        // if the "soft total limit has been reached", the individual limit is lowered to `LIMIT_2`
+      } else if (gitcoinAllowlist.includes(participant)) {
         return {
+          inDollar: this.config.limits.individualLimit2.inDollar,
           inCollateral: this.toCollateral(
             this.config.limits.individualLimit2.inDollar,
             this.config.price
           ),
-          inDollar: this.config.limits.individualLimit2.inDollar,
         };
       }
     }

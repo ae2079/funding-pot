@@ -28,5 +28,15 @@ export const queryBuilder = {
         users
       }
     }`,
+    allowlists: () => `{
+      batchMintingEligibleUsersV2(limit:1000, skip:0) {
+        users {
+          address
+          kycType
+        }
+        total
+        skip
+      }
+    }`,
   },
 };
