@@ -262,6 +262,35 @@ export class Queries {
     return users;
   }
 
+  async getAllowlists() {
+    const timerKey = '  ⏱️ Getting allowlists (QACC API)';
+    console.time(timerKey);
+    const {
+      batchMintingEligibleUsersV2: { users },
+    } = await this.backendConnector(
+      queryBuilder.backend.allowlists()
+    );
+    console.timeEnd(timerKey);
+
+    const privadoAllowlist = [];
+    const gitcoinAllowlist = [];
+
+    for (const user of users) {
+      if (user.kycType === 'zkId') {
+        privadoAllowlist.push(user.address);
+      } else if (user.kycType === 'GTCPass') {
+        gitcoinAllowlist.push(user.address);
+      }
+    }
+
+    this.queries.allowlists = {
+      privadoAllowlist,
+      gitcoinAllowlist,
+    };
+
+    return this.queries.allowlists;
+  }
+
   async getIssuanceTokenFromWrapper() {
     const mintWrapper = getContract({
       address: this.queries.addresses.mintWrapper,

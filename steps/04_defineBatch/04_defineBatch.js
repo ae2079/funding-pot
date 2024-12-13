@@ -29,11 +29,17 @@ export const defineBatch = async ({
   );
 
   // get allowlist
-  const allowlist = await queryService.getAllowlist();
+  const { privadoAllowlist, gitcoinAllowlist } =
+    await queryService.getAllowlists();
 
   // based on allowlists and contribution limits per contributor
   // assess how much valid contributions they have
-  batchService.assessInflows(inflows, allowlist, nftHolders);
+  batchService.assessInflows(
+    inflows,
+    privadoAllowlist,
+    nftHolders,
+    gitcoinAllowlist
+  );
 
   // no valid contributions => no allocations
   // => no batch buy => no vestings

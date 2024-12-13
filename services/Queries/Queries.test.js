@@ -209,6 +209,19 @@ describe('Queries', () => {
     });
   });
 
+  describe('#getAllowlists', () => {
+    const queryService = new Queries({
+      indexerUrl: process.env.INDEXER_URL,
+      rpcUrl: process.env.RPC_URL,
+      chainId: process.env.CHAIN_ID,
+      backendUrl: process.env.BACKEND_URL,
+    });
+
+    it('should return the allowlist', async () => {
+      await queryService.getAllowlists();
+    });
+  });
+
   describe('#getIssuanceTokenFromWrapper', () => {
     const queryService = new Queries({
       indexerUrl: process.env.INDEXER_URL,
