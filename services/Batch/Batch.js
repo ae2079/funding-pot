@@ -35,6 +35,7 @@ export class Batch {
       },
       price: batchConfig.PRICE,
       isEarlyAccess,
+      matchingFunds: parseUnits(batchConfig.MACHING_FUNDS, 18),
     };
 
     // for individual caps we need to know how much each address had already contributed before
@@ -201,10 +202,22 @@ export class Batch {
     const totalValidContributionFloat = this.bigIntToFloat(
       totalValidContribution.inCollateral
     );
-    const additionalIssuanceFloat = this.bigIntToFloat(
+    let additionalIssuanceFloat = this.bigIntToFloat(
       additionalIssuance
     );
 
+    let denominator = totalValidContributionFloat;
+
+    if (
+      this.config.matchingFunds &&
+      parseFloat(this.config.matchingFunds) > 0
+    ) {
+      denominator += this.bigIntToFloat(this.config.matchingFunds);
+    }
+
+    let contributorAllocations = 0n;
+
+    // calculate allocations
     for (const address of Object.keys(participants)) {
       const { validContribution } = participants[address];
       if (!validContribution) continue;
@@ -213,15 +226,20 @@ export class Batch {
         validContribution.inCollateral
       );
 
-      const contributionShare =
-        validContributionFloat / totalValidContributionFloat;
+      const contributionShare = validContributionFloat / denominator;
       const issuanceAllocation =
         Math.floor(
           contributionShare * additionalIssuanceFloat * 10000
         ) / 10000;
       this.data.participants[address].issuanceAllocation =
         this.floatToBigInt(issuanceAllocation);
+
+      contributorAllocations +=
+        this.data.participants[address].issuanceAllocation;
     }
+
+    this.data.matchingFundsAllocation =
+      additionalIssuance - contributorAllocations;
   }
 
   // INTERNAL HELPER FUNCTIONS
@@ -432,5 +450,28 @@ export class Batch {
     const collateralAmountReadable =
       parseFloat(dollarAmount) / parseFloat(price);
     return parseUnits(collateralAmountReadable.toString(), 18);
+  }
+
+  // GETTERS
+  getCollateralAmountIn() {
+    if (!this.config.matchingFunds) {
+      return this.data.totalValidContribution.inCollateral;
+    }
+
+    console.log(
+      'total valid: ',
+      this.data.totalValidContribution.inCollateral
+    );
+    console.log('matching funds: ', this.config.matchingFunds);
+    console.log(
+      'sum: ',
+      this.data.totalValidContribution.inCollateral +
+        this.config.matchingFunds
+    );
+
+    return (
+      this.data.totalValidContribution.inCollateral +
+      this.config.matchingFunds
+    );
   }
 }

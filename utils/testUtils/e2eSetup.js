@@ -216,12 +216,23 @@ export const getBatchConfig = async (safe) => {
   batchConfig.PRICE = price;
 
   batchConfig.IS_EARLY_ACCESS = false;
+  batchConfig.MACHING_FUNDS = '420.69';
+
+  const contributors = [owner, delegate];
+
+  console.info('> Minting matching funds...');
+  await mintMockTokens(
+    mockCollateralToken,
+    parseUnits(batchConfig.MACHING_FUNDS, 18),
+    safe,
+    delegate.walletClient,
+    delegate.publicClient
+  );
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
   );
 
-  const contributors = [owner, delegate];
   const contributions = [];
 
   for (let i = 0; i < contributors.length; i++) {
