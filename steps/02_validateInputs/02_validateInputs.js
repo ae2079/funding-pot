@@ -39,8 +39,13 @@ const validateConfigs = ({
   projectName,
   batchConfig,
 }) => {
-  const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS, PRICE } =
-    batchConfig;
+  const {
+    VESTING_DETAILS,
+    LIMITS,
+    IS_EARLY_ACCESS,
+    PRICE,
+    MACHING_FUNDS,
+  } = batchConfig;
   const { SAFE, ORCHESTRATOR, NFT } = projectsConfig[projectName];
 
   if (!SAFE || !isAddress(SAFE))
@@ -103,6 +108,12 @@ const validateConfigs = ({
   if (IS_EARLY_ACCESS === false) {
     if (!LIMITS.INDIVIDUAL_2) {
       throwConfigError('INDIVIDUAL_2 missing or empty', {
+        projectName,
+        batchConfig,
+      });
+    }
+    if (!MACHING_FUNDS) {
+      throwConfigError('MACHING_FUNDS missing or empty', {
         projectName,
         batchConfig,
       });

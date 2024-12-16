@@ -47,7 +47,7 @@ export const defineBatch = async ({
 
   // get amountOut based on aggregate valid contributions
   const additionalIssuance = await queryService.getAmountOut(
-    batchService.data.totalValidContribution.inCollateral
+    batchService.getCollateralAmountIn()
   );
 
   // calculate allocations

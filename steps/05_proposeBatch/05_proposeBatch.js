@@ -5,21 +5,22 @@ export const proposeBatch = async ({
   safeService,
   skipPropose = false,
 }) => {
-  const { totalValidContribution, additionalIssuance } =
-    batchService.data;
+  const { additionalIssuance } = batchService.data;
   const { collateralToken, bondingCurve } =
     queryService.queries.addresses;
-  batchService.getAllocations();
+
+  // use sum of total valid contribution and matching funds (if any)
+  const collateralAmountIn = batchService.getCollateralAmountIn();
 
   // approve token
   transactionBuilderService.approve(
     collateralToken,
     bondingCurve,
-    totalValidContribution.inCollateral
+    collateralAmountIn
   );
 
   // add batch buy tx
-  transactionBuilderService.buy(totalValidContribution.inCollateral);
+  transactionBuilderService.buy(collateralAmountIn);
 
   // send issuance tokens to payment router˚
   transactionBuilderService.transferTokens(
