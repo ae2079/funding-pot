@@ -139,7 +139,7 @@ There are three types of inputs that the script executor can take. They can all 
   },
   "IS_EARLY_ACCESS": false, // if its an early access round (true) or a qacc round (false),
   "PRICE": "0.1", // assumed dollar price per collateral token for that batch,
-  "MATCHING_FUNDS": "420.69" // amount of collateral tokens to be as matching funds; e.g. 420.69 POL coming from the matching pool
+  "MATCHING_FUNDS": "420.69" // ONLY REQUIRED FOR QACC ROUND: amount of collateral tokens to be used as matching funds; e.g. 420.69 POL coming from the matching pool
 }
 ```
 
