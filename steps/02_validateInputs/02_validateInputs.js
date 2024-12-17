@@ -44,7 +44,7 @@ const validateConfigs = ({
     LIMITS,
     IS_EARLY_ACCESS,
     PRICE,
-    MACHING_FUNDS,
+    MATCHING_FUNDS,
   } = batchConfig;
   const { SAFE, ORCHESTRATOR, NFT } = projectsConfig[projectName];
 
@@ -112,8 +112,8 @@ const validateConfigs = ({
         batchConfig,
       });
     }
-    if (!MACHING_FUNDS) {
-      throwConfigError('MACHING_FUNDS missing or empty', {
+    if (!MATCHING_FUNDS) {
+      throwConfigError('MATCHING_FUNDS missing or empty', {
         projectName,
         batchConfig,
       });

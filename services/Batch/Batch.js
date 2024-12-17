@@ -35,7 +35,7 @@ export class Batch {
       },
       price: batchConfig.PRICE,
       isEarlyAccess,
-      matchingFunds: parseUnits(batchConfig.MACHING_FUNDS, 18),
+      matchingFunds: parseUnits(batchConfig.MATCHING_FUNDS, 18),
     };
 
     // for individual caps we need to know how much each address had already contributed before
