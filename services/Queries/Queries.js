@@ -350,7 +350,7 @@ export class Queries {
     } else if (chainId == 84532) {
       return 'base_sepolia';
     } else if (chainId == 1101) {
-      return 'zkevm_sepolia';
+      return 'polygon_zkevm';
     }
   }
 
