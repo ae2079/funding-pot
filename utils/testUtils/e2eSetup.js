@@ -216,14 +216,11 @@ export const getBatchConfig = async (safe) => {
   batchConfig.PRICE = price;
 
   batchConfig.IS_EARLY_ACCESS = false;
-  batchConfig.MATCHING_FUNDS = '420.69';
-
-  const contributors = [owner, delegate];
 
   console.info('> Minting matching funds...');
   await mintMockTokens(
     mockCollateralToken,
-    parseUnits(batchConfig.MATCHING_FUNDS, 18),
+    parseUnits('420.69', 18),
     safe,
     delegate.walletClient,
     delegate.publicClient
@@ -232,6 +229,8 @@ export const getBatchConfig = async (safe) => {
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
   );
+
+  const contributors = [owner, delegate];
 
   const contributions = [];
 
@@ -303,7 +302,9 @@ export const getBatchConfig = async (safe) => {
   return { batchConfig, contributions, contributors };
 };
 
-export const getProjectConfig = async (owner) => {
+export const getProjectConfig = async (owner, safe) => {
+  const { delegate } = clients;
+
   const filePath = path.join(
     __dirname,
     '../../data/test/input/projects.json'
@@ -342,6 +343,7 @@ export const getProjectConfig = async (owner) => {
             SAFE: safeAddress,
             ORCHESTRATOR: orchestratorAddress,
             NFT: projectConfig.NFT,
+            MATCHING_FUNDS: '420.69',
           },
         },
         null,

@@ -39,14 +39,10 @@ const validateConfigs = ({
   projectName,
   batchConfig,
 }) => {
-  const {
-    VESTING_DETAILS,
-    LIMITS,
-    IS_EARLY_ACCESS,
-    PRICE,
-    MATCHING_FUNDS,
-  } = batchConfig;
-  const { SAFE, ORCHESTRATOR, NFT } = projectsConfig[projectName];
+  const { VESTING_DETAILS, LIMITS, IS_EARLY_ACCESS, PRICE } =
+    batchConfig;
+  const { SAFE, ORCHESTRATOR, NFT, MATCHING_FUNDS } =
+    projectsConfig[projectName];
 
   if (!SAFE || !isAddress(SAFE))
     throwConfigError('SAFE missing or invalid address', {

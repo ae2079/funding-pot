@@ -40,6 +40,7 @@ export const instantiateServices = async (
   const batchService = new Batch({
     batchConfig,
     batchReports,
+    projectConfig,
   });
 
   return {
