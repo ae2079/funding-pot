@@ -12,7 +12,6 @@ import { Safe } from '../../../services/Safe/Safe.js';
 import { TransactionBuilder } from '../../../services/TransactionBuilder/TransactionBuilder.js';
 import { keccak256, toHex } from 'viem';
 import { Queries } from '../../../services/Queries/Queries.js';
-import { getAnkrRpcUrl } from '../../helpers.js';
 
 const { CHAIN_ID, INDEXER_URL, BACKEND_URL, RPC_URL } = process.env;
 

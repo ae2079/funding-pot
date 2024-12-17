@@ -2,7 +2,6 @@ import { Queries } from '../../services/Queries/Queries.js';
 import { Batch } from '../../services/Batch/Batch.js';
 import { Safe } from '../../services/Safe/Safe.js';
 import { TransactionBuilder } from '../../services/TransactionBuilder/TransactionBuilder.js';
-import { getAnkrRpcUrl } from '../../utils/helpers.js';
 
 export const instantiateServices = async (
   projectConfig,
