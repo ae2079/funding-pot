@@ -5,7 +5,8 @@ export const proposeBatch = async ({
   safeService,
   skipPropose = false,
 }) => {
-  const { additionalIssuance } = batchService.data;
+  const { additionalIssuance, matchingFundsAllocation } =
+    batchService.data;
   const { collateralToken, bondingCurve } =
     queryService.queries.addresses;
 
@@ -26,7 +27,7 @@ export const proposeBatch = async ({
   transactionBuilderService.transferTokens(
     queryService.queries.addresses.issuanceToken,
     queryService.queries.addresses.paymentRouter,
-    additionalIssuance
+    BigInt(additionalIssuance) - BigInt(matchingFundsAllocation)
   );
 
   // get parsed allocations
