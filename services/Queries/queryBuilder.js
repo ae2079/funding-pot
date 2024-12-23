@@ -24,12 +24,12 @@ export const queryBuilder = {
   },
   backend: {
     allowlist: () => `{
-      batchMintingEligibleUsers(limit:1000, skip:0) {
+      batchMintingEligibleUsers(limit:3000, skip:0) {
         users
       }
     }`,
     allowlists: () => `{
-      batchMintingEligibleUsersV2(limit:1000, skip:0) {
+      batchMintingEligibleUsersV2(limit:3000, skip:0) {
         users {
           address
           kycType
