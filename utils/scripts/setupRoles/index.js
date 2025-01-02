@@ -40,6 +40,7 @@ console.info('> fee recipient:     ', feeRecipient);
 console.info('> orchestrator:      ', projectConfig.ORCHESTRATOR);
 
 const runScript = async () => {
+  const projectName = PROJECT_NAME;
   // iterate over all projects
   const projectConfig = projectsConfig[projectName];
 
