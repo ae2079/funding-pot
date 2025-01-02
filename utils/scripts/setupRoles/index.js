@@ -41,21 +41,19 @@ console.info('> orchestrator:      ', projectConfig.ORCHESTRATOR);
 
 const runScript = async () => {
   // iterate over all projects
-  for (const projectName in projectsConfig) {
-    const projectConfig = projectsConfig[projectName];
+  const projectConfig = projectsConfig[projectName];
 
-    if (!projectConfig) {
-      console.error(`Project ${projectName} not found`);
-      continue;
-    }
-
-    await setupRoles(
-      workflowAdmin,
-      projectConfig.ORCHESTRATOR,
-      feeClaimer,
-      feeRecipient
-    );
+  if (!projectConfig) {
+    console.error(`Project ${projectName} not found`);
+    return;
   }
+
+  await setupRoles(
+    workflowAdmin,
+    projectConfig.ORCHESTRATOR,
+    feeClaimer,
+    feeRecipient
+  );
 };
 
 runScript();
