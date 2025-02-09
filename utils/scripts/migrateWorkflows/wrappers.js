@@ -1,0 +1,4 @@
+export const tokenToWrapper = {
+  '0xc530B75465Ce3c6286e718110A7B2e2B64Bdc860':
+    '0x594a6257a477C6fd15f0dF56d1d319985197c1b0',
+};
