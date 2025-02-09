@@ -6,6 +6,8 @@ import {
   createWalletClient,
   http,
   getContract,
+  parseUnits,
+  formatUnits,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { polygonZkEvm, baseSepolia } from 'viem/chains';
@@ -38,10 +40,6 @@ export function loadProjectReport(projectName) {
     const outputData = JSON.parse(
       fs.readFileSync(outputPath, 'utf8')
     );
-    console.log(
-      `Loaded output data for project ${projectName}:`,
-      outputData
-    );
     return outputData;
   } catch (error) {
     console.error('Error processing output file:', error);
@@ -59,16 +57,12 @@ export function createClients(type = 'source') {
     };
   } else if (type === 'target') {
     baseConfig = {
-      chain: getChain(process.env.CHAIN_ID),
+      chain: baseSepolia,
       transport: http(process.env.RPC_URL),
     };
   }
 
-  console.log(process.env.PK);
-
   const account = privateKeyToAccount(process.env.PK);
-
-  console.log('account: ', account);
 
   const publicClient = createPublicClient({
     ...baseConfig,
@@ -172,7 +166,7 @@ export async function getState(projectConfig) {
   return state;
 }
 
-export async function mintTokens(state, tokenToWrapper) {
+export async function recreateTokenSnapshot(state, tokenToWrapper) {
   const { publicClient, walletClient } = createClients('target');
 
   const wrapper = tokenToWrapper[state.issuanceToken];
@@ -214,4 +208,48 @@ export async function mintTokens(state, tokenToWrapper) {
     // Wait for transaction to be mined
     await publicClient.waitForTransactionReceipt({ hash });
   }
+}
+
+export async function deployWorkflow(state) {
+  const { publicClient, walletClient } = createClients('target');
+
+  const sdk = new Inverter({
+    publicClient,
+    walletClient,
+  });
+
+  const { run } = await sdk.getDeploy({
+    requestedModules,
+    factoryType: 'default',
+  });
+
+  const args = {
+    orchestrator: {
+      independentUpdates: false,
+      independentUpdateAdmin:
+        '0x0000000000000000000000000000000000000000',
+    },
+    authorizer: {
+      initialAdmin: sdk.walletClient.account.address,
+    },
+    fundingManager: {
+      issuanceToken: state.issuanceToken,
+      bondingCurveParams: {
+        formula: '0xfaf6c989dB0582D7b31e40343dd4A41a1848E038',
+        buyFee: '50',
+        sellFee: '50',
+        reserveRatioForBuying: 333_333,
+        reserveRatioForSelling: 333_333,
+        buyIsOpen: true,
+        sellIsOpen: false,
+        initialIssuanceSupply: state.virtualIssuanceSupply,
+        initialCollateralSupply: state.virtualCollateralSupply,
+      },
+      collateralToken: '0x5deac602762362fe5f135fa5904351916053cf70',
+    },
+  };
+
+  const x = await run(args);
+
+  console.log(x);
 }

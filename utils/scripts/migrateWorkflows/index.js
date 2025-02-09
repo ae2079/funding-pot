@@ -1,6 +1,11 @@
 import '../../../env.js';
 
-import { loadProjectReport, getState, mintTokens } from './utils.js';
+import {
+  loadProjectReport,
+  getState,
+  recreateTokenSnapshot,
+  deployWorkflow,
+} from './utils.js';
 import { tokenToWrapper } from './wrappers.js';
 
 async function main() {
@@ -14,7 +19,11 @@ async function main() {
   const report = loadProjectReport(projectName);
   const state = await getState(report.inputs.projectConfig);
 
-  await mintTokens(state, tokenToWrapper);
+  // mints issuance tokens according to the token snapshot
+  //   await recreateTokenSnapshot(state, tokenToWrapper);
+
+  // deploy workflow
+  await deployWorkflow(state);
 
   // Add your migration logic here using the outputData
 }
