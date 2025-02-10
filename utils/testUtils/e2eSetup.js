@@ -183,6 +183,36 @@ export const deployWorkflowViaFactory = async (
   const { orchestratorAddress } = await run(args);
   console.info('✅ Workflow deployed');
 
+  console.info(
+    '> Setting additional admin... (for testing purposes)'
+  );
+  const workflow = await inverterSdk.getWorkflow({
+    orchestratorAddress,
+  });
+  const adminRole = await workflow.authorizer.read.getAdminRole.run();
+  const tx3 = await workflow.authorizer.write.grantRole.run([
+    adminRole,
+    safeAddress,
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash: tx3 });
+  console.info('✅ Safe set as workflow admin');
+
+  console.info(
+    '> Setting safe as token admin (for testing purposes)'
+  );
+  const mintWrapper =
+    await workflow.fundingManager.read.getIssuanceToken.run();
+  const mintWrapperContract = getContract({
+    abi: abis.mintWrapperAbi,
+    address: mintWrapper,
+    client: walletClient,
+  });
+  const tx4 = await mintWrapperContract.write.transferOwnership([
+    safeAddress,
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash: tx4 });
+  console.info('✅ Safe set as mint wrapper admin');
+
   return orchestratorAddress;
 };
 

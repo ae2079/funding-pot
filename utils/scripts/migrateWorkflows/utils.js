@@ -83,7 +83,7 @@ export function createClients(type = 'source') {
   };
 }
 
-const getTokenSnapshot = async (token) => {
+export const getTokenSnapshot = async (token) => {
   const ankrProvider = new AnkrProvider(
     `https://rpc.ankr.com/multichain/${process.env.ANKR_API_KEY}`
   );
@@ -95,7 +95,10 @@ const getTokenSnapshot = async (token) => {
     try {
       ({ holders } = await ankrProvider.getTokenHolders({
         contractAddress: token,
-        blockchain: 'polygon_zkevm',
+        blockchain:
+          process.env.NODE_ENV === 'production'
+            ? 'polygon_zkevm'
+            : 'base_sepolia',
         pageSize: 10,
       }));
       break;

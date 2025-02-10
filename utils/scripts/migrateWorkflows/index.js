@@ -26,12 +26,12 @@ async function main() {
   const workflow = await deployWorkflow(state);
 
   // mint and put all issuance tokens where they belong
-  //   await recreateIssuanceSnapshot(
-  //     workflow,
-  //     state,
-  //     tokenToWrapper,
-  //     report
-  //   );
+  await recreateIssuanceSnapshot(
+    workflow,
+    state,
+    tokenToWrapper,
+    report
+  );
 
   // configure workflow
   await configureWorkflow(workflow, state, tokenToWrapper, report);

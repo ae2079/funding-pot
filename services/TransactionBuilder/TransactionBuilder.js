@@ -32,6 +32,7 @@ export class TransactionBuilder {
     this.issuanceToken = workflowAddresses.issuanceToken;
     this.collateralToken = workflowAddresses.collateralToken;
     this.bondingCurve = workflowAddresses.bondingCurve;
+    this.mintWrapper = workflowAddresses.mintWrapper;
     if (batchConfig) {
       this.start = batchConfig.VESTING_DETAILS.START;
       this.cliff = batchConfig.VESTING_DETAILS.CLIFF;
@@ -189,6 +190,24 @@ export class TransactionBuilder {
     );
   }
 
+  setMinter(newMinter) {
+    this.addTx(
+      this.mintWrapper,
+      'mintWrapperAbi',
+      'setMinter(address,bool)',
+      [newMinter, true]
+    );
+  }
+
+  burnIssuance(from, amount) {
+    this.addTx(
+      this.mintWrapper,
+      'mintWrapperAbi',
+      'burn(address,uint256)',
+      [from, amount]
+    );
+  }
+
   addTx(to, abiName, functionSignature, inputValues) {
     this.transactions.push({
       to,
@@ -203,8 +222,10 @@ export class TransactionBuilder {
   getEncodedTxs() {
     const encodedTxs = [];
     for (const tx of this.transactions) {
+      console.log(tx);
       const { to, abiName, functionSignature, inputValues } = tx;
       const abi = abis[abiName];
+
       const encoded = encodeSingle({
         type: TransactionType.callContract,
         id: '0',

@@ -4393,25 +4393,6 @@ export default {
     },
     {
       type: 'event',
-      name: 'MinterSet',
-      inputs: [
-        {
-          name: 'minter',
-          type: 'address',
-          indexed: true,
-          internalType: 'address',
-        },
-        {
-          name: 'allowed',
-          type: 'bool',
-          indexed: false,
-          internalType: 'bool',
-        },
-      ],
-      anonymous: false,
-    },
-    {
-      type: 'event',
       name: 'OwnershipTransferred',
       inputs: [
         {
@@ -4428,11 +4409,6 @@ export default {
         },
       ],
       anonymous: false,
-    },
-    {
-      type: 'error',
-      name: 'IERC20Issuance__CallerIsNotMinter',
-      inputs: [],
     },
     {
       type: 'error',

@@ -33,6 +33,7 @@ export class Safe {
   }
 
   async proposeTxs(txs) {
+    console.log('PROPOSE TO: ', this.safeAddress);
     if (!this.protocolKit) {
       this.protocolKit = await ProtocolKit.default.init({
         signer: process.env.DELEGATE,
