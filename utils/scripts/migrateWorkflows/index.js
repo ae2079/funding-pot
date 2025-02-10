@@ -3,10 +3,11 @@ import '../../../env.js';
 import {
   loadProjectReport,
   getState,
-  recreateTokenSnapshot,
+  recreateIssuanceSnapshot,
   deployWorkflow,
+  configureWorkflow,
 } from './utils.js';
-import { tokenToWrapper } from './wrappers.js';
+import { tokenToWrapper } from './inputs/wrappers.js';
 
 async function main() {
   const [, , projectName] = process.argv;
@@ -19,13 +20,21 @@ async function main() {
   const report = loadProjectReport(projectName);
   const state = await getState(report.inputs.projectConfig);
 
-  // mints issuance tokens according to the token snapshot
-  //   await recreateTokenSnapshot(state, tokenToWrapper);
+  console.info('> START MIGRATION');
 
   // deploy workflow
-  await deployWorkflow(state);
+  const workflow = await deployWorkflow(state);
 
-  // Add your migration logic here using the outputData
+  // mint and put all issuance tokens where they belong
+  await recreateIssuanceSnapshot(
+    workflow,
+    state,
+    tokenToWrapper,
+    report
+  );
+
+  // configure workflow
+  await configureWorkflow(workflow, state, tokenToWrapper);
 }
 
 main().catch((error) => {

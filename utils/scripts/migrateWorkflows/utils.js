@@ -159,6 +159,7 @@ export async function getState(projectConfig) {
     virtualCollateralSupply,
     issuanceToken,
     paymentRouterBalance,
+    paymentRouter,
     totalIssuanceSupply,
     tokenSnapshot,
   };
@@ -166,59 +167,186 @@ export async function getState(projectConfig) {
   return state;
 }
 
-export async function recreateTokenSnapshot(state, tokenToWrapper) {
+export async function recreateIssuanceSnapshot(
+  workflow,
+  state,
+  tokenToWrapper,
+  report
+) {
+  console.info();
+  console.info('> Recreating Token Snapshot');
+
   const { publicClient, walletClient } = createClients('target');
 
   const wrapper = tokenToWrapper[state.issuanceToken];
 
   if (!wrapper) {
-    console.log('No wrapper found for token', state.issuanceToken);
+    console.info('No wrapper found for token', state.issuanceToken);
     return;
   }
 
+  // minting tokens
+  console.info('    > Minting tokens');
   for (const entry of state.tokenSnapshot) {
-    const { holderAddress, balanceRawInteger } = entry;
+    const { holderAddress, balanceRawInteger, balance } = entry;
     if (balanceRawInteger === 0n) continue;
 
-    console.log(
-      `Minting ${balanceRawInteger} tokens for ${holderAddress}`
+    const newPaymentRouter =
+      workflow.optionalModule.LM_PC_PaymentRouter_v1.address;
+
+    const target =
+      holderAddress.toLowerCase() ===
+      state.paymentRouter.toLowerCase()
+        ? newPaymentRouter
+        : holderAddress;
+
+    console.info(
+      `         > Minting ${balance} tokens for ${target}${
+        holderAddress.toLowerCase() ===
+          state.paymentRouter.toLowerCase() && ' (new PaymentRouter)'
+      }`
     );
-
-    // const mintWrapperContract = getContract({
-    //   address: wrapper,
-    //   client: walletClient,
-    //   abi: abis.mintWrapperAbi,
-    // });
-
-    // console.log([holderAddress, balanceRawInteger]);
-    // const hash = await mintWrapperContract.write.mint([
-    //   holderAddress,
-    //   balanceRawInteger,
-    // ]);
 
     const hash = await walletClient.writeContract({
       address: wrapper,
       abi: abis.mintWrapperAbi,
       functionName: 'mint',
-      args: [holderAddress, balanceRawInteger],
+      args: [target, balanceRawInteger],
     });
 
-    console.log('Mint transaction:', hash);
+    console.info('            > Transaction:', hash);
 
     // Wait for transaction to be mined
     await publicClient.waitForTransactionReceipt({ hash });
   }
+
+  // self assigning vesting role
+  console.info('    > Creating vestings');
+  console.info('         > Self Assigning Payment Pusher Role');
+
+  const tx1 =
+    await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
+      [
+        await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
+        walletClient.account.address,
+      ]
+    );
+
+  await publicClient.waitForTransactionReceipt({ hash: tx1 });
+  console.info('            > Transaction:', tx1);
+
+  // creating vestings
+
+  const { transactions, batchReports } = report;
+
+  const allTransactions = [
+    ...transactions.readable.flat(),
+    ...Object.values(batchReports)
+      .map((b) => b.transactions.readable.flat())
+      .flat(),
+  ];
+
+  const allVestings = allTransactions
+    .filter((t) => t.functionSignature.includes('pushPayment'))
+    .map((t) => t.inputValues);
+
+  const tranches = {};
+  for (const vesting of allVestings) {
+    const [, , , start, cliff, duration] = vesting;
+    const id = `${start}-${cliff}-${duration}`;
+    if (!tranches[id]) {
+      tranches[id] = [];
+    }
+    tranches[id].push(vesting);
+  }
+
+  let recipients = [];
+  let paymentTokens = [];
+  let amounts = [];
+  let start = 0;
+  let cliff = 0;
+  let end = 0;
+
+  for (const tranchId in tranches) {
+    const tranch = tranches[tranchId];
+
+    for (let i = 0; i < tranch.length; i++) {
+      const [
+        recipient,
+        paymentToken,
+        amount,
+        thisStart,
+        thisCliff,
+        thisEnd,
+      ] = tranch[i];
+      start = thisStart;
+      cliff = thisCliff;
+      end = thisEnd;
+      recipients.push(recipient);
+      paymentTokens.push(paymentToken);
+      amounts.push(amount);
+
+      if (recipients.length === 40 || i === tranch.length - 1) {
+        console.info(
+          '         > Creating vesting tranche:',
+          recipients.length,
+          `(start: ${start}, cliff: ${cliff}, end: ${end})`
+        );
+        const tx =
+          await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.pushPaymentBatched.run(
+            [
+              recipients.length,
+              recipients,
+              paymentTokens,
+              amounts,
+              start,
+              cliff,
+              end,
+            ]
+          );
+        await publicClient.waitForTransactionReceipt({ hash: tx });
+        console.info('            > Transaction:', tx);
+
+        recipients = [];
+        paymentTokens = [];
+        amounts = [];
+        start = 0;
+        cliff = 0;
+        end = 0;
+      }
+    }
+  }
+
+  // removing vesting role
+
+  console.info('         > Removing vesting role');
+
+  const tx2 =
+    await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.revokeModuleRole.run(
+      [
+        await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
+        walletClient.account.address,
+      ]
+    );
+
+  await publicClient.waitForTransactionReceipt({ hash: tx2 });
+  console.info('            > Transaction:', tx2);
 }
 
+let targetSdk;
+
 export async function deployWorkflow(state) {
+  console.info();
+  console.info('> Deploying Workflow');
+
   const { publicClient, walletClient } = createClients('target');
 
-  const sdk = new Inverter({
+  targetSdk = new Inverter({
     publicClient,
     walletClient,
   });
 
-  const { run } = await sdk.getDeploy({
+  const { run } = await targetSdk.getDeploy({
     requestedModules,
     factoryType: 'default',
   });
@@ -230,7 +358,7 @@ export async function deployWorkflow(state) {
         '0x0000000000000000000000000000000000000000',
     },
     authorizer: {
-      initialAdmin: sdk.walletClient.account.address,
+      initialAdmin: targetSdk.walletClient.account.address,
     },
     fundingManager: {
       issuanceToken: state.issuanceToken,
@@ -249,7 +377,64 @@ export async function deployWorkflow(state) {
     },
   };
 
-  const x = await run(args);
+  const { orchestratorAddress, transactionHash } = await run(args);
 
-  console.log(x);
+  await publicClient.waitForTransactionReceipt({
+    hash: transactionHash,
+  });
+
+  console.info('    > Workflow deployed at:', orchestratorAddress);
+
+  return await targetSdk.getWorkflow({
+    orchestratorAddress,
+    requestedModules,
+  });
+}
+
+export async function configureWorkflow(
+  workflow,
+  state,
+  tokenToWrapper
+) {
+  console.info();
+  console.info('> Configuring Workflow');
+
+  // assign minting rights
+  console.info('    > Setting minter...');
+
+  const mintWrapper = tokenToWrapper[state.issuanceToken];
+  const mintWrapperContract = getContract({
+    address: mintWrapper,
+    abi: abis.mintWrapperAbi,
+    client: targetSdk.walletClient,
+  });
+
+  const tx1 = await mintWrapperContract.write.setMinter([
+    workflow.fundingManager.address,
+    true,
+  ]);
+
+  await targetSdk.publicClient.waitForTransactionReceipt({
+    hash: tx1,
+  });
+
+  console.info('        > Transaction: ', tx1);
+
+  // assigning curve interaction rights
+  console.info('    > Setting curve interaction rights...');
+  const curveInteractionRole =
+    await workflow.fundingManager.read.CURVE_INTERACTION_ROLE.run();
+
+  const tx2 = await workflow.fundingManager.write.grantModuleRole.run(
+    [
+      curveInteractionRole,
+      workflow.optionalModule.LM_PC_PaymentRouter_v1.address,
+    ]
+  );
+
+  await targetSdk.publicClient.waitForTransactionReceipt({
+    hash: tx2,
+  });
+
+  console.info('        > Transaction: ', tx2);
 }
