@@ -17,6 +17,7 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 import { getChain } from '../../../utils/testUtils/testHelpers.js';
 import abis from '../../../data/abis.js';
 import { requestedModules } from '../../../utils/testUtils/staticTestData.js';
+import { getDeployArgs } from './inputs/deploymentArgs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -351,31 +352,12 @@ export async function deployWorkflow(state) {
     factoryType: 'default',
   });
 
-  const args = {
-    orchestrator: {
-      independentUpdates: false,
-      independentUpdateAdmin:
-        '0x0000000000000000000000000000000000000000',
-    },
-    authorizer: {
-      initialAdmin: targetSdk.walletClient.account.address,
-    },
-    fundingManager: {
-      issuanceToken: state.issuanceToken,
-      bondingCurveParams: {
-        formula: '0xfaf6c989dB0582D7b31e40343dd4A41a1848E038',
-        buyFee: '50',
-        sellFee: '50',
-        reserveRatioForBuying: 333_333,
-        reserveRatioForSelling: 333_333,
-        buyIsOpen: true,
-        sellIsOpen: false,
-        initialIssuanceSupply: state.virtualIssuanceSupply,
-        initialCollateralSupply: state.virtualCollateralSupply,
-      },
-      collateralToken: '0x5deac602762362fe5f135fa5904351916053cf70',
-    },
-  };
+  const args = getDeployArgs(
+    targetSdk.walletClient.account.address,
+    state.issuanceToken,
+    state.virtualIssuanceSupply,
+    state.virtualCollateralSupply
+  );
 
   const { orchestratorAddress, transactionHash } = await run(args);
 
