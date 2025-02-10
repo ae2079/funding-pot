@@ -17,7 +17,10 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 import { getChain } from '../../../utils/testUtils/testHelpers.js';
 import abis from '../../../data/abis.js';
 import { requestedModules } from '../../../utils/testUtils/staticTestData.js';
-import { getDeployArgs } from './inputs/deploymentArgs.js';
+import {
+  getDeployArgs,
+  adminMultisig,
+} from './inputs/deploymentArgs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -376,7 +379,8 @@ export async function deployWorkflow(state) {
 export async function configureWorkflow(
   workflow,
   state,
-  tokenToWrapper
+  tokenToWrapper,
+  report
 ) {
   console.info();
   console.info('> Configuring Workflow');
@@ -403,15 +407,14 @@ export async function configureWorkflow(
   console.info('        > Transaction: ', tx1);
 
   // assigning curve interaction rights
-  console.info('    > Setting curve interaction rights...');
+  console.info(
+    `    > Granting curve interaction rights to ${report.inputs.projectConfig.SAFE} (Funding Pot Multisig)`
+  );
   const curveInteractionRole =
     await workflow.fundingManager.read.CURVE_INTERACTION_ROLE.run();
 
   const tx2 = await workflow.fundingManager.write.grantModuleRole.run(
-    [
-      curveInteractionRole,
-      workflow.optionalModule.LM_PC_PaymentRouter_v1.address,
-    ]
+    [curveInteractionRole, report.inputs.projectConfig.SAFE]
   );
 
   await targetSdk.publicClient.waitForTransactionReceipt({
@@ -419,4 +422,17 @@ export async function configureWorkflow(
   });
 
   console.info('        > Transaction: ', tx2);
+
+  // assign admin role to admin multisig
+  console.info(`    > Granting admin role to ${adminMultisig}`);
+  const tx3 = await workflow.authorizer.write.grantRole.run([
+    await workflow.authorizer.read.getAdminRole.run(),
+    adminMultisig,
+  ]);
+
+  await targetSdk.publicClient.waitForTransactionReceipt({
+    hash: tx3,
+  });
+
+  console.info('        > Transaction: ', tx3);
 }

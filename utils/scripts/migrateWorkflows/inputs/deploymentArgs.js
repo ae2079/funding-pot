@@ -25,6 +25,9 @@ export const getDeployArgs = (
       initialIssuanceSupply: virtualIssuanceSupply,
       initialCollateralSupply: virtualCollateralSupply,
     },
-    collateralToken: '0x5deac602762362fe5f135fa5904351916053cf70',
+    collateralToken: '0x4200000000000000000000000000000000000006',
   },
 });
+
+export const adminMultisig =
+  '0x44a0eBe19A93C801AD97F308672fdc7B110B2128';
