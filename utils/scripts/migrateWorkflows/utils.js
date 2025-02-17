@@ -6,11 +6,9 @@ import {
   createWalletClient,
   http,
   getContract,
-  parseUnits,
-  formatUnits,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { polygonZkEvm, baseSepolia } from 'viem/chains';
+import { polygonZkEvm } from 'viem/chains';
 import { Inverter } from '@inverter-network/sdk';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 
@@ -24,6 +22,10 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const getWrapperForToken = (tokenToWrapper, token) => {
+  return tokenToWrapper[token.toLowerCase()];
+};
 
 export function loadProjectReport(projectName) {
   const outputPath = path.join(
@@ -61,7 +63,7 @@ export function createClients(type = 'source') {
     };
   } else if (type === 'target') {
     baseConfig = {
-      chain: baseSepolia,
+      chain: getChain(process.env.CHAIN_ID),
       transport: http(process.env.RPC_URL),
     };
   }
@@ -95,10 +97,7 @@ export const getTokenSnapshot = async (token) => {
     try {
       ({ holders } = await ankrProvider.getTokenHolders({
         contractAddress: token,
-        blockchain:
-          process.env.NODE_ENV === 'production'
-            ? 'polygon_zkevm'
-            : 'base_sepolia',
+        blockchain: 'polygon_zkevm',
         pageSize: 10,
       }));
       break;
@@ -116,6 +115,10 @@ export const getTokenSnapshot = async (token) => {
 };
 
 export async function getState(projectConfig) {
+  console.info();
+  console.info('> Retrieving Workflow State on zkevm');
+  console.info();
+
   const { publicClient, walletClient } = createClients();
 
   const inverter = new Inverter({
@@ -171,6 +174,8 @@ export async function getState(projectConfig) {
     tokenSnapshot,
   };
 
+  console.info('    > Workflow State:', state);
+
   return state;
 }
 
@@ -185,12 +190,27 @@ export async function recreateIssuanceSnapshot(
 
   const { publicClient, walletClient } = createClients('target');
 
-  const wrapper = tokenToWrapper[state.issuanceToken];
+  const wrapper = getWrapperForToken(
+    tokenToWrapper,
+    state.issuanceToken
+  );
 
   if (!wrapper) {
     console.info('No wrapper found for token', state.issuanceToken);
     return;
   }
+
+  console.info('    > Granting minting rights to deployer');
+
+  const tx0 = await walletClient.writeContract({
+    address: wrapper,
+    abi: abis.mintWrapperAbi,
+    functionName: 'setMinter',
+    args: [walletClient.account.address, true],
+  });
+
+  await publicClient.waitForTransactionReceipt({ hash: tx0 });
+  console.info('        > Transaction: ', tx0);
 
   // minting tokens
   console.info('    > Minting tokens');
@@ -227,11 +247,23 @@ export async function recreateIssuanceSnapshot(
     await publicClient.waitForTransactionReceipt({ hash });
   }
 
+  console.info('    > Revoking minting rights to deployer');
+
+  const tx1 = await walletClient.writeContract({
+    address: wrapper,
+    abi: abis.mintWrapperAbi,
+    functionName: 'setMinter',
+    args: [walletClient.account.address, false],
+  });
+
+  await publicClient.waitForTransactionReceipt({ hash: tx1 });
+  console.info('        > Transaction: ', tx1);
+
   // self assigning vesting role
   console.info('    > Creating vestings');
   console.info('         > Self Assigning Payment Pusher Role');
 
-  const tx1 =
+  const tx2 =
     await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
       [
         await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
@@ -239,8 +271,8 @@ export async function recreateIssuanceSnapshot(
       ]
     );
 
-  await publicClient.waitForTransactionReceipt({ hash: tx1 });
-  console.info('            > Transaction:', tx1);
+  await publicClient.waitForTransactionReceipt({ hash: tx2 });
+  console.info('            > Transaction:', tx2);
 
   // creating vestings
 
@@ -328,7 +360,7 @@ export async function recreateIssuanceSnapshot(
 
   console.info('         > Removing vesting role');
 
-  const tx2 =
+  const tx3 =
     await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.revokeModuleRole.run(
       [
         await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
@@ -336,8 +368,8 @@ export async function recreateIssuanceSnapshot(
       ]
     );
 
-  await publicClient.waitForTransactionReceipt({ hash: tx2 });
-  console.info('            > Transaction:', tx2);
+  await publicClient.waitForTransactionReceipt({ hash: tx3 });
+  console.info('            > Transaction:', tx3);
 }
 
 let targetSdk;
@@ -360,7 +392,7 @@ export async function deployWorkflow(state, tokenToWrapper) {
 
   const args = getDeployArgs(
     targetSdk.walletClient.account.address,
-    tokenToWrapper[state.issuanceToken],
+    getWrapperForToken(tokenToWrapper, state.issuanceToken),
     state.virtualIssuanceSupply,
     state.virtualCollateralSupply
   );
@@ -388,15 +420,17 @@ export async function configureWorkflow(
   console.info();
   console.info('> Configuring Workflow');
 
-  // assign minting rights
-  console.info('    > Setting minter...');
-
-  const mintWrapper = tokenToWrapper[state.issuanceToken];
+  const mintWrapper = getWrapperForToken(
+    tokenToWrapper,
+    state.issuanceToken
+  );
   const mintWrapperContract = getContract({
     address: mintWrapper,
     abi: abis.mintWrapperAbi,
     client: targetSdk.walletClient,
   });
+
+  console.info('    > Setting bonding curve as minter...');
 
   const tx1 = await mintWrapperContract.write.setMinter([
     workflow.fundingManager.address,
@@ -426,16 +460,33 @@ export async function configureWorkflow(
 
   console.info('        > Transaction: ', tx2);
 
-  // assign admin role to admin multisig
-  console.info(`    > Granting admin role to ${adminMultisig}`);
-  const tx3 = await workflow.authorizer.write.grantRole.run([
-    await workflow.authorizer.read.getAdminRole.run(),
-    adminMultisig,
-  ]);
+  console.info(
+    `    > Granting payment pusher rights to ${report.inputs.projectConfig.SAFE} (Funding Pot Multisig)`
+  );
+  const paymentPusher =
+    await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run();
+
+  const tx3 =
+    await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
+      [paymentPusher, report.inputs.projectConfig.SAFE]
+    );
 
   await targetSdk.publicClient.waitForTransactionReceipt({
     hash: tx3,
   });
 
   console.info('        > Transaction: ', tx3);
+
+  // assign admin role to admin multisig
+  console.info(`    > Granting admin role to ${adminMultisig}`);
+  const tx4 = await workflow.authorizer.write.grantRole.run([
+    await workflow.authorizer.read.getAdminRole.run(),
+    adminMultisig,
+  ]);
+
+  await targetSdk.publicClient.waitForTransactionReceipt({
+    hash: tx4,
+  });
+
+  console.info('        > Transaction: ', tx4);
 }

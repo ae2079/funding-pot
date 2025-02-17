@@ -1,3 +1,8 @@
+const WPOL =
+  process.env.NODE_ENV === 'production'
+    ? '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
+    : '0xA5733b3A8e62A8faF43b0376d5fAF46E89B3033E';
+
 export const getDeployArgs = (
   deployer,
   wrapper,
@@ -28,12 +33,9 @@ export const getDeployArgs = (
       initialIssuanceSupply: virtualIssuanceSupply,
       initialCollateralSupply: virtualCollateralSupply,
     },
-    collateralToken:
-      process.env.NODE_ENV === 'production'
-        ? '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
-        : '0xfaf6c989dB0582D7b31e40343dd4A41a1848E038',
+    collateralToken: WPOL,
   },
 });
 
 export const adminMultisig =
-  '0x44a0eBe19A93C801AD97F308672fdc7B110B2128';
+  '0x4D3cFf0bD16b48f4B6e906D4d44BB077036dc8bb';

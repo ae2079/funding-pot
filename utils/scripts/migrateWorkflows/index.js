@@ -20,7 +20,10 @@ async function main() {
   const report = loadProjectReport(projectName);
   const state = await getState(report.inputs.projectConfig);
 
-  console.info('> START MIGRATION');
+  console.info(
+    '> START MIGRATION TO NETWORK: ',
+    process.env.CHAIN_ID
+  );
 
   // deploy workflow
   const workflow = await deployWorkflow(state, tokenToWrapper);
@@ -37,7 +40,11 @@ async function main() {
   await configureWorkflow(workflow, state, tokenToWrapper, report);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+main()
+  .then(() => {
+    console.info('> MIGRATION COMPLETE');
+  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
