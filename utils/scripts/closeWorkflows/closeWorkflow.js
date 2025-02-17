@@ -31,11 +31,19 @@ export async function closeWorkflow(projectConfig, adminMultisig) {
   const transactionBuilder = new TransactionBuilder({
     projectConfig: { SAFE: adminMultisig },
     workflowAddresses: addresses,
+    batchConfig: {
+      VESTING_DETAILS: {
+        START: 10,
+        CLIFF: 0,
+        END: 10,
+      },
+    },
   });
   const safe = new Safe(CHAIN_ID, { SAFE: adminMultisig }, RPC_URL);
   const snapshot = await getTokenSnapshot(addresses.issuanceToken);
 
-  transactionBuilder.setMinter(adminMultisig);
+  transactionBuilder.setMinter(adminMultisig, true);
+
   for (const entry of snapshot) {
     transactionBuilder.burnIssuance(
       entry.holderAddress,
@@ -43,30 +51,31 @@ export async function closeWorkflow(projectConfig, adminMultisig) {
     );
   }
 
+  transactionBuilder.setMinter(adminMultisig, false);
+  transactionBuilder.setMinter(addresses.bondingCurve, false);
+  transactionBuilder.renounceOwnership(addresses.mintWrapper);
+  transactionBuilder.closeCurve();
+
+  const collateralInFundingManager = await queriesService.balanceOf(
+    addresses.collateralToken,
+    addresses.bondingCurve
+  );
+  const feesCollected = await queriesService.feesCollected();
+
+  transactionBuilder.createVestings(
+    [
+      {
+        recipient: adminMultisig,
+        amount: collateralInFundingManager - feesCollected,
+      },
+    ],
+    addresses.collateralToken
+  );
+
+  transactionBuilder.claimStream();
+
   // Propose transactions
   const txBatches = transactionBuilder.getEncodedTxBatches();
 
   await safe.proposeTxs(txBatches);
-
-  //   // Deploy Roles
-  //   const rolesModule = transactionBuilder.deployZodiacRoles(
-  //     rolesFactory,
-  //     rolesMasterCopy
-  //   );
-
-  //   // Enable Roles on Safe
-  //   transactionBuilder.enableModule(admin, rolesModule);
-
-  //   // Define role
-  //   transactionBuilder.createRole(ROLE_KEY, rolesModule, feeRecipient);
-
-  //   // // Assign role to fee claimer
-  //   transactionBuilder.assignRole(ROLE_KEY, rolesModule, feeClaimer);
-
-  //   // Propose transactions
-  //   const txBatches = transactionBuilder.getEncodedTxBatches();
-
-  //   await safe.proposeTxs(txBatches);
-
-  //   return rolesModule;
 }

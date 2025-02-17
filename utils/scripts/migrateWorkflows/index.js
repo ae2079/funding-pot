@@ -23,7 +23,7 @@ async function main() {
   console.info('> START MIGRATION');
 
   // deploy workflow
-  const workflow = await deployWorkflow(state);
+  const workflow = await deployWorkflow(state, tokenToWrapper);
 
   // mint and put all issuance tokens where they belong
   await recreateIssuanceSnapshot(

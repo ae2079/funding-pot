@@ -342,7 +342,7 @@ export async function recreateIssuanceSnapshot(
 
 let targetSdk;
 
-export async function deployWorkflow(state) {
+export async function deployWorkflow(state, tokenToWrapper) {
   console.info();
   console.info('> Deploying Workflow');
 
@@ -360,7 +360,7 @@ export async function deployWorkflow(state) {
 
   const args = getDeployArgs(
     targetSdk.walletClient.account.address,
-    state.issuanceToken,
+    tokenToWrapper[state.issuanceToken],
     state.virtualIssuanceSupply,
     state.virtualCollateralSupply
   );

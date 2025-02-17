@@ -29,6 +29,7 @@ export class TransactionBuilder {
     this.transactions = [];
     this.safe = projectConfig.SAFE;
     this.paymentRouter = workflowAddresses.paymentRouter;
+    this.paymentProcessor = workflowAddresses.paymentProcessor;
     this.issuanceToken = workflowAddresses.issuanceToken;
     this.collateralToken = workflowAddresses.collateralToken;
     this.bondingCurve = workflowAddresses.bondingCurve;
@@ -63,21 +64,14 @@ export class TransactionBuilder {
     ]);
   }
 
-  createVestings(vestingSpecs) {
+  createVestings(vestingSpecs, token = this.issuanceToken) {
     for (const vestingSpec of vestingSpecs) {
       const { recipient, amount } = vestingSpec;
       this.addTx(
         this.paymentRouter,
         'paymentRouterAbi',
         'pushPayment(address,address,uint256,uint256,uint256,uint256)',
-        [
-          recipient,
-          this.issuanceToken,
-          amount,
-          this.start,
-          this.cliff,
-          this.end,
-        ]
+        [recipient, token, amount, this.start, this.cliff, this.end]
       );
     }
   }
@@ -190,12 +184,12 @@ export class TransactionBuilder {
     );
   }
 
-  setMinter(newMinter) {
+  setMinter(newMinter, allowed) {
     this.addTx(
       this.mintWrapper,
       'mintWrapperAbi',
       'setMinter(address,bool)',
-      [newMinter, true]
+      [newMinter, allowed]
     );
   }
 
@@ -205,6 +199,34 @@ export class TransactionBuilder {
       'mintWrapperAbi',
       'burn(address,uint256)',
       [from, amount]
+    );
+  }
+
+  renounceOwnership(contract) {
+    this.addTx(contract, 'mintWrapperAbi', 'renounceOwnership()', []);
+  }
+
+  closeCurve() {
+    this.addTx(
+      this.bondingCurve,
+      'bondingCurveAbi',
+      'closeBuy()',
+      []
+    );
+    this.addTx(
+      this.bondingCurve,
+      'bondingCurveAbi',
+      'closeSell()',
+      []
+    );
+  }
+
+  claimStream() {
+    this.addTx(
+      this.paymentProcessor,
+      'streamingProcessorAbi',
+      'claimAll(address)',
+      [this.paymentRouter]
     );
   }
 
@@ -222,7 +244,6 @@ export class TransactionBuilder {
   getEncodedTxs() {
     const encodedTxs = [];
     for (const tx of this.transactions) {
-      console.log(tx);
       const { to, abiName, functionSignature, inputValues } = tx;
       const abi = abis[abiName];
 

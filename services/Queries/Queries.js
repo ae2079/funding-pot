@@ -55,6 +55,8 @@ export class Queries {
     this.queries.addresses.orchestrator = orchestratorAddress;
     this.queries.addresses.bondingCurve =
       await orchestrator.read.fundingManager();
+    this.queries.addresses.paymentProcessor =
+      await orchestrator.read.paymentProcessor();
     this.bondingCurve = getContract({
       address: this.queries.addresses.bondingCurve,
       client: this.publicClient,
@@ -305,6 +307,24 @@ export class Queries {
     }
   }
 
+  async balanceOf(token, address) {
+    const tokenContract = getContract({
+      address: token,
+      client: this.publicClient,
+      abi: abis.erc20Abi,
+    });
+    return await tokenContract.read.balanceOf([address]);
+  }
+
+  async feesCollected() {
+    const fundingManager = getContract({
+      address: this.queries.addresses.bondingCurve,
+      client: this.publicClient,
+      abi: abis.bondingCurveAbi,
+    });
+    return await fundingManager.read.projectCollateralFeeCollected();
+  }
+
   /* 
     CONNECTORS
   */
@@ -351,6 +371,10 @@ export class Queries {
       return 'base_sepolia';
     } else if (chainId == 1101) {
       return 'polygon_zkevm';
+    } else if (chainId == 80002) {
+      return 'polygon_amoy';
+    } else if (chainId == 137) {
+      return 'polygon';
     }
   }
 

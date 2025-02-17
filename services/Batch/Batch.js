@@ -461,17 +461,6 @@ export class Batch {
       return this.data.totalValidContribution.inCollateral;
     }
 
-    console.log(
-      'total valid: ',
-      this.data.totalValidContribution.inCollateral
-    );
-    console.log('matching funds: ', this.config.matchingFunds);
-    console.log(
-      'sum: ',
-      this.data.totalValidContribution.inCollateral +
-        this.config.matchingFunds
-    );
-
     return (
       this.data.totalValidContribution.inCollateral +
       this.config.matchingFunds
