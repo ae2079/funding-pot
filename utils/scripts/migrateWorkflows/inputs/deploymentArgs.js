@@ -1,7 +1,7 @@
 const WPOL =
   process.env.NODE_ENV === 'production'
-    ? '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
-    : '0xA5733b3A8e62A8faF43b0376d5fAF46E89B3033E';
+    ? '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270' // WPOL on Polygon
+    : '0xA5733b3A8e62A8faF43b0376d5fAF46E89B3033E'; // WPOL on Amoy
 
 export const getDeployArgs = (
   deployer,
@@ -38,4 +38,4 @@ export const getDeployArgs = (
 });
 
 export const adminMultisig =
-  '0x4D3cFf0bD16b48f4B6e906D4d44BB077036dc8bb';
+  '0x9298fD550E2c02AdeBf781e08214E4131CDeC44e';

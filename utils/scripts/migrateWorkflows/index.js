@@ -25,7 +25,7 @@ async function main() {
     process.env.CHAIN_ID
   );
 
-  // deploy workflow
+  // // deploy workflow
   const workflow = await deployWorkflow(state, tokenToWrapper);
 
   // mint and put all issuance tokens where they belong
@@ -36,8 +36,8 @@ async function main() {
     report
   );
 
-  // configure workflow
-  await configureWorkflow(workflow, state, tokenToWrapper, report);
+  // // configure workflow
+  // await configureWorkflow(workflow, state, tokenToWrapper, report);
 }
 
 main()

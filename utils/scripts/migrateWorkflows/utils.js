@@ -6,6 +6,8 @@ import {
   createWalletClient,
   http,
   getContract,
+  getAddress,
+  parseUnits,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { polygonZkEvm } from 'viem/chains';
@@ -136,6 +138,8 @@ export async function getState(projectConfig) {
   const virtualCollateralSupply =
     await workflow.fundingManager.read.getVirtualCollateralSupply.run();
 
+  const paymentProcessor = await workflow.paymentProcessor.address;
+
   const paymentRouter = await workflow.optionalModule
     .LM_PC_PaymentRouter_v1.address;
   const mintWrapper =
@@ -164,6 +168,40 @@ export async function getState(projectConfig) {
 
   const tokenSnapshot = await getTokenSnapshot(issuanceToken);
 
+  const query = `{
+  LinearVesting(
+    where: {chainId: {_eq: 1101}, streamingPaymentProcessor: {address: {_eq: "${getAddress(
+      paymentProcessor
+    )}"}}}
+  ) {
+    recipient
+    amount
+    token {
+      address
+    }
+    cliff
+    end
+    start
+  }
+}`;
+
+  const response = await fetch(
+    'https://dev.indexer.inverter.network/v1/graphql',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+      }),
+    }
+  );
+
+  const {
+    data: { LinearVesting },
+  } = await response.json();
+
   const state = {
     virtualIssuanceSupply,
     virtualCollateralSupply,
@@ -172,6 +210,7 @@ export async function getState(projectConfig) {
     paymentRouter,
     totalIssuanceSupply,
     tokenSnapshot,
+    vestings: LinearVesting,
   };
 
   console.info('    > Workflow State:', state);
@@ -275,24 +314,11 @@ export async function recreateIssuanceSnapshot(
   console.info('            > Transaction:', tx2);
 
   // creating vestings
-
-  const { transactions, batchReports } = report;
-
-  const allTransactions = [
-    ...transactions.readable.flat(),
-    ...Object.values(batchReports)
-      .map((b) => b.transactions.readable.flat())
-      .flat(),
-  ];
-
-  const allVestings = allTransactions
-    .filter((t) => t.functionSignature.includes('pushPayment'))
-    .map((t) => t.inputValues);
-
+  const { vestings } = state;
+  // creating vestings
   const tranches = {};
-  for (const vesting of allVestings) {
-    const [, , , start, cliff, duration] = vesting;
-    const id = `${start}-${cliff}-${duration}`;
+  for (const vesting of vestings) {
+    const id = `${vesting.start}-${vesting.cliff}-${vesting.end}`;
     if (!tranches[id]) {
       tranches[id] = [];
     }
@@ -310,20 +336,13 @@ export async function recreateIssuanceSnapshot(
     const tranch = tranches[tranchId];
 
     for (let i = 0; i < tranch.length; i++) {
-      const [
-        recipient,
-        paymentToken,
-        amount,
-        thisStart,
-        thisCliff,
-        thisEnd,
-      ] = tranch[i];
-      start = thisStart;
-      cliff = thisCliff;
-      end = thisEnd;
-      recipients.push(recipient);
-      paymentTokens.push(paymentToken);
-      amounts.push(amount);
+      const vesting = tranch[i];
+      start = vesting.start;
+      cliff = vesting.cliff;
+      end = vesting.end;
+      recipients.push(vesting.recipient);
+      paymentTokens.push(vesting.token.address);
+      amounts.push(parseUnits(vesting.amount, 18));
 
       if (recipients.length === 40 || i === tranch.length - 1) {
         console.info(
