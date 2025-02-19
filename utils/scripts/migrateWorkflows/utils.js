@@ -170,9 +170,9 @@ export async function getState(projectConfig) {
 
   const query = `{
   LinearVesting(
-    where: {chainId: {_eq: 1101}, streamingPaymentProcessor: {address: {_eq: "${getAddress(
-      paymentProcessor
-    )}"}}}
+    where: {chainId: {_eq: 1101}, streamingPaymentProcessor: {workflow: {address: {_eq: "${getAddress(
+      projectConfig.ORCHESTRATOR
+    )}"}}}}
   ) {
     recipient
     amount
