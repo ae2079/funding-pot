@@ -462,6 +462,18 @@ export async function configureWorkflow(
 
   console.info('        > Transaction: ', tx1);
 
+  console.info('    > Setting admin multisig as owner of wrapper...');
+
+  const tx1a = await mintWrapperContract.write.transferOwnership([
+    adminMultisig,
+  ]);
+
+  await targetSdk.publicClient.waitForTransactionReceipt({
+    hash: tx1a,
+  });
+
+  console.info('        > Transaction: ', tx1a);
+
   // assigning curve interaction rights
   console.info(
     `    > Granting curve interaction rights to ${report.inputs.projectConfig.SAFE} (Funding Pot Multisig)`

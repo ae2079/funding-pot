@@ -36,8 +36,8 @@ async function main() {
     report
   );
 
-  // // configure workflow
-  // await configureWorkflow(workflow, state, tokenToWrapper, report);
+  // configure workflow
+  await configureWorkflow(workflow, state, tokenToWrapper, report);
 }
 
 main()
