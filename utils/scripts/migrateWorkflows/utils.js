@@ -169,21 +169,21 @@ export async function getState(projectConfig) {
   const tokenSnapshot = await getTokenSnapshot(issuanceToken);
 
   const query = `{
-  LinearVesting(
-    where: {chainId: {_eq: 1101}, streamingPaymentProcessor: {workflow: {address: {_eq: "${getAddress(
-      projectConfig.ORCHESTRATOR
-    )}"}}}}
-  ) {
-    recipient
-    amount
-    token {
-      address
+    LinearVesting(
+      where: {chainId: {_eq: 1101}, streamingPaymentProcessor: {workflow: {address: {_eq: "${getAddress(
+        projectConfig.ORCHESTRATOR
+      )}"}}}}
+    ) {
+      recipient
+      amount
+      token {
+        address
+      }
+      cliff
+      end
+      start
     }
-    cliff
-    end
-    start
-  }
-}`;
+  }`;
 
   const response = await fetch(
     'https://dev.indexer.inverter.network/v1/graphql',
