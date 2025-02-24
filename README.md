@@ -149,34 +149,21 @@ There are three types of inputs that the script executor can take. They can all 
 
 To run the script for one project use the following command:
 
-`npm run project <PROJECT_NAME> <BATCH_NUMBER>`
+`npm run project <SEASON> <PROJECT_NAME> <BATCH_NUMBER>`
 
+- `SEASON`: the season you want to run the script for; used to fetch season-specific configurations from `batches/<SEASON>/<BATCH_NUMBER>.json`
 - `PROJECT_NAME`: the name of the project you want to run the script for; used to fetch project-specific configurations from `projects.json`
-- `BATCH_NUMBER`: the batch number you want to run the script for; used to fetch batch-specific configurations from `batches/<BATCH_NUMBER>.json`
+- `BATCH_NUMBER`: the batch number you want to run the script for; used to fetch batch-specific configurations from `batches/<SEASON>/<BATCH_NUMBER>.json`
 
 **Example:**
 
-The following command will run the script for the 3rd batch of the project `FUNKY_FOXES`:
+The following command will run the script for the 2nd batch of the project `FUNKY_FOXES` in season 3:
 
-`npm run project 3 "FUNKY_FOXES"`
+`npm run project 3 "FUNKY_FOXES" 2`
 
 ### Checking the script's output
 
 When the script has executed a JSON report will be added under `data/production/output/<PROJECT_NAME>/<BATCH_NUMBER>.json`. You can use this file to better understand what has been proposed to the safe.
-
-#### For all projects
-
-To run the script for all projects use the following command:
-
-`npm run all <BATCH_NUMBER>`
-
-- `BATCH_NUMBER`: the batch number you want to run the script for; used to fetch batch-specific configurations from `batches/<BATCH_NUMBER>.json`
-
-**Example:**
-
-The following command will run the script for the 3rd batch for all projects defined in the `projects.json`:
-
-`npm run all 3`
 
 ## Running the vesting script
 
@@ -302,7 +289,7 @@ In summary this project does three things:
 
 - contributions per user per batch are capped
 - how much a user can contribute is calculated as follows:
-  1. the batch config (`/input/batches/<batchNr>.json`) specifies the amount of collateral tokens that a user can contribute per batch
+  1. the batch config (`/input/batches/s<season>/<batchNr>.json`) specifies the amount of collateral tokens that a user can contribute per batch
   2. the batch config also specifies a total cap on the batch and if this cap is reached the batch is closed
   3. the unfilled total cap carries over to the next batch (the individual cap doesn't)
 
@@ -321,26 +308,30 @@ In summary this project does three things:
 .
 ├── README.md
 ├── config.js
-├── data
-│ ├── abis.js
-│ └── test
-│ ├── input
-│ │ ├── allowlist.json
-│ │ ├── batches
-│ │ │ ├── 1.json
-│ │ │ ├── 2.json
-│ │ │ └── 3.json
-│ │ └── projects.json
-│ └── output
-│ ├── GENERATED_TEST_PROJECT
-│ │ ├── 1.json
-│ │ ├── 2.json
-│ │ └── 3.json
-│ ├── STATIC_TEST_PROJECT_1
-│ └── STATIC_TEST_PROJECT_2
-│ ├── 1.json
-│ └── 2.json
-
+└── data
+  ├── abis.js
+  ├── test
+  └── production
+    ├── input
+    │   ├── batches
+    │   │   ├── s1
+    │   │   │   ├── 1.json
+    │   │   │   ├── 2.json
+    │   │   │   └── 3.json
+    │   │   └── s2
+    │   │       ├── 1.json
+    │   │       ├── 2.json
+    │   │       └── 3.json
+    │   └── projects.json
+    └── output
+        ├── GENERATED_TEST_PROJECT
+        │   ├── 1.json
+        │   ├── 2.json
+        │   └── 3.json
+        ├── STATIC_TEST_PROJECT_1
+        └── STATIC_TEST_PROJECT_2
+            ├── 1.json
+            └── 2.json
 ```
 
 #### Services
@@ -358,20 +349,20 @@ The services are where the most of the logic sits. All services are classes that
 ├── index.js
 ├── package-lock.json
 ├── package.json
-├── services
-│ ├── Batch
-│ │ ├── Batch.js
-│ │ └── Batch.test.js
-│ ├── Queries
-│ │ ├── Queries.js
-│ │ ├── Queries.test.js
-│ │ └── queryBuilder.js
-│ ├── Safe
-│ │ ├── Safe.js
-│ │ └── Safe.test.js
-│ └── TransactionBuilder
-│ ├── TransactionBuilder.js
-│ └── TransactionBuilder.test.js
+└── services
+  ├── Batch
+  │ ├── Batch.js
+  │ └── Batch.test.js
+  ├── Queries
+  │ ├── Queries.js
+  │ ├── Queries.test.js
+  │ └── queryBuilder.js
+  ├── Safe
+  │ ├── Safe.js
+  │ └── Safe.test.js
+  └── TransactionBuilder
+    ├── TransactionBuilder.js
+    └── TransactionBuilder.test.js
 
 ```
 

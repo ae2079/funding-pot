@@ -99,11 +99,11 @@ MELODEX: 19/02/2025
 **Permissions**
 
 - [x] workflow admin from config is workflow admin (workflow admin multisig: `0x9298fD550E2c02AdeBf781e08214E4131CDeC44e`)
-- [x] workflow admin from config is owner of token wrapper contract (`0x9298fD550E2c02AdeBf781e08214E4131CDeC44e`)
 - [x] dev is workflow admin (`0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4`); _to be removed after grace period_
+- [x] dev is owner of token wrapper contract (`0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4`); _to be removed after grace period_
 - [x] dev is owner of token (`0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4`); _to be removed after grace period_
+- [x] dev (`0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4`) is still set as minter on wrapper; _to be removed after grace period_
 
-- [x] dev not set as minter anymore on wrapper
 - [x] bonding curv module is set as minter on wrapper
 - [x] wrapper is set as minter on token
 

@@ -222,7 +222,7 @@ export async function recreateIssuanceSnapshot(
   workflow,
   state,
   tokenToWrapper,
-  report
+  migrationProtocol
 ) {
   console.info();
   console.info('> Recreating Token Snapshot');
@@ -241,18 +241,38 @@ export async function recreateIssuanceSnapshot(
 
   console.info('    > Granting minting rights to deployer');
 
-  const tx0 = await walletClient.writeContract({
+  const grantMintingToDeployerPayload = {
     address: wrapper,
-    abi: abis.mintWrapperAbi,
     functionName: 'setMinter',
     args: [walletClient.account.address, true],
-  });
+  };
 
-  await publicClient.waitForTransactionReceipt({ hash: tx0 });
-  console.info('        > Transaction: ', tx0);
+  try {
+    const tx0 = await walletClient.writeContract({
+      ...grantMintingToDeployerPayload,
+      abi: abis.mintWrapperAbi,
+    });
+    await publicClient.waitForTransactionReceipt({ hash: tx0 });
+    console.info('        > Transaction: ', tx0);
+
+    migrationProtocol.grantMintingToDeployerPayload = {
+      grantMintingToDeployerPayload,
+      status: 'success',
+      hash: tx0,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.grantMintingToDeployerPayload = {
+      grantMintingToDeployerPayload,
+      status: 'failed',
+      error: e.message,
+    };
+  }
 
   // minting tokens
   console.info('    > Minting tokens');
+  migrationProtocol.mintPayloads = [];
+
   for (const entry of state.tokenSnapshot) {
     const { holderAddress, balanceRawInteger, balance } = entry;
     if (balanceRawInteger === 0n) continue;
@@ -273,49 +293,106 @@ export async function recreateIssuanceSnapshot(
       }`
     );
 
-    const hash = await walletClient.writeContract({
+    const mintPayload = {
       address: wrapper,
-      abi: abis.mintWrapperAbi,
       functionName: 'mint',
-      args: [target, balanceRawInteger],
-    });
+      args: [target, balanceRawInteger.toString()],
+    };
 
-    console.info('            > Transaction:', hash);
+    try {
+      const hash = await walletClient.writeContract({
+        ...mintPayload,
+        abi: abis.mintWrapperAbi,
+      });
 
-    // Wait for transaction to be mined
-    await publicClient.waitForTransactionReceipt({ hash });
+      console.info('            > Transaction:', hash);
+
+      // Wait for transaction to be mined
+      await publicClient.waitForTransactionReceipt({ hash });
+
+      migrationProtocol.mintPayloads.push({
+        mintPayload,
+        status: 'success',
+        hash,
+      });
+    } catch (e) {
+      console.error('            > Error: ', e.message);
+      migrationProtocol.mintPayloads.push({
+        mintPayload,
+        status: 'failed',
+        error: e.message,
+      });
+    }
   }
 
-  console.info('    > Revoking minting rights to deployer');
-
-  const tx1 = await walletClient.writeContract({
+  console.info('    > Revoking minting rights from deployer');
+  const revokeMintingRightsFromDeployer = {
     address: wrapper,
     abi: abis.mintWrapperAbi,
     functionName: 'setMinter',
     args: [walletClient.account.address, false],
-  });
+  };
 
-  await publicClient.waitForTransactionReceipt({ hash: tx1 });
-  console.info('        > Transaction: ', tx1);
+  try {
+    const tx1 = await walletClient.writeContract(
+      revokeMintingRightsFromDeployer
+    );
+    await publicClient.waitForTransactionReceipt({ hash: tx1 });
+    console.info('        > Transaction: ', tx1);
+
+    migrationProtocol.revokeMintingRightsFromDeployer = {
+      revokeMintingRightsFromDeployer,
+      status: 'success',
+      hash: tx1,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.revokeMintingRightsFromDeployer = {
+      revokeMintingRightsFromDeployer,
+      status: 'failed',
+      error: e.message,
+    };
+  }
 
   // self assigning vesting role
   console.info('    > Creating vestings');
   console.info('         > Self Assigning Payment Pusher Role');
 
-  const tx2 =
-    await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
-      [
-        await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
-        walletClient.account.address,
-      ]
-    );
+  const selfAssigningVestingPayloadViaSdk = {
+    address: workflow.optionalModule.LM_PC_PaymentRouter_v1.address,
+    functionName: 'grantModuleRole',
+    args: [
+      await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
+      walletClient.account.address,
+    ],
+  };
 
-  await publicClient.waitForTransactionReceipt({ hash: tx2 });
-  console.info('            > Transaction:', tx2);
+  try {
+    const tx2 =
+      await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
+        selfAssigningVestingPayloadViaSdk.args
+      );
+    await publicClient.waitForTransactionReceipt({ hash: tx2 });
+    console.info('            > Transaction:', tx2);
+
+    migrationProtocol.selfAssigningVestingPayloadViaSdk = {
+      selfAssigningVestingPayloadViaSdk,
+      status: 'success',
+      hash: tx2,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.selfAssigningVestingPayloadViaSdk = {
+      selfAssigningVestingPayloadViaSdk,
+      status: 'failed',
+      error: e.message,
+    };
+  }
 
   // creating vestings
+
+  migrationProtocol.vestingBatches = [];
   const { vestings } = state;
-  // creating vestings
   const tranches = {};
   for (const vesting of vestings) {
     const id = `${vesting.start}-${vesting.cliff}-${vesting.end}`;
@@ -337,12 +414,12 @@ export async function recreateIssuanceSnapshot(
 
     for (let i = 0; i < tranch.length; i++) {
       const vesting = tranch[i];
-      start = vesting.start;
-      cliff = vesting.cliff;
-      end = vesting.end;
+      start = vesting.start.toString();
+      cliff = vesting.cliff.toString();
+      end = vesting.end.toString();
       recipients.push(vesting.recipient);
       paymentTokens.push(vesting.token.address);
-      amounts.push(parseUnits(vesting.amount, 18));
+      amounts.push(parseUnits(vesting.amount, 18).toString());
 
       if (recipients.length === 40 || i === tranch.length - 1) {
         console.info(
@@ -350,20 +427,47 @@ export async function recreateIssuanceSnapshot(
           recipients.length,
           `(start: ${start}, cliff: ${cliff}, end: ${end})`
         );
-        const tx =
-          await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.pushPaymentBatched.run(
-            [
-              recipients.length,
-              recipients,
-              paymentTokens,
-              amounts,
-              start,
-              cliff,
-              end,
-            ]
-          );
-        await publicClient.waitForTransactionReceipt({ hash: tx });
-        console.info('            > Transaction:', tx);
+
+        const pushPaymentBatchedPayloadViaSdk = {
+          address:
+            workflow.optionalModule.LM_PC_PaymentRouter_v1.address,
+          functionName: 'pushPaymentBatched',
+          args: [
+            recipients.length,
+            recipients,
+            paymentTokens,
+            amounts,
+            start,
+            cliff,
+            end,
+          ],
+        };
+
+        try {
+          throw new Error('test');
+
+          const tx =
+            await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.pushPaymentBatched.run(
+              pushPaymentBatchedPayloadViaSdk.args
+            );
+
+          await publicClient.waitForTransactionReceipt({ hash: tx });
+          console.info('            > Transaction:', tx);
+
+          migrationProtocol.vestingBatches.push({
+            pushPaymentBatchedPayloadViaSdk,
+            status: 'success',
+            hash: tx,
+          });
+        } catch (e) {
+          console.error('            > Error: ', e.message);
+
+          migrationProtocol.vestingBatches.push({
+            pushPaymentBatchedPayloadViaSdk,
+            status: 'failed',
+            error: e.message,
+          });
+        }
 
         recipients = [];
         paymentTokens = [];
@@ -379,16 +483,39 @@ export async function recreateIssuanceSnapshot(
 
   console.info('         > Removing vesting role');
 
-  const tx3 =
-    await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.revokeModuleRole.run(
-      [
-        await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
-        walletClient.account.address,
-      ]
-    );
+  const revokeVestingRolePayloadViaSdk = {
+    address: workflow.optionalModule.LM_PC_PaymentRouter_v1.address,
+    functionName: 'revokeModuleRole',
+    args: [
+      await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run(),
+      walletClient.account.address,
+    ],
+  };
 
-  await publicClient.waitForTransactionReceipt({ hash: tx3 });
-  console.info('            > Transaction:', tx3);
+  try {
+    const tx3 =
+      await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.revokeModuleRole.run(
+        revokeVestingRolePayloadViaSdk.args
+      );
+
+    await publicClient.waitForTransactionReceipt({ hash: tx3 });
+    console.info('            > Transaction:', tx3);
+
+    migrationProtocol.revokeVestingRolePayloadViaSdk = {
+      revokeVestingRolePayloadViaSdk,
+      status: 'success',
+      hash: tx3,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.revokeVestingRolePayloadViaSdk = {
+      revokeVestingRolePayloadViaSdk,
+      status: 'failed',
+      error: e.message,
+    };
+  }
+
+  return migrationProtocol;
 }
 
 let targetSdk;
@@ -462,17 +589,17 @@ export async function configureWorkflow(
 
   console.info('        > Transaction: ', tx1);
 
-  console.info('    > Setting admin multisig as owner of wrapper...');
+  // console.info('    > Setting admin multisig as owner of wrapper...');
 
-  const tx1a = await mintWrapperContract.write.transferOwnership([
-    adminMultisig,
-  ]);
+  // const tx1a = await mintWrapperContract.write.transferOwnership([
+  //   adminMultisig,
+  // ]);
 
-  await targetSdk.publicClient.waitForTransactionReceipt({
-    hash: tx1a,
-  });
+  // await targetSdk.publicClient.waitForTransactionReceipt({
+  //   hash: tx1a,
+  // });
 
-  console.info('        > Transaction: ', tx1a);
+  // console.info('        > Transaction: ', tx1a);
 
   // assigning curve interaction rights
   console.info(

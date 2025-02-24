@@ -12,6 +12,8 @@ import { tokenToWrapper } from './inputs/wrappers.js';
 async function main() {
   const [, , projectName] = process.argv;
 
+  let migrationProtocol = {};
+
   if (!projectName) {
     console.error('Please provide a project name as an argument');
     process.exit(1);
@@ -25,19 +27,44 @@ async function main() {
     process.env.CHAIN_ID
   );
 
-  // // deploy workflow
+  // deploy workflow
   const workflow = await deployWorkflow(state, tokenToWrapper);
+  migrationProtocol.orchestratorAddress =
+    workflow.orchestrator.address;
 
   // mint and put all issuance tokens where they belong
-  await recreateIssuanceSnapshot(
+  migrationProtocol = await recreateIssuanceSnapshot(
     workflow,
     state,
     tokenToWrapper,
-    report
+    migrationProtocol
   );
 
-  // configure workflow
-  await configureWorkflow(workflow, state, tokenToWrapper, report);
+  // write migration protocol to filesystem
+  const fs = await import('fs');
+  const path = await import('path');
+
+  const outputDir = path.join(
+    process.cwd(),
+    'utils/scripts/migrateWorkflows/output'
+  );
+
+  // Create output directory if it doesn't exist
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  const outputPath = path.join(outputDir, `${projectName}.json`);
+
+  fs.writeFileSync(
+    outputPath,
+    JSON.stringify(migrationProtocol, null, 2)
+  );
+
+  console.info('> Migration protocol written to:', outputPath);
+
+  // // configure workflow
+  // await configureWorkflow(workflow, state, tokenToWrapper, report);
 }
 
 main()

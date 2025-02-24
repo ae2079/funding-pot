@@ -5,14 +5,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-export const loadInputs = (projectName, batch) => {
+export const loadInputs = (season, projectName, batch) => {
   return {
-    ...loadConfigs(batch),
+    ...loadConfigs(season, batch),
     ...loadbatchReports(projectName, batch),
   };
 };
 
-const loadConfigs = (batch) => {
+const loadConfigs = (season, batch) => {
   const basePath = getBasePath('input');
 
   // load project config (= project-specific constants)
@@ -21,7 +21,10 @@ const loadConfigs = (batch) => {
   // load batch config (batch-specific constants such as allowlist, start & end block, vesting schedule)
   const batchConfig = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, `${basePath}/batches/${batch}.json`)
+      path.join(
+        __dirname,
+        `${basePath}/batches/s${season}/${batch}.json`
+      )
     )
   );
 
@@ -31,7 +34,7 @@ const loadConfigs = (batch) => {
   };
 };
 
-const loadbatchReports = (projectName, batch) => {
+const loadbatchReports = (projectName) => {
   const batchReportsPath = path.join(
     __dirname,
     `${getBasePath('output')}/${projectName}`

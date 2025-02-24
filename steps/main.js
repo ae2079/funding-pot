@@ -5,14 +5,15 @@ import { defineBatch } from './04_defineBatch/04_defineBatch.js';
 import { proposeBatch } from './05_proposeBatch/05_proposeBatch.js';
 import { storeReport } from './06_storeReport/06_storeReport.js';
 
-export const main = async (projectName, batchNr) => {
+export const main = async (season, projectName, batchNr) => {
   console.info(
-    `🚀 Starting batch execution for project ${projectName} with batch number ${batchNr}`
+    `🚀 Starting batch execution for season ${season} for project ${projectName} for batch ${batchNr}`
   );
 
   // load configs & batchReports
   console.info(`1️⃣ Loading configs...`);
   const { projectsConfig, batchConfig, batchReports } = loadInputs(
+    season,
     projectName,
     batchNr
   );
