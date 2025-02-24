@@ -7,7 +7,7 @@ import {
   deployWorkflow,
   configureWorkflow,
 } from './utils.js';
-import { tokenToWrapper } from './inputs/wrappers.js';
+import { tokenToWrapper } from './input/wrappers.js';
 
 async function main() {
   const [, , projectName] = process.argv;
@@ -63,8 +63,14 @@ async function main() {
 
   console.info('> Migration protocol written to:', outputPath);
 
-  // // configure workflow
-  // await configureWorkflow(workflow, state, tokenToWrapper, report);
+  // configure workflow
+  await configureWorkflow(
+    workflow,
+    state,
+    tokenToWrapper,
+    report,
+    migrationProtocol
+  );
 }
 
 main()

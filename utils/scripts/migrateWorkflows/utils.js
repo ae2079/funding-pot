@@ -20,7 +20,7 @@ import { requestedModules } from '../../../utils/testUtils/staticTestData.js';
 import {
   getDeployArgs,
   adminMultisig,
-} from './inputs/deploymentArgs.js';
+} from './input/deploymentArgs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -264,7 +264,7 @@ export async function recreateIssuanceSnapshot(
     console.error('            > Error: ', e.message);
     migrationProtocol.grantMintingToDeployerPayload = {
       grantMintingToDeployerPayload,
-      status: 'failed',
+      status: 'failure',
       error: e.message,
     };
   }
@@ -319,14 +319,14 @@ export async function recreateIssuanceSnapshot(
       console.error('            > Error: ', e.message);
       migrationProtocol.mintPayloads.push({
         mintPayload,
-        status: 'failed',
+        status: 'failure',
         error: e.message,
       });
     }
   }
 
   console.info('    > Revoking minting rights from deployer');
-  const revokeMintingRightsFromDeployer = {
+  const revokeMintingRightsFromDeployerPayload = {
     address: wrapper,
     abi: abis.mintWrapperAbi,
     functionName: 'setMinter',
@@ -335,21 +335,21 @@ export async function recreateIssuanceSnapshot(
 
   try {
     const tx1 = await walletClient.writeContract(
-      revokeMintingRightsFromDeployer
+      revokeMintingRightsFromDeployerPayload
     );
     await publicClient.waitForTransactionReceipt({ hash: tx1 });
     console.info('        > Transaction: ', tx1);
 
-    migrationProtocol.revokeMintingRightsFromDeployer = {
-      revokeMintingRightsFromDeployer,
+    migrationProtocol.revokeMintingRightsFromDeployerPayload = {
+      revokeMintingRightsFromDeployerPayload,
       status: 'success',
       hash: tx1,
     };
   } catch (e) {
     console.error('            > Error: ', e.message);
-    migrationProtocol.revokeMintingRightsFromDeployer = {
-      revokeMintingRightsFromDeployer,
-      status: 'failed',
+    migrationProtocol.revokeMintingRightsFromDeployerPayload = {
+      revokeMintingRightsFromDeployerPayload,
+      status: 'failure',
       error: e.message,
     };
   }
@@ -384,7 +384,7 @@ export async function recreateIssuanceSnapshot(
     console.error('            > Error: ', e.message);
     migrationProtocol.selfAssigningVestingPayloadViaSdk = {
       selfAssigningVestingPayloadViaSdk,
-      status: 'failed',
+      status: 'failure',
       error: e.message,
     };
   }
@@ -444,8 +444,6 @@ export async function recreateIssuanceSnapshot(
         };
 
         try {
-          throw new Error('test');
-
           const tx =
             await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.pushPaymentBatched.run(
               pushPaymentBatchedPayloadViaSdk.args
@@ -464,7 +462,7 @@ export async function recreateIssuanceSnapshot(
 
           migrationProtocol.vestingBatches.push({
             pushPaymentBatchedPayloadViaSdk,
-            status: 'failed',
+            status: 'failure',
             error: e.message,
           });
         }
@@ -510,7 +508,7 @@ export async function recreateIssuanceSnapshot(
     console.error('            > Error: ', e.message);
     migrationProtocol.revokeVestingRolePayloadViaSdk = {
       revokeVestingRolePayloadViaSdk,
-      status: 'failed',
+      status: 'failure',
       error: e.message,
     };
   }
@@ -561,7 +559,8 @@ export async function configureWorkflow(
   workflow,
   state,
   tokenToWrapper,
-  report
+  report,
+  migrationProtocol
 ) {
   console.info();
   console.info('> Configuring Workflow');
@@ -577,46 +576,79 @@ export async function configureWorkflow(
   });
 
   console.info('    > Setting bonding curve as minter...');
+  const setBondingCurveAsMinterPayload = {
+    address: mintWrapper,
+    functionName: 'setMinter',
+    args: [workflow.fundingManager.address, true],
+  };
 
-  const tx1 = await mintWrapperContract.write.setMinter([
-    workflow.fundingManager.address,
-    true,
-  ]);
+  try {
+    const tx1 = await mintWrapperContract.write.setMinter(
+      setBondingCurveAsMinterPayload.args
+    );
 
-  await targetSdk.publicClient.waitForTransactionReceipt({
-    hash: tx1,
-  });
+    await targetSdk.publicClient.waitForTransactionReceipt({
+      hash: tx1,
+    });
 
-  console.info('        > Transaction: ', tx1);
+    console.info('        > Transaction: ', tx1);
 
-  // console.info('    > Setting admin multisig as owner of wrapper...');
-
-  // const tx1a = await mintWrapperContract.write.transferOwnership([
-  //   adminMultisig,
-  // ]);
-
-  // await targetSdk.publicClient.waitForTransactionReceipt({
-  //   hash: tx1a,
-  // });
-
-  // console.info('        > Transaction: ', tx1a);
+    migrationProtocol.setBondingCurveAsMinterPayload = {
+      setBondingCurveAsMinterPayload,
+      status: 'success',
+      hash: tx1,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.setBondingCurveAsMinterPayload = {
+      setBondingCurveAsMinterPayload,
+      status: 'failure',
+      error: e.message,
+    };
+  }
 
   // assigning curve interaction rights
   console.info(
     `    > Granting curve interaction rights to ${report.inputs.projectConfig.SAFE} (Funding Pot Multisig)`
   );
-  const curveInteractionRole =
-    await workflow.fundingManager.read.CURVE_INTERACTION_ROLE.run();
 
-  const tx2 = await workflow.fundingManager.write.grantModuleRole.run(
-    [curveInteractionRole, report.inputs.projectConfig.SAFE]
-  );
+  const grantCurveInteractionRightsPayload = {
+    address: workflow.fundingManager.address,
+    functionName: 'grantModuleRole',
+    args: [
+      await workflow.fundingManager.read.CURVE_INTERACTION_ROLE.run(),
+      report.inputs.projectConfig.SAFE,
+    ],
+  };
 
-  await targetSdk.publicClient.waitForTransactionReceipt({
-    hash: tx2,
-  });
+  try {
+    const curveInteractionRole =
+      await workflow.fundingManager.read.CURVE_INTERACTION_ROLE.run();
 
-  console.info('        > Transaction: ', tx2);
+    const tx2 =
+      await workflow.fundingManager.write.grantModuleRole.run(
+        grantCurveInteractionRightsPayload.args
+      );
+
+    await targetSdk.publicClient.waitForTransactionReceipt({
+      hash: tx2,
+    });
+
+    console.info('        > Transaction: ', tx2);
+
+    migrationProtocol.grantCurveInteractionRightsPayload = {
+      grantCurveInteractionRightsPayload,
+      status: 'success',
+      hash: tx2,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.grantCurveInteractionRightsPayload = {
+      grantCurveInteractionRightsPayload,
+      status: 'failure',
+      error: e.message,
+    };
+  }
 
   console.info(
     `    > Granting payment pusher rights to ${report.inputs.projectConfig.SAFE} (Funding Pot Multisig)`
@@ -624,27 +656,72 @@ export async function configureWorkflow(
   const paymentPusher =
     await workflow.optionalModule.LM_PC_PaymentRouter_v1.read.PAYMENT_PUSHER_ROLE.run();
 
-  const tx3 =
-    await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
-      [paymentPusher, report.inputs.projectConfig.SAFE]
-    );
+  const grantPaymentPusherRightsPayload = {
+    address: workflow.optionalModule.LM_PC_PaymentRouter_v1.address,
+    functionName: 'grantModuleRole',
+    args: [paymentPusher, report.inputs.projectConfig.SAFE],
+  };
 
-  await targetSdk.publicClient.waitForTransactionReceipt({
-    hash: tx3,
-  });
+  try {
+    const tx3 =
+      await workflow.optionalModule.LM_PC_PaymentRouter_v1.write.grantModuleRole.run(
+        grantPaymentPusherRightsPayload.args
+      );
 
-  console.info('        > Transaction: ', tx3);
+    await targetSdk.publicClient.waitForTransactionReceipt({
+      hash: tx3,
+    });
+
+    console.info('        > Transaction: ', tx3);
+
+    migrationProtocol.grantPaymentPusherRightsPayload = {
+      grantPaymentPusherRightsPayload,
+      status: 'success',
+      hash: tx3,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+
+    migrationProtocol.grantPaymentPusherRightsPayload = {
+      grantPaymentPusherRightsPayload,
+      status: 'failure',
+      error: e.message,
+    };
+  }
 
   // assign admin role to admin multisig
   console.info(`    > Granting admin role to ${adminMultisig}`);
-  const tx4 = await workflow.authorizer.write.grantRole.run([
-    await workflow.authorizer.read.getAdminRole.run(),
-    adminMultisig,
-  ]);
+  const grantAdminRolePayload = {
+    address: workflow.authorizer.address,
+    functionName: 'grantRole',
+    args: [
+      await workflow.authorizer.read.getAdminRole.run(),
+      adminMultisig,
+    ],
+  };
 
-  await targetSdk.publicClient.waitForTransactionReceipt({
-    hash: tx4,
-  });
+  try {
+    const tx4 = await workflow.authorizer.write.grantRole.run(
+      grantAdminRolePayload.args
+    );
 
-  console.info('        > Transaction: ', tx4);
+    await targetSdk.publicClient.waitForTransactionReceipt({
+      hash: tx4,
+    });
+
+    console.info('        > Transaction: ', tx4);
+
+    migrationProtocol.grantAdminRolePayload = {
+      grantAdminRolePayload,
+      status: 'success',
+      hash: tx4,
+    };
+  } catch (e) {
+    console.error('            > Error: ', e.message);
+    migrationProtocol.grantAdminRolePayload = {
+      grantAdminRolePayload,
+      status: 'failure',
+      error: e.message,
+    };
+  }
 }
