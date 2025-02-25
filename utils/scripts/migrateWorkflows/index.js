@@ -41,7 +41,7 @@ async function main() {
 
   // mint and put all issuance tokens where they belong
   migrationProtocol = await recreateIssuanceSnapshot(
-    workflow,
+    deployed.workflow,
     state,
     tokenToWrapper,
     migrationProtocol
