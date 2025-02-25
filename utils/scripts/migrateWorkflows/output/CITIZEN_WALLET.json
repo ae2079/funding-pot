@@ -28,10 +28,7 @@
     "grantMintingToDeployerPayload": {
       "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
       "functionName": "setMinter",
-      "args": [
-        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4",
-        true
-      ]
+      "args": ["0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4", true]
     },
     "status": "success",
     "hash": "0xab7fa67da8c3cb81286f8b53aafe31f3325cc1d916081f48cf6dcec4debdcc68"
@@ -156,16 +153,142 @@
       },
       "status": "success",
       "hash": "0xd6e80c07e80508506182c29d87b2c0aa8a7875ece088472d476305c70b936d25"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0x796567377b4413a82b3f51ca1a2c2b651d0b2487",
+          "5900020787925128058025"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x4f6560fed4add913ef6e219db094d662794790ad3d2ad9db1209bc9371888af9"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0x7c996fc3a62b4b0fb1675e251c3d865f146f062e",
+          "333950176964605980353"
+        ]
+      },
+      "status": "manual",
+      "hash": "0xc6c4fa16d889d510c15f9d6bf6d55c122040c113e3c99ed97702f7f9a216dcd2"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0x9060c482ab7d1b99504fc7d5f597ff61818b4f77",
+          "846597583119002772"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x4837eeb792d63261f19d433f37cc6346ddce1c0ee2f17063c899f5183fa06945"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0x9d0eeb8bf5b2c3ec6800b9a55195f567e72f1ec4",
+          "175574544639021378710469"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x8a62c7a20f33a2805ee1b5fbf0c3e3417ba18522a0c1ed6695ca098cf7f6b0e1"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0xa39e7b901570120f6f963bcce8f5ea4d883cb2ee",
+          "9840419631925589868101"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x8b5901402bc439004726f758dff825cfe2ea6b84db6974d03b223a8aa3dac0e0"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0xa78610d5e65177c97698c32a4ffc3f2c77d2ffcc",
+          "69932334654524510923856"
+        ]
+      },
+      "status": "manual",
+      "hash": "0xae460f3840fcb5fe78f869724e545c28fcaee0d76932ce64e73f9116c72ee86c"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0xaa9c9f1cd814ad4284ef1f6c30500563f27339ac",
+          "7529651350643053"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x43c779db8ab9027979872ad79584aa61877c953499f653d77be10381ab4d7eb4"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0xad52da8fa5116accfc2caaa6310068670242eaca",
+          "1672171851345636117306"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x05e113520011735a4648ab694ba538821a69f09bb1c1a891c8af9fabd98eaf66"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0xb9498ce63839650598218a6cb31bc7120a13d319",
+          "3079759542115840199894"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x59e5767a57d8c243fccc66cc119411cbdef3d4bb637b8ba20b34175e650a9adc"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": ["0xc15cf33f41c114cce5d6ef823fef6684136944f9", "19"]
+      },
+      "status": "manual",
+      "hash": "0xd183d5e731e2b4846ad6b52e28233440815bf16d61ae8335c6e47fe5b56c9880"
+    },
+    {
+      "mintPayload": {
+        "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
+        "functionName": "mint",
+        "args": [
+          "0xeb4cb5b5c78adbaa9b0a3fb0689b8ba450dc1a46",
+          "2696170895747128288754"
+        ]
+      },
+      "status": "manual",
+      "hash": "0x882b7a6f09b0ed5ce5ed6342b06fbc08464a7b6a10ea7d509110421f97d66a64"
     }
   ],
   "revokeMintingRightsFromDeployerPayload": {
     "revokeMintingRightsFromDeployerPayload": {
       "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
       "functionName": "setMinter",
-      "args": [
-        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4",
-        false
-      ]
+      "args": ["0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4", false]
     },
     "status": "success",
     "hash": "0x7dcb3c6944862de91b8370ffd08826566a7d8fd6c03f8f5d208db7f156497ecd"
@@ -947,10 +1070,7 @@
     "setBondingCurveAsMinterPayload": {
       "address": "0x0c2350F5A6F1FFC436524FAd2FAfA5dFB551f15c",
       "functionName": "setMinter",
-      "args": [
-        "0xE1B18FE51289627C22944aC0A8A22b605Fcc21DA",
-        true
-      ]
+      "args": ["0xE1B18FE51289627C22944aC0A8A22b605Fcc21DA", true]
     },
     "status": "success",
     "hash": "0xbea21108c62ba8b5d6b1a5acd20482da0997fc7eeb137237a0f58f63f3ef57e1"
