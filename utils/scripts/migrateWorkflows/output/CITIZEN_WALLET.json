@@ -43,8 +43,8 @@
           "693464523734659091"
         ]
       },
-      "status": "success",
-      "hash": "0xbf50ca50c29f392021e8174cdc383344862bc01aa1868beded8c7e4dd6cdf488"
+      "status": "manual",
+      "hash": "0x5375ba474b8474f0f303323239a128cc2aded25c516a33e3b7ad01284722cac8"
     },
     {
       "mintPayload": {
@@ -55,8 +55,8 @@
           "39233200440247276946"
         ]
       },
-      "status": "success",
-      "hash": "0xafdda35434f44e96a7220f7aefc06e6f88d082cfaaed95b8b60c8f59d6cfc882"
+      "status": "manual",
+      "hash": "0x7d10d7e41cf63a700f67a44667249a536a30137001097e6cca493666beba5f83"
     },
     {
       "mintPayload": {
@@ -67,8 +67,8 @@
           "4256040960860183240903"
         ]
       },
-      "status": "success",
-      "hash": "0xddca64f1804a8c4da0e060c3e21dc590f7239292e3012d16668823766df711f8"
+      "status": "manual",
+      "hash": "0x29d97a79a121c3dc998665593cdab5d90fea39c09fae71bc3572787526f11f75"
     },
     {
       "mintPayload": {
@@ -79,8 +79,8 @@
           "305279846893254788904"
         ]
       },
-      "status": "success",
-      "hash": "0xf361b7fb1b68620185055b38b57517b68105891b2a2493132633e36adf13dff8"
+      "status": "manual",
+      "hash": "0xb9229ffba09601a5a32643a23dcad28458fac50c6181dcd9ac29bfe8098f48d9"
     },
     {
       "mintPayload": {
@@ -91,8 +91,8 @@
           "6304424399557944563629"
         ]
       },
-      "status": "success",
-      "hash": "0x0c3cd6c4dc32ab3952157c1df0c6fa09e930defabeb9e29e1882688cc6110df1"
+      "status": "manual",
+      "hash": "0xe78e404e45c95316ddcda8f629b81545d5268e1c425a173b3ec4192a71a45fa2"
     },
     {
       "mintPayload": {
@@ -103,8 +103,8 @@
           "35000000000000000000"
         ]
       },
-      "status": "success",
-      "hash": "0xcfb45c03183a86685d01fa1c3947a8920c4b0c8073b2a25396095d54864addfe"
+      "status": "manual",
+      "hash": "0xa79d07d0d8ed2264e24d93bbffc6858d9dc3666ef04066fb70adc4cc6521b13e"
     },
     {
       "mintPayload": {
@@ -115,8 +115,8 @@
           "8000143075571086731317"
         ]
       },
-      "status": "success",
-      "hash": "0xb81dd79f57909b775bda0fa555b782077d6b73b9249cdb73a0531cb2e111e6c4"
+      "status": "manual",
+      "hash": "0xc9879c358484e1e0d191ddb09b36c375a23684a43fcf02df5743147d21bfea5e"
     },
     {
       "mintPayload": {
@@ -127,8 +127,8 @@
           "6666612189854841394354314"
         ]
       },
-      "status": "success",
-      "hash": "0x5f6bc092dad14d4f431f8b9be4d1ffb61d83fa90dbc8783112d3836c11cdfedc"
+      "status": "manual",
+      "hash": "0xba8798feb3b05afd2f390bbef4074f99b717d67e29c54b9e9f2386079205731f"
     },
     {
       "mintPayload": {
@@ -139,8 +139,8 @@
           "6134369967222324077740"
         ]
       },
-      "status": "success",
-      "hash": "0xf5d1bd0ee3791d7ebdcaf6968c158971cbebf0d0eef3ed18ecc9dc604783d472"
+      "status": "manual",
+      "hash": "0x05ed8dfe5abe82c9d5e67351266795109ab53ce761eb2e379ad520745e419d20"
     },
     {
       "mintPayload": {
@@ -151,8 +151,8 @@
           "10628671315054540123481"
         ]
       },
-      "status": "success",
-      "hash": "0xd6e80c07e80508506182c29d87b2c0aa8a7875ece088472d476305c70b936d25"
+      "status": "manual",
+      "hash": "0x918996f2d2d9f00b4c8190b8c09b302ec4e414111dbd74a63e8bd83e542a242b"
     },
     {
       "mintPayload": {
@@ -164,7 +164,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x4f6560fed4add913ef6e219db094d662794790ad3d2ad9db1209bc9371888af9"
+      "hash": "0xe476656516abac0d0f1995bf106541d567cf72ff134d7c0db9110ecb4fda1322"
     },
     {
       "mintPayload": {
@@ -176,7 +176,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0xc6c4fa16d889d510c15f9d6bf6d55c122040c113e3c99ed97702f7f9a216dcd2"
+      "hash": "0x1d26593670f4cc0d38697361dc37431e9a0a711f5d02a3bd61b8adb81190c9c3"
     },
     {
       "mintPayload": {
@@ -188,7 +188,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x4837eeb792d63261f19d433f37cc6346ddce1c0ee2f17063c899f5183fa06945"
+      "hash": "0xbe35fb6032d4c36aa6001b021acdba1e9469fd0b97b3e9af22c8807e19bb667e"
     },
     {
       "mintPayload": {
@@ -200,7 +200,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x8a62c7a20f33a2805ee1b5fbf0c3e3417ba18522a0c1ed6695ca098cf7f6b0e1"
+      "hash": "0xddc6661e527644038fa721bceeed9ce64ff9734db4b5153119bac0da99a1ee11"
     },
     {
       "mintPayload": {
@@ -212,7 +212,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x8b5901402bc439004726f758dff825cfe2ea6b84db6974d03b223a8aa3dac0e0"
+      "hash": "0xacfd869e19f778f1f0210d30e69329fd8fa2b04731270463f3812f6d65740413"
     },
     {
       "mintPayload": {
@@ -224,7 +224,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0xae460f3840fcb5fe78f869724e545c28fcaee0d76932ce64e73f9116c72ee86c"
+      "hash": "0x5a42ca06480abe4e7c36bb04b95dde61a725bb9d39b255456811a9f125c9831b"
     },
     {
       "mintPayload": {
@@ -236,7 +236,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x43c779db8ab9027979872ad79584aa61877c953499f653d77be10381ab4d7eb4"
+      "hash": "0xc32a1ead6b34b4dba3f8496a79be3191089838419a3e65e690fc16fd218c4a94"
     },
     {
       "mintPayload": {
@@ -248,7 +248,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x05e113520011735a4648ab694ba538821a69f09bb1c1a891c8af9fabd98eaf66"
+      "hash": "0x9ba4d814f2880d7d59edf34c61430a404a03233489575d50d7f26f1efc06cc18"
     },
     {
       "mintPayload": {
@@ -260,7 +260,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x59e5767a57d8c243fccc66cc119411cbdef3d4bb637b8ba20b34175e650a9adc"
+      "hash": "0x6fbfffe72cf389ac28d3a54a686b593ecbd938c4fd35be0508cd3d2bad053f07"
     },
     {
       "mintPayload": {
@@ -269,7 +269,7 @@
         "args": ["0xc15cf33f41c114cce5d6ef823fef6684136944f9", "19"]
       },
       "status": "manual",
-      "hash": "0xd183d5e731e2b4846ad6b52e28233440815bf16d61ae8335c6e47fe5b56c9880"
+      "hash": "0xd4747f4f35443354bd998f101dee609912ef40d23342ee235dfab8cbf28423b2"
     },
     {
       "mintPayload": {
@@ -281,7 +281,7 @@
         ]
       },
       "status": "manual",
-      "hash": "0x882b7a6f09b0ed5ce5ed6342b06fbc08464a7b6a10ea7d509110421f97d66a64"
+      "hash": "0x3b1ce99bb31260fbf746db1902f9d31bca394b4e2bcd240a73fa661c2366006a"
     }
   ],
   "revokeMintingRightsFromDeployerPayload": {
