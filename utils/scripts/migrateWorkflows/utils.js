@@ -328,15 +328,15 @@ export async function recreateIssuanceSnapshot(
   console.info('    > Revoking minting rights from deployer');
   const revokeMintingRightsFromDeployerPayload = {
     address: wrapper,
-    abi: abis.mintWrapperAbi,
     functionName: 'setMinter',
     args: [walletClient.account.address, false],
   };
 
   try {
-    const tx1 = await walletClient.writeContract(
-      revokeMintingRightsFromDeployerPayload
-    );
+    const tx1 = await walletClient.writeContract({
+      ...revokeMintingRightsFromDeployerPayload,
+      abi: abis.mintWrapperAbi,
+    });
     await publicClient.waitForTransactionReceipt({ hash: tx1 });
     console.info('        > Transaction: ', tx1);
 
@@ -518,7 +518,11 @@ export async function recreateIssuanceSnapshot(
 
 let targetSdk;
 
-export async function deployWorkflow(state, tokenToWrapper) {
+export async function deployWorkflow(
+  state,
+  tokenToWrapper,
+  migrationProtocol
+) {
   console.info();
   console.info('> Deploying Workflow');
 
@@ -541,6 +545,8 @@ export async function deployWorkflow(state, tokenToWrapper) {
     state.virtualCollateralSupply
   );
 
+  migrationProtocol.deployWorkflowArgs = args;
+
   const { orchestratorAddress, transactionHash } = await run(args);
 
   await publicClient.waitForTransactionReceipt({
@@ -549,10 +555,13 @@ export async function deployWorkflow(state, tokenToWrapper) {
 
   console.info('    > Workflow deployed at:', orchestratorAddress);
 
-  return await targetSdk.getWorkflow({
-    orchestratorAddress,
-    requestedModules,
-  });
+  return {
+    migrationProtocol,
+    workflow: await targetSdk.getWorkflow({
+      orchestratorAddress,
+      requestedModules,
+    }),
+  };
 }
 
 export async function configureWorkflow(
@@ -724,4 +733,6 @@ export async function configureWorkflow(
       error: e.message,
     };
   }
+
+  return migrationProtocol;
 }

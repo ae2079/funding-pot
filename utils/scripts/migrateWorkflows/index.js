@@ -28,9 +28,16 @@ async function main() {
   );
 
   // deploy workflow
-  const workflow = await deployWorkflow(state, tokenToWrapper);
+  const deployed = await deployWorkflow(
+    state,
+    tokenToWrapper,
+    migrationProtocol
+  );
+
+  migrationProtocol = deployed.migrationProtocol;
+
   migrationProtocol.orchestratorAddress =
-    workflow.orchestrator.address;
+    deployed.workflow.orchestrator.address;
 
   // mint and put all issuance tokens where they belong
   migrationProtocol = await recreateIssuanceSnapshot(
@@ -56,21 +63,21 @@ async function main() {
 
   const outputPath = path.join(outputDir, `${projectName}.json`);
 
+  // configure workflow
+  migrationProtocol = await configureWorkflow(
+    deployed.workflow,
+    state,
+    tokenToWrapper,
+    report,
+    migrationProtocol
+  );
+
   fs.writeFileSync(
     outputPath,
     JSON.stringify(migrationProtocol, null, 2)
   );
 
   console.info('> Migration protocol written to:', outputPath);
-
-  // configure workflow
-  await configureWorkflow(
-    workflow,
-    state,
-    tokenToWrapper,
-    report,
-    migrationProtocol
-  );
 }
 
 main()
