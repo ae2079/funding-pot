@@ -100,7 +100,7 @@ export const getTokenSnapshot = async (token) => {
       ({ holders } = await ankrProvider.getTokenHolders({
         contractAddress: token,
         blockchain: 'polygon_zkevm',
-        pageSize: 10,
+        pageSize: 25,
       }));
       break;
     } catch (e) {
