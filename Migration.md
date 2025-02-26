@@ -137,6 +137,7 @@ MELODEX: 19/02/2025
   - [ ] all ABC tokens are been burnt (supply == 0)
   - [ ] the collateral is withdrawn to the admin multisig
   - [ ] the bonding curve is not minter on the wrapper anymore
+  - [ ] ownership over wrapper is renounced
 
 ## To do manually after migration
 
