@@ -130,7 +130,7 @@ MELODEX: 19/02/2025
 
 # Closedown on zkevm
 
-## Checklist (done by script)
+## Checklist
 
 - [ ] uses a delegate flow to propose batched txs (one batch per project) to the workflow admin multisig;
 - [ ] one batch does the following:
@@ -138,6 +138,6 @@ MELODEX: 19/02/2025
   - [ ] the collateral is withdrawn to the admin multisig
   - [ ] the bonding curve is not minter on the wrapper anymore
 
-### To do manually
+## To do manually after migration
 
 - [ ] workflow admin multisig burns admin keys
