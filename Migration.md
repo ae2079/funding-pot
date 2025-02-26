@@ -133,5 +133,9 @@ MELODEX: 19/02/2025
 ## Checklist
 
 - [ ] all ABC tokens have been burned (supply == 0)
-- [ ] the workflows dont have an admin anymore
 - [ ] the collateral is withdrawn to the admin multisig
+- [ ] the bonding curve is not minter on the wrapper anymore
+
+### To do manually
+
+- [ ] burn admin keys
