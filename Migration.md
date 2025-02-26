@@ -130,12 +130,14 @@ MELODEX: 19/02/2025
 
 # Closedown on zkevm
 
-## Checklist
+## Checklist (done by script)
 
-- [ ] all ABC tokens have been burned (supply == 0)
-- [ ] the collateral is withdrawn to the admin multisig
-- [ ] the bonding curve is not minter on the wrapper anymore
+- [ ] uses a delegate flow to propose batched txs (one batch per project) to the workflow admin multisig;
+- [ ] one batch does the following:
+  - [ ] all ABC tokens are been burnt (supply == 0)
+  - [ ] the collateral is withdrawn to the admin multisig
+  - [ ] the bonding curve is not minter on the wrapper anymore
 
 ### To do manually
 
-- [ ] burn admin keys
+- [ ] workflow admin multisig burns admin keys
