@@ -60,10 +60,12 @@ export const main = async (season, projectName, batchNr) => {
     batchConfig,
   });
 
+  let multiSendEncodedTxs;
+
   if (batchService.data.totalValidContribution.inCollateral > 0n) {
     // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
     console.info(`5️⃣ Proposing batch...`);
-    await proposeBatch({
+    multiSendEncodedTxs = await proposeBatch({
       batchService,
       queryService,
       transactionBuilderService,
@@ -81,6 +83,7 @@ export const main = async (season, projectName, batchNr) => {
     queryService,
     projectConfig,
     batchConfig,
+    multiSendEncodedTxs,
     batchReports,
   });
 

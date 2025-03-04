@@ -16,6 +16,8 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter } from '@inverter-network/sdk';
 
+import { WITH_PROPOSING } from '../../config.js';
+
 import {
   projectConfig,
   allowlist,
@@ -93,23 +95,25 @@ export const deployTestSafe = async () => {
   );
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
-  const apiKit = new SafeApiKit.default({
-    chainId: process.env.CHAIN_ID,
-  });
+  if (WITH_PROPOSING) {
+    const apiKit = new SafeApiKit.default({
+      chainId: process.env.CHAIN_ID,
+    });
 
-  console.info(
-    `> Adding delegate ${delegateAccount.address} to safe ${safeAddress}...`
-  );
+    console.info(
+      `> Adding delegate ${delegateAccount.address} to safe ${safeAddress}...`
+    );
 
-  await apiKit.addSafeDelegate({
-    delegateAddress: delegateAccount.address,
-    delegatorAddress: ownerAccount.address,
-    safeAddress: safeAddress,
-    signer: wallet,
-    label: 'round-proposer',
-  });
+    await apiKit.addSafeDelegate({
+      delegateAddress: delegateAccount.address,
+      delegatorAddress: ownerAccount.address,
+      safeAddress: safeAddress,
+      signer: wallet,
+      label: 'round-proposer',
+    });
 
-  console.info('✅ Delegate added');
+    console.info('✅ Delegate added');
+  }
 
   return safeAddress;
 };
@@ -244,6 +248,7 @@ export const getBatchConfig = async (safe) => {
   batchConfig.LIMITS.INDIVIDUAL_2 = individualLimit2;
   batchConfig.LIMITS.TOTAL = totalLimit;
   batchConfig.PRICE = price;
+  const season = '2';
 
   batchConfig.IS_EARLY_ACCESS = false;
 
@@ -316,7 +321,7 @@ export const getBatchConfig = async (safe) => {
 
   const batchConfigFilePath = path.join(
     __dirname,
-    '../../data/test/input/batches/3.json'
+    `../../data/test/input/batches/s${season}/3.json`
   );
 
   fs.writeFileSync(
@@ -326,7 +331,7 @@ export const getBatchConfig = async (safe) => {
   );
 
   console.info(
-    '💾 Batch config stored to data/test/input/batches/3.json'
+    `💾 Batch config stored to data/test/input/batches/s${season}/3.json`
   );
 
   return { batchConfig, contributions, contributors };
