@@ -99,11 +99,12 @@ export const getTokenSnapshot = async (token) => {
     try {
       ({ holders } = await ankrProvider.getTokenHolders({
         contractAddress: token,
-        blockchain: 'polygon_zkevm',
+        blockchain: getNetworkIdString(process.env.CHAIN_ID),
         pageSize: 25,
       }));
       break;
     } catch (e) {
+      console.log(e);
       if (e.data.includes('context deadline exceeded')) {
         console.error('  ❌ Ankr API error, retrying...');
         attempts++;
@@ -736,3 +737,17 @@ export async function configureWorkflow(
 
   return migrationProtocol;
 }
+
+export const getNetworkIdString = (chainId) => {
+  if (chainId == 11155111) {
+    return 'eth_sepolia';
+  } else if (chainId == 84532) {
+    return 'base_sepolia';
+  } else if (chainId == 1101) {
+    return 'polygon_zkevm';
+  } else if (chainId == 80002) {
+    return 'polygon_amoy';
+  } else if (chainId == 137) {
+    return 'polygon';
+  }
+};

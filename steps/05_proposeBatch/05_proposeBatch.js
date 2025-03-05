@@ -41,11 +41,12 @@ export const proposeBatch = async ({
   // get encoded tx batches from transaction service
   const txBatches = transactionBuilderService.getEncodedTxBatches();
 
-  if (skipPropose || !WITH_PROPOSING) {
-    console.log('❗ Not proposing the tx batches');
-    return safeService.getMultiSendEncodedTxs(txBatches);
+  if (!skipPropose && WITH_PROPOSING) {
+    await safeService.proposeTxs(txBatches);
+    return;
   }
 
+  console.log('❗ Not proposing the tx batches');
+  return;
   // propose tx batches
-  await safeService.proposeTxs(txBatches);
 };

@@ -32,7 +32,11 @@ const runScript = async () => {
     return;
   }
 
-  await closeWorkflow(projectConfig, workflowAdminMultisig);
+  await closeWorkflow(
+    projectName,
+    projectsConfig,
+    workflowAdminMultisig
+  );
 };
 
 runScript();

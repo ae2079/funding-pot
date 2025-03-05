@@ -17,7 +17,13 @@ import { getTokenSnapshot } from '../migrateWorkflows/utils.js';
 
 const { CHAIN_ID, INDEXER_URL, BACKEND_URL, RPC_URL } = process.env;
 
-export async function closeWorkflow(projectConfig, adminMultisig) {
+export async function closeWorkflow(
+  projectName,
+  projectsConfig,
+  adminMultisig
+) {
+  const projectConfig = projectsConfig[projectName];
+
   const queriesService = new Queries({
     rpcUrl: RPC_URL,
     indexerUrl: INDEXER_URL,
@@ -28,6 +34,7 @@ export async function closeWorkflow(projectConfig, adminMultisig) {
 
   await queriesService.setup(projectConfig.ORCHESTRATOR);
   const { addresses } = queriesService.queries;
+
   const transactionBuilder = new TransactionBuilder({
     projectConfig: { SAFE: adminMultisig },
     workflowAddresses: addresses,
@@ -73,9 +80,14 @@ export async function closeWorkflow(projectConfig, adminMultisig) {
   );
 
   transactionBuilder.claimStream();
+  transactionBuilder.revokeCurveInteractionRole(projectConfig.SAFE);
+  transactionBuilder.revokeVestingAdmin(projectConfig.SAFE);
 
   // Propose transactions
-  const txBatches = transactionBuilder.getEncodedTxBatches();
+  const transactionJsons = transactionBuilder.getTransactionJsons(
+    `[CLOSE-WORKFLOW]_[PROJECT-${projectName}]`,
+    `Close workflow for ${projectName}`
+  );
 
-  await safe.proposeTxs(txBatches);
+  transactionBuilder.saveTransactionJsons(transactionJsons);
 }

@@ -10,9 +10,13 @@ import {
   pad,
   getFunctionSelector,
 } from 'viem';
+import { writeFileSync, mkdirSync } from 'fs';
+import path from 'path';
 
 const PAYMENT_PUSHER_ROLE =
   '0x5041594d454e545f505553484552000000000000000000000000000000000000';
+const CURVE_INTERACTION_ROLE =
+  '0x43555256455f5553455200000000000000000000000000000000000000000000';
 
 export class TransactionBuilder {
   transactions;
@@ -82,6 +86,24 @@ export class TransactionBuilder {
       'paymentRouterAbi',
       'grantModuleRole(bytes32,address)',
       [PAYMENT_PUSHER_ROLE, newRoleOwner]
+    );
+  }
+
+  revokeVestingAdmin(oldRoleOwner) {
+    this.addTx(
+      this.paymentRouter,
+      'paymentRouterAbi',
+      'revokeModuleRole(bytes32,address)',
+      [PAYMENT_PUSHER_ROLE, oldRoleOwner]
+    );
+  }
+
+  revokeCurveInteractionRole(oldRoleOwner) {
+    this.addTx(
+      this.bondingCurve,
+      'bondingCurveAbi',
+      'revokeModuleRole(bytes32,address)',
+      [CURVE_INTERACTION_ROLE, oldRoleOwner]
     );
   }
 
@@ -327,5 +349,79 @@ export class TransactionBuilder {
       -40
     )}`;
     return deploymentAddress;
+  }
+
+  getTransactionJsons(name, description) {
+    const encodedTxBatches = this.getEncodedTxBatches();
+    const readableTxBatches = this.getReadableTxBatches();
+
+    const transactionJsons = [];
+
+    for (let i = 0; i < encodedTxBatches.length; i++) {
+      const encodedTxs = encodedTxBatches[i];
+      const readableTxs = readableTxBatches[i];
+
+      transactionJsons.push({
+        version: '1.0',
+        chainId: `${process.env.CHAIN_ID}`,
+        createdAt: Date.now(),
+        meta: {
+          name: `${name}_[TX-${i}]`,
+          description: description,
+          txBuilderVersion: '', // Left empty as unclear
+          createdFromSafeAddress: this.safe,
+          createdFromOwnerAddress: '',
+          checksum: '',
+        },
+        transactions: encodedTxs.map((tx, index) => {
+          return {
+            to: tx.to,
+            value: tx.value,
+            data: tx.data,
+            contractMethod: readableTxs[index].functionSignature,
+            contractInputsValues: readableTxs[index].inputValues.map(
+              (input) => {
+                if (typeof input !== 'string') {
+                  return input.toString();
+                }
+                return input;
+              }
+            ),
+          };
+        }),
+      });
+    }
+
+    return transactionJsons;
+  }
+
+  saveTransactionJsons(transactionJsons) {
+    for (const transactionJson of transactionJsons) {
+      // Get name from meta, default to timestamp if empty
+      const fileName =
+        transactionJson.meta.name || `tx-batch-${Date.now()}`;
+
+      // Create directory path based on environment
+      const dirPath = path.join(
+        'data',
+        process.env.NODE_ENV || 'development',
+        'transactions'
+      );
+
+      // Ensure directory exists
+      mkdirSync(dirPath, { recursive: true });
+
+      // Create full file path with .json extension
+      const filePath = path.join(dirPath, `${fileName}.json`);
+
+      // Write file with pretty formatting
+      writeFileSync(
+        filePath,
+        JSON.stringify(transactionJson, null, 2),
+        'utf8'
+      );
+
+      console.log(`💾 Saved transaction batch to ${filePath}`);
+    }
   }
 }

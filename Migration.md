@@ -132,12 +132,13 @@ MELODEX: 19/02/2025
 
 ## Checklist
 
-- [ ] uses a delegate flow to propose batched txs (one batch per project) to the workflow admin multisig;
 - [ ] one batch does the following:
-  - [ ] all ABC tokens are been burnt (supply == 0)
-  - [ ] the collateral is withdrawn to the admin multisig
+  - [x] all ABC tokens are burnt (supply == 0)
+  - [x] the collateral is withdrawn to the admin multisig
   - [ ] the bonding curve is not minter on the wrapper anymore
   - [ ] ownership over wrapper is renounced
+  - [ ] safe has no payment pusher role anymore
+  - [ ] safe has no curve interaction role anymore
 
 ## To do manually after migration
 

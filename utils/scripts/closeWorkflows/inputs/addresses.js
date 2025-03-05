@@ -1,2 +1,2 @@
 export const workflowAdminMultisig =
-  '0x6a0bbECb7fCffec29160F76B327dF25558a5a11a';
+  '0x046DccdEd2106512b0f38917256e35900913d1F0';

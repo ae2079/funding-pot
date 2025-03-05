@@ -184,6 +184,7 @@ export const deployWorkflowViaFactory = async (
     requestedModules,
     factoryType: 'restricted-pim',
   });
+
   const { orchestratorAddress } = await run(args);
   console.info('✅ Workflow deployed');
 

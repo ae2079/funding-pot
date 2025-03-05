@@ -60,18 +60,25 @@ export const main = async (season, projectName, batchNr) => {
     batchConfig,
   });
 
-  let multiSendEncodedTxs;
-
   if (batchService.data.totalValidContribution.inCollateral > 0n) {
     // propose batch transactions to safe (= batch buy tx, vesting txs) via Transaction API
     console.info(`5️⃣ Proposing batch...`);
-    multiSendEncodedTxs = await proposeBatch({
+    await proposeBatch({
       batchService,
       queryService,
       transactionBuilderService,
       safeService,
       skipPropose: batchConfig.ONLY_REPORT || WITH_PROPOSING,
     });
+  }
+
+  let transactionJsons;
+  if (!WITH_PROPOSING) {
+    transactionJsons = transactionBuilderService.getTransactionJsons(
+      `funding-pot-${projectName}-${batchNr}`,
+      `Batch ${batchNr} for ${projectName}`
+    );
+    transactionBuilderService.saveTransactionJsons(transactionJson);
   }
 
   // store comprehensive report in a JSON file
@@ -83,7 +90,7 @@ export const main = async (season, projectName, batchNr) => {
     queryService,
     projectConfig,
     batchConfig,
-    multiSendEncodedTxs,
+    transactionJsons,
     batchReports,
   });
 
