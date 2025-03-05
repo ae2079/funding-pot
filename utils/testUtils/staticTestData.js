@@ -213,7 +213,9 @@ export const batchReportData = {
 export const nftHolders = [addresses.addr1, addresses.addr2];
 
 export const mockCollateralToken =
-  '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80';
+  '0x668f5965c26e5df5e9917f0d7d3367c8d8433682';
+
+// '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80'; base sepolia
 
 export const deployArgs = (admin, safe) => {
   return {
@@ -226,7 +228,7 @@ export const deployArgs = (admin, safe) => {
     fundingManager: {
       issuanceToken: '0x0000000000000000000000000000000000000000',
       bondingCurveParams: {
-        formula: '0xfaf6c989dB0582D7b31e40343dd4A41a1848E038',
+        formula: '0xaAA597779bdbC7D54836FCdDDd38690787d04d6d',
         buyFee: '50',
         sellFee: '50',
         reserveRatioForBuying: 333_333,
@@ -258,7 +260,7 @@ export const requestedModules = {
 };
 
 export const restrictedPimFactory =
-  '0x1dF39e3A03FE64a3d55E34e80086864b123c9f1f';
+  '0x69891b6FF840999A165569eBA13C2aFdbCcFAB31';
 
 export const projectConfigWithWrapper = {
   SAFE: '0x23A9afdA8301D2C4bBdA1f0bC1B990E8515647a1',
