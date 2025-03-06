@@ -10,9 +10,9 @@
 6. Check the following files for the results:
 
 - inputs:
-  - batchConfig (to be set per batch): `data/test/input/batches/3.json`
+  - batchConfig (to be set per batch): `data/test/input/batches/s1/3.json`
+    **NOTE**: subdivided by seasons, where s1 refers to season 1
   - projects (to be set once): `data/test/input/projects.json` (=> `GENERATED_TEST_PROJECT`)
-  - allowlist (to be once; can be edited over time): `data/test/input/allowlist.json`
 - outputs:
   - batchReport: `data/test/output/GENERATED_TEST_PROJECT/3.json`
 
@@ -40,15 +40,11 @@ Next you will have to set some environment variables.
 ### Prerequisites
 
 - you have an ANKR API key for their "advanced API" (get one [here](https://www.ankr.com/rpc/advanced-api/))
-- you have two private keys whose addresses are funded with small amounts of testnet ETH on Base Sepolia
+- you have two private keys whose addresses are funded with small amounts of testnet gas tokens
 
 ### Instructions
 
-Copy `.env.example` to `.env.test` and fill in the values. In order to run all tests, you need to have an **ANKR API key** and specify **two private keys**. One key is associated with the **single owner of a Safe** and the other the key is associated with the role of a **delegate** who can **propose transactions** to that safe. You will require a small amount of _testnet ETH_ on Base Sepolia for both accounts. When running the e2e tests, the private keys will be used to setup an safe and workflow for your personal accounts that is used to test against.
-
-### Unit tests
-
-`npm run test:unit`
+Copy `.env.example` to `.env.test` and fill in the values. In order to run all tests, you need to have an **ANKR API key** and specify **two private keys**. One key is associated with the **single owner of a Safe** and the other the key is associated with the role of a **delegate** who can **propose transactions** to that safe. If the delegation mechanism is configured to be disabled, the second address will only be used to emulate a second contributor to a test funding round You will require a small amount of _testnet ETH_ for both accounts. When running the e2e tests, the private keys will be used to setup an safe and workflow for your personal accounts that is used to test against.
 
 ### End-to-end test
 
@@ -59,9 +55,8 @@ The `main.e2e.test.js` file is an end-to-end test that tests the whole flow from
 - deploy the workflow (via the [Inverter SDK](https://github.com/InverterNetwork/sdk))
 - make all inverter-related workflow configurations
 - send some contributions to the safe from the owner and delegate accounts (using [this](https://sepolia.basescan.org/address/0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80) collateral token)
-- generate & save a project & batch config as well as an allowlist
+- generate & save a project & batch config
 - execute the funding pot script
-- sign and execute the transactions from the safe (via Safe's Protocol and API Kits)
 
 By running this test, you will be able to understand the input parameters that the script requires, as well as the output that it produces.
 
@@ -98,7 +93,7 @@ Copy `.env.example` to `.env` and fill in the values. If the delegate has alread
 
 There are three types of inputs that the script executor can take. They can all be found under `/data/production/input`.
 
-1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("GENERATED_TEST_PROJECT") will be added to `/data/test/input/projects.json`.
+1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project, the NFT contract address associated with the early access round, and the amount of collateral tokens to be used as matching funds. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("GENERATED_TEST_PROJECT") will be added to `/data/test/input/projects.json`.
 
 **Example:**
 
@@ -112,12 +107,13 @@ There are three types of inputs that the script executor can take. They can all 
   "ANOTHER_PROJECT": {
     "SAFE": "0x0000000000000000000000000000000000000003",
     "ORCHESTRATOR": "0x0000000000000000000000000000000000000004",
-    "NFT": "0x0000000000000000000000000000000000000005"
+    "NFT": "0x0000000000000000000000000000000000000005",
+    "MATCHING_FUNDS": "420.69"
   }
 }
 ```
 
-2. `batches/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory. The file contains the vesting timelines (start, cliff, end) for that batch, the timeframe (fromTimestamp, toTimestamp) expressed in unix time (seconds, not miliseconds) during which contributions will be considered, the limits that apply to the contributions, as well as a flag if it's an early access round or not. If you run the e2e test for the first time, an example file for a fictional 3rd batch is generated in `/data/test/input/batches/3.json`. The following limits are
+2. `batches/<season>/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory under the corresponding season. The file contains the vesting timelines (start, cliff, end) for that batch, the timeframe (fromTimestamp, toTimestamp) expressed in unix time (seconds, not miliseconds) during which contributions will be considered, the limits that apply to the contributions, as well as a flag if it's an early access round or not, the assumed price for that round and whether only a report should be generated (for reviewing purposes). If you run the e2e test for the first time, an example file for a fictional 3rd batch is generated in `/data/test/input/batches/s2/3.json`.
 
 **Example:**
 
