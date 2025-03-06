@@ -55,6 +55,8 @@ export class Queries {
     this.queries.addresses.orchestrator = orchestratorAddress;
     this.queries.addresses.bondingCurve =
       await orchestrator.read.fundingManager();
+    this.queries.addresses.authorizer =
+      await orchestrator.read.authorizer();
     this.queries.addresses.paymentProcessor =
       await orchestrator.read.paymentProcessor();
     this.bondingCurve = getContract({
@@ -85,6 +87,34 @@ export class Queries {
   }
 
   // QUERIES
+  async getFirstAdmin() {
+    const authorizer = getContract({
+      address: this.queries.addresses.authorizer,
+      client: this.publicClient,
+      abi: abis.authorizerAbi,
+    });
+
+    const firstAdmin = await authorizer.read.getRoleMember([
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+      0,
+    ]);
+
+    return firstAdmin;
+  }
+
+  async adminCount() {
+    const authorizer = getContract({
+      address: this.queries.addresses.authorizer,
+      client: this.publicClient,
+      abi: abis.authorizerAbi,
+    });
+
+    const adminCount = await authorizer.read.getRoleMemberCount([
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+    ]);
+
+    return adminCount;
+  }
 
   async getTimeframe({ configuration }) {
     const timeframe = {};

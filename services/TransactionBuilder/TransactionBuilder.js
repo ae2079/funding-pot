@@ -366,7 +366,7 @@ export class TransactionBuilder {
         chainId: `${process.env.CHAIN_ID}`,
         createdAt: Date.now(),
         meta: {
-          name: `${name}_[TX-${i}]`,
+          name: `${name}-[TX-${i}]`,
           description: description,
           txBuilderVersion: '', // Left empty as unclear
           createdFromSafeAddress: this.safe,

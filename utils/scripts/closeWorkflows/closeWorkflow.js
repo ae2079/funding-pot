@@ -17,11 +17,7 @@ import { getTokenSnapshot } from '../migrateWorkflows/utils.js';
 
 const { CHAIN_ID, INDEXER_URL, BACKEND_URL, RPC_URL } = process.env;
 
-export async function closeWorkflow(
-  projectName,
-  projectsConfig,
-  adminMultisig
-) {
+export async function closeWorkflow(projectName, projectsConfig) {
   const projectConfig = projectsConfig[projectName];
 
   const queriesService = new Queries({
@@ -35,8 +31,18 @@ export async function closeWorkflow(
   await queriesService.setup(projectConfig.ORCHESTRATOR);
   const { addresses } = queriesService.queries;
 
+  const adminCount = await queriesService.adminCount();
+  if (adminCount > 1) {
+    throw new Error('More than one admin found');
+  }
+
+  const firstAdmin = await queriesService.getFirstAdmin();
+  if (firstAdmin === '0x0000000000000000000000000000000000000000') {
+    throw new Error('No admin found - first admin is zero address');
+  }
+
   const transactionBuilder = new TransactionBuilder({
-    projectConfig: { SAFE: adminMultisig },
+    projectConfig: { SAFE: firstAdmin },
     workflowAddresses: addresses,
     batchConfig: {
       VESTING_DETAILS: {
@@ -46,10 +52,10 @@ export async function closeWorkflow(
       },
     },
   });
-  const safe = new Safe(CHAIN_ID, { SAFE: adminMultisig }, RPC_URL);
+
   const snapshot = await getTokenSnapshot(addresses.issuanceToken);
 
-  transactionBuilder.setMinter(adminMultisig, true);
+  transactionBuilder.setMinter(firstAdmin, true);
 
   for (const entry of snapshot) {
     transactionBuilder.burnIssuance(
@@ -58,7 +64,7 @@ export async function closeWorkflow(
     );
   }
 
-  transactionBuilder.setMinter(adminMultisig, false);
+  transactionBuilder.setMinter(firstAdmin, false);
   transactionBuilder.setMinter(addresses.bondingCurve, false);
   transactionBuilder.renounceOwnership(addresses.mintWrapper);
   transactionBuilder.closeCurve();
@@ -72,7 +78,7 @@ export async function closeWorkflow(
   transactionBuilder.createVestings(
     [
       {
-        recipient: adminMultisig,
+        recipient: firstAdmin,
         amount: collateralInFundingManager - feesCollected,
       },
     ],
@@ -85,7 +91,7 @@ export async function closeWorkflow(
 
   // Propose transactions
   const transactionJsons = transactionBuilder.getTransactionJsons(
-    `[CLOSE-WORKFLOW]_[PROJECT-${projectName}]`,
+    `[CLOSE-WORKFLOW]-[PROJECT-${projectName}]`,
     `Close workflow for ${projectName}`
   );
 

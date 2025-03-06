@@ -75,10 +75,10 @@ export const main = async (season, projectName, batchNr) => {
   let transactionJsons;
   if (!WITH_PROPOSING) {
     transactionJsons = transactionBuilderService.getTransactionJsons(
-      `funding-pot-${projectName}-${batchNr}`,
+      `[FUNDING_POT]-[PROJECT-${projectName}]-[BATCH-${batchNr}]`,
       `Batch ${batchNr} for ${projectName}`
     );
-    transactionBuilderService.saveTransactionJsons(transactionJson);
+    transactionBuilderService.saveTransactionJsons(transactionJsons);
   }
 
   // store comprehensive report in a JSON file

@@ -8,7 +8,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import { closeWorkflow } from './closeWorkflow.js';
-import { workflowAdminMultisig } from './inputs/addresses.js';
 
 const [, , PROJECT_NAME] = process.argv;
 
@@ -32,11 +31,7 @@ const runScript = async () => {
     return;
   }
 
-  await closeWorkflow(
-    projectName,
-    projectsConfig,
-    workflowAdminMultisig
-  );
+  await closeWorkflow(projectName, projectsConfig);
 };
 
 runScript();
