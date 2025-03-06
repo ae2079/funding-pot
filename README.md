@@ -161,6 +161,8 @@ The following command will run the script for the 2nd batch of the project `FUNK
 
 When the script has executed a JSON report will be added under `data/production/output/<PROJECT_NAME>/<BATCH_NUMBER>.json`. You can use this file to better understand what has been proposed to the safe.
 
+**Running the script will store a json to data/<environment>/output/transactions that can then be executed in the safe UI.**
+
 ## Running the vesting script
 
 ### Pre-requisites
