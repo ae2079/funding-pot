@@ -1,0 +1,364 @@
+{
+  "deployWorkflowArgs": {
+    "orchestrator": {
+      "independentUpdates": false,
+      "independentUpdateAdmin": "0x0000000000000000000000000000000000000000"
+    },
+    "authorizer": {
+      "initialAdmin": "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4"
+    },
+    "fundingManager": {
+      "issuanceToken": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+      "bondingCurveParams": {
+        "formula": "0xaAA597779bdbC7D54836FCdDDd38690787d04d6d",
+        "reserveRatioForBuying": 125000,
+        "reserveRatioForSelling": 125000,
+        "buyFee": "800",
+        "sellFee": "800",
+        "buyIsOpen": true,
+        "sellIsOpen": true,
+        "initialIssuanceSupply": "6498673.48070613675635679",
+        "initialCollateralSupply": "171944.022128666300896049"
+      },
+      "collateralToken": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
+    }
+  },
+  "orchestratorAddress": "0x8b17B8B5E09db4D0bB392F948eCe3236324a0e6b",
+  "grantMintingToDeployerPayload": {
+    "grantMintingToDeployerPayload": {
+      "address": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+      "functionName": "setMinter",
+      "args": [
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4",
+        true
+      ]
+    },
+    "status": "success",
+    "hash": "0x165cac9475d097965df3342963f027585194c9c5d10be5708d4df1158886ad50"
+  },
+  "mintPayloads": [
+    {
+      "mintPayload": {
+        "address": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+        "functionName": "mint",
+        "args": [
+          "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+          "6419230147111884685990751"
+        ]
+      },
+      "status": "success",
+      "hash": "0x394451a510d6ba9ef3710871db3dd86599a18f380b2c4d9272aada694dc06a4d"
+    },
+    {
+      "mintPayload": {
+        "address": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+        "functionName": "mint",
+        "args": [
+          "0x32628a849657e6637318bb21e3d0f9f633e1e91b",
+          "77568682193067357012040"
+        ]
+      },
+      "status": "success",
+      "hash": "0x97110dea6753ccc38292dd9464c6a10e0dbfd57b5099dcb3b119027f00082693"
+    },
+    {
+      "mintPayload": {
+        "address": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+        "functionName": "mint",
+        "args": [
+          "0x7022ce36b265cacd497b2d3ac70fb7020d3892a6",
+          "1874651401184713353999"
+        ]
+      },
+      "status": "success",
+      "hash": "0x10d1d823ff1f7b75d8787bc60c7604d874936f7efd7f6619ed979ae26930d725"
+    }
+  ],
+  "revokeMintingRightsFromDeployerPayload": {
+    "revokeMintingRightsFromDeployerPayload": {
+      "address": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+      "functionName": "setMinter",
+      "args": [
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4",
+        false
+      ]
+    },
+    "status": "success",
+    "hash": "0x38c9011cc9ef8558357b66d0207d453d358e475b28304285b3e41e53a457417c"
+  },
+  "selfAssigningVestingPayloadViaSdk": {
+    "selfAssigningVestingPayloadViaSdk": {
+      "address": "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+      "functionName": "grantModuleRole",
+      "args": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4"
+      ]
+    },
+    "status": "success",
+    "hash": "0x5ecaed02941c14024870289ac7fdf27fe170a097c927e3c65ef27bfbb92ff4b1"
+  },
+  "vestingBatches": [
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          4,
+          [
+            "0x0D3edA53332b9fDf4d4e9FB4C1C940A80B16eD9D",
+            "0x01b9F17e97dFb2e25581690e048d4fF8d0b788f3",
+            "0x51e8342532973Bfd08447AabD9C4550324a2d621",
+            "0x3D041510f58665a17D722EE2BC73Ae409BB8715b"
+          ],
+          [
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf"
+          ],
+          [
+            "64000000000000000000000",
+            "256000000000000000000000",
+            "6080000000000000000000000",
+            "94799600000000000000"
+          ],
+          "1730196000",
+          "31536000",
+          "1793268000"
+        ]
+      },
+      "status": "success",
+      "hash": "0x86892c176a2d672e2fc60a2c2f833cc5bec1c500bc23367c3de7f84d794a7a96"
+    },
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          40,
+          [
+            "0xb760FE1bbC4A2752aBCBb28291a57Cb0cA99fF44",
+            "0xC46c67Bb7E84490D7EbdD0b8ecDaca68Cf3823F4",
+            "0x701d0ECB3BA780De7b2b36789aEC4493A426010a",
+            "0x313a58f11D8cF6f1667B7C8D615BD93B8c3F49Cb",
+            "0x3b023b1D4B01A2f82f0872aB7E0E80eC521C3406",
+            "0xA8e36b688eC3741e18D4F9f3AFBFA7f0F9f0662A",
+            "0x9703d9cF2F834e71D9b70675e746F7B634c9D1e9",
+            "0x536299a4fCF0d1d492596C2C816fc20F3F7Ec557",
+            "0x0F46540678c7e6D2eF983B382CC07Fa815AB148c",
+            "0xB6647e02AE6Dd74137cB80b1C24333852E4AF890",
+            "0x575c2f4D798de38E39692c5f21959FFE2FD43fef",
+            "0xd9B04F8EdFF8a2b5E1C55BB24Bf7236C3df9d562",
+            "0x1E8cd608e37fbfedE9721fF1B94Bd5E5b149c911",
+            "0xF2bbd9D1B80Ead64800DbDb1EeC9A91aeb7231E6",
+            "0xc5Fa8D1c5E226F3901e11246F5986847c63534e9",
+            "0xb300AA30dD33e1Ae849Cb69FA23D6Ddaf90a69BC",
+            "0xF9cD810B52213c89B7f73a2da4d1260B65Fc45D5",
+            "0x5D69C42A3a481d0CCFd88CFA8a2a08e2BF456134",
+            "0xaB888291F4127352B655fd476F64AC2ebfb8fe76",
+            "0x2332A02Fea96b42Fc3095aE7c73963980db9331B",
+            "0x64aDAF7040422Ab75b4E369B43957380c43C2ECF",
+            "0x97a1CA841B4792068932D4224681f6F6fa22C549",
+            "0x8AE4c29C97A9DFbA7a4440c6336a7D37EbA0e12c",
+            "0x12135a10B522fB2291fb00B7146C6fA8ABbaadB4",
+            "0x739d1b54808c309B032ce582d3175B2f0cA6A622",
+            "0x197D3b7675Ba58B8d3e826B8be0A39C1e397e50C",
+            "0x1Be49f4c800ec9DE69D3D906ADC995c52B9A23D5",
+            "0x1dF428833f2C9FB1eF098754e5D710432450d706",
+            "0xF3Ad97364bcCC3eA0582Ede58C363888f8C4ec85",
+            "0x092EcE065C3B07E341DDAc9f97860A76815f9466",
+            "0xf61771B1808BF37b0D0a02D52b896C9DeCF2ed9e",
+            "0xd54DA03AF0Fd56f57820f94f4245F51ED349493f",
+            "0x86A43656B482243803925194624Ea1d92692d852",
+            "0x00d18ca9782bE1CaEF611017c2Fbc1a39779A57C",
+            "0xf728b1F95bDc795B537B2D7a1386f4F733677839",
+            "0xf9Bf898bF2f41Ade970D9fF718d6027a217c491c",
+            "0xE04885c3f1419C6E8495C33bDCf5F8387cd88846",
+            "0xE059A37d87C49503B283a2F7A3A5d4B652ff7351",
+            "0xBEa26DE685Ef828b60cA53b40Ecc9Bab35645fDF",
+            "0xf632Ce27Ea72deA30d30C1A9700B6b3bCeAA05cF"
+          ],
+          [
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf"
+          ],
+          [
+            "179328800000000000000",
+            "224161000000000000000",
+            "224161000000000000000",
+            "2689932300000000000000",
+            "6276508700000000000000",
+            "139943000000000000000",
+            "89664400000000000000",
+            "2017449200000000000000",
+            "224161000000000000000",
+            "448322000000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "94147600000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "94147600000000000000",
+            "112080500000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "2241610200000000000000",
+            "224161000000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "89664400000000000000",
+            "448322000000000000000",
+            "672483000000000000000",
+            "336241500000000000000",
+            "89664400000000000000",
+            "112080500000000000000",
+            "89664400000000000000"
+          ],
+          "1734688800",
+          "15724800",
+          "1766224800"
+        ]
+      },
+      "status": "success",
+      "hash": "0xb58f3a63cd791b3ed4dcd4545cf846e8efdebc5c32953c3c4ee71bad7932bc06"
+    },
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          3,
+          [
+            "0xD112071a5837Ac1F69e40Fac7a25CaAa9BAaFbcD",
+            "0xeC952ED8e7c2AA466cac36fD611D2E87Df1243D7",
+            "0x7e461d582a6286Ec922B5863453D8C19c2aAFE8e"
+          ],
+          [
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf",
+            "0x4191F84f66e0B7CC10370Ff47a0E2168E35b9Bdf"
+          ],
+          [
+            "89664400000000000000",
+            "89664400000000000000",
+            "224161000000000000000"
+          ],
+          "1734688800",
+          "15724800",
+          "1766224800"
+        ]
+      },
+      "status": "success",
+      "hash": "0x8caae960c6e43b8a5421306eb4c2c77fc172546001071b27d0618680cb4a3f3b"
+    }
+  ],
+  "revokeVestingRolePayloadViaSdk": {
+    "revokeVestingRolePayloadViaSdk": {
+      "address": "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+      "functionName": "revokeModuleRole",
+      "args": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4"
+      ]
+    },
+    "status": "success",
+    "hash": "0x40d23fcfa68bf718ff1dc94c7729a81236322609bd4947ed25930dea3f54da19"
+  },
+  "setBondingCurveAsMinterPayload": {
+    "setBondingCurveAsMinterPayload": {
+      "address": "0xF13e2BC8Bd790389E10937B5F02229dBb133f289",
+      "functionName": "setMinter",
+      "args": [
+        "0x5B34dE32e40842e2e1D0135f0F52C467Ad8b2baB",
+        true
+      ]
+    },
+    "status": "success",
+    "hash": "0x240074906a24128add3498de60cc5d1bb54213bf90fd5510d1af67a6b6656dcd"
+  },
+  "grantCurveInteractionRightsPayload": {
+    "grantCurveInteractionRightsPayload": {
+      "address": "0x5B34dE32e40842e2e1D0135f0F52C467Ad8b2baB",
+      "functionName": "grantModuleRole",
+      "args": [
+        "0x43555256455f5553455200000000000000000000000000000000000000000000",
+        "0x32628a849657e6637318bb21e3d0f9f633e1e91b"
+      ]
+    },
+    "status": "success",
+    "hash": "0x914e2110c5fb7ccee530c67ca0e24acc2332bfe46c42e90d5deb8c0fff6ee51d"
+  },
+  "grantPaymentPusherRightsPayload": {
+    "grantPaymentPusherRightsPayload": {
+      "address": "0x1e4350605E143E58F0C786A76FA8f70257B3D20e",
+      "functionName": "grantModuleRole",
+      "args": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0x32628a849657e6637318bb21e3d0f9f633e1e91b"
+      ]
+    },
+    "status": "success",
+    "hash": "0x8616fb713952995a73375f1a105bd0a5e596d82b6dcb112b601f13099d67c150"
+  },
+  "grantAdminRolePayload": {
+    "grantAdminRolePayload": {
+      "address": "0x17759Cc0206d0AD2956CC9495ff20Fdffcc3AE11",
+      "functionName": "grantRole",
+      "args": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e"
+      ]
+    },
+    "status": "success",
+    "hash": "0x977cf00638523431315e35cd7bbb1b0748cc91b16141fa725ce7e2ceb24a4756"
+  }
+}

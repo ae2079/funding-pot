@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import SafeApiKit from '@safe-global/api-kit';
 import ProtocolKit from '@safe-global/protocol-kit';
 import { getAddress } from 'viem';
+import { encodeMulti } from 'ethers-multisend';
 
 export class Safe {
   safeAddress;
@@ -33,6 +34,7 @@ export class Safe {
   }
 
   async proposeTxs(txs) {
+    console.log('PROPOSE TO: ', this.safeAddress);
     if (!this.protocolKit) {
       this.protocolKit = await ProtocolKit.default.init({
         signer: process.env.DELEGATE,
@@ -72,6 +74,17 @@ export class Safe {
       this.safeTransactions.push({ safeTxHash });
       console.timeEnd(timerKey);
     }
+  }
+
+  async getMultiSendEncodedTxs(txBatches) {
+    const multiSendTxs = [];
+
+    for (const txBatch of txBatches) {
+      const multiSendTx = encodeMulti(txBatch);
+      multiSendTxs.push(multiSendTx);
+    }
+
+    return multiSendTxs;
   }
 
   async getProposedTransactions() {}

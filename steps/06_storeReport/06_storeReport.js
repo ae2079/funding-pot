@@ -18,6 +18,7 @@ export const storeReport = async (
     projectConfig,
     batchConfig,
     batchReports,
+    transactionJsons,
   }
 ) => {
   const report = {
@@ -36,6 +37,7 @@ export const storeReport = async (
       projectConfig,
       batchConfig,
     },
+    transactionJsons,
     batchReports,
   };
 

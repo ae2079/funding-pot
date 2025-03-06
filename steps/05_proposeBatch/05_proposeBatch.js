@@ -1,3 +1,5 @@
+import { WITH_PROPOSING } from '../../config.js';
+
 export const proposeBatch = async ({
   queryService,
   batchService,
@@ -39,11 +41,12 @@ export const proposeBatch = async ({
   // get encoded tx batches from transaction service
   const txBatches = transactionBuilderService.getEncodedTxBatches();
 
-  if (skipPropose) {
-    console.log('❗ Not proposing because ONLY_REPORT flag is set');
+  if (!skipPropose && WITH_PROPOSING) {
+    await safeService.proposeTxs(txBatches);
     return;
   }
 
+  console.log('❗ Not proposing the tx batches');
+  return;
   // propose tx batches
-  await safeService.proposeTxs(txBatches);
 };

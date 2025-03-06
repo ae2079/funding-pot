@@ -1,0 +1,621 @@
+{
+  "deployWorkflowArgs": {
+    "orchestrator": {
+      "independentUpdates": false,
+      "independentUpdateAdmin": "0x0000000000000000000000000000000000000000"
+    },
+    "authorizer": {
+      "initialAdmin": "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4"
+    },
+    "fundingManager": {
+      "issuanceToken": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "bondingCurveParams": {
+        "formula": "0xaAA597779bdbC7D54836FCdDDd38690787d04d6d",
+        "reserveRatioForBuying": 125000,
+        "reserveRatioForSelling": 125000,
+        "buyFee": "800",
+        "sellFee": "800",
+        "buyIsOpen": true,
+        "sellIsOpen": true,
+        "initialIssuanceSupply": "6666525.065538717183532024",
+        "initialCollateralSupply": "210855.764163989914850928"
+      },
+      "collateralToken": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
+    }
+  },
+  "orchestratorAddress": "0x26424d7a425b7607B53705D4e21fa22Fb7F69166",
+  "grantMintingToDeployerPayload": {
+    "grantMintingToDeployerPayload": {
+      "address": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "functionName": "setMinter",
+      "args": [
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4",
+        true
+      ]
+    },
+    "status": "success",
+    "hash": "0x047a0aabdd4252db61d66fbbbf9e7416e41a93d44fb3d528165247919f9e620d"
+  },
+  "mintPayloads": [
+    {
+      "mintPayload": {
+        "address": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+        "functionName": "mint",
+        "args": [
+          "0x7022ce36b265cacd497b2d3ac70fb7020d3892a6",
+          "4968794515347733980199"
+        ]
+      },
+      "status": "success",
+      "hash": "0x7d103064a3dc1344261d78e839af77b0824b7c580d332f28deb236b3a5237936"
+    },
+    {
+      "mintPayload": {
+        "address": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+        "functionName": "mint",
+        "args": [
+          "0x480f463b0831990b1929fB401f21E55B21E985cD",
+          "6539996179776569592024320"
+        ]
+      },
+      "status": "success",
+      "hash": "0x0368c49e1aeccb82ca0d008b4494fa20f9986c1bbc6161cd27c9b3e38b1ec544"
+    },
+    {
+      "mintPayload": {
+        "address": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+        "functionName": "mint",
+        "args": [
+          "0xd5c09846fec86d4965bc4b258e8615280aa511e9",
+          "121560091246799857527505"
+        ]
+      },
+      "status": "success",
+      "hash": "0xe84eeaddf3db919ab0cf8e62973c299d2189c28e84325fb7b19bbe2185818ec4"
+    }
+  ],
+  "revokeMintingRightsFromDeployerPayload": {
+    "revokeMintingRightsFromDeployerPayload": {
+      "address": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "functionName": "setMinter",
+      "args": [
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4",
+        false
+      ]
+    },
+    "status": "success",
+    "hash": "0xebbd4d535f862e1cb259b6c883636fa8ccb8026191716b5cb81787f398dcf059"
+  },
+  "selfAssigningVestingPayloadViaSdk": {
+    "selfAssigningVestingPayloadViaSdk": {
+      "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+      "functionName": "grantModuleRole",
+      "args": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4"
+      ]
+    },
+    "status": "success",
+    "hash": "0xf7c534988bbeaddbd3e9c590630d78d56e882395cfccf8ae3f21f445427f07a4"
+  },
+  "vestingBatches": [
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          7,
+          [
+            "0x0D3edA53332b9fDf4d4e9FB4C1C940A80B16eD9D",
+            "0x01b9F17e97dFb2e25581690e048d4fF8d0b788f3",
+            "0x64a161e167001B761CD692C2a921eb5FdAD15D5f",
+            "0x636fDCF6fDeD8de50663ad1035d6670EdfD80a12",
+            "0xc57E6861e439287221147B9841BB34D68A054048",
+            "0x9F1B06550300fc5a5FE7bfD2d533b3C66692333D",
+            "0xa982BbDaf783Eb7C3914D988b7e2a0bE865ccB53"
+          ],
+          [
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd"
+          ],
+          [
+            "64000000000000000000000",
+            "256000000000000000000000",
+            "268800000000000000000000",
+            "5811200000000000000000000",
+            "52141000000000000000",
+            "170336500000000000000",
+            "62121555500000000000000"
+          ],
+          "1730196000",
+          "31536000",
+          "1793268000"
+        ]
+      },
+      "status": "success",
+      "hash": "0x0712320ddcf9bfa2ee09cd1baf71073a6f24b5b40cf093ab47427d24941ca684"
+    },
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          40,
+          [
+            "0xb760FE1bbC4A2752aBCBb28291a57Cb0cA99fF44",
+            "0x27460E6B55C7A4c42cBC52babea9fF1f5C1e8Cb4",
+            "0xC46c67Bb7E84490D7EbdD0b8ecDaca68Cf3823F4",
+            "0x701d0ECB3BA780De7b2b36789aEC4493A426010a",
+            "0x6Ac81eD433B45aC181C9764E8402ae9cE413633B",
+            "0x313a58f11D8cF6f1667B7C8D615BD93B8c3F49Cb",
+            "0x3b023b1D4B01A2f82f0872aB7E0E80eC521C3406",
+            "0xA8e36b688eC3741e18D4F9f3AFBFA7f0F9f0662A",
+            "0x9703d9cF2F834e71D9b70675e746F7B634c9D1e9",
+            "0x536299a4fCF0d1d492596C2C816fc20F3F7Ec557",
+            "0x33878e070db7f70D2953Fe0278Cd32aDf8104572",
+            "0x0F46540678c7e6D2eF983B382CC07Fa815AB148c",
+            "0xb62E762Af637b49Eb4870BCe8fE21bffF189e495",
+            "0x5b655EDa7D101f98934392Cc3610BcB25b633789",
+            "0x8Bb2884ee943111AA5119a36b30085a15a66c972",
+            "0x1cCd9F598a51cE30A912C0B1713dEC9478762DeB",
+            "0x810816a0F73590D43160d6ec14399ACB8124E4bB",
+            "0x575c2f4D798de38E39692c5f21959FFE2FD43fef",
+            "0x6B5CF1EEfbf4E919690cC06F6dAa25Cd0c925130",
+            "0xC0eA3aFEb9A83EF8f83A5Df7C563a3b7c4A5fAe4",
+            "0x9e4C48c7c7d758Af0985fCc360ae6B7CDa662e70",
+            "0xCE4b779aa407234EE950691B42f54b70b725b39f",
+            "0x47D228fb786BB14117625147f1055638F46b6893",
+            "0x25659eEfd7caE21566a257420bBcB0C8317Ef94f",
+            "0xADa29F411823a2a98314404f0e227bc901cE1aBC",
+            "0x4Bb32D86606f0601aaD2aE36C8b153968544Dee2",
+            "0x65Cbf9A496e5BC9CaED929b2007633Aca8b2EF2F",
+            "0x288457AC35bBdF035845acB7F2A310BbF7a74c52",
+            "0x99E5FF5126C68294108dF8f92f9321A0D7A69d4e",
+            "0xd26b76e50f6510cdD4bf45d59279705f36946d23",
+            "0xf2D93ECDC03582D3445B64B5a61Bbe84Ef06b79B",
+            "0xC8499D0311CA31A60e11D58A5A7e4F1C24B95575",
+            "0x19F5959d7e369aFE2942ab2b32aEDd33664707dA",
+            "0x1BfEf10693Dd39A78afD9C90aD9b16A779C4E538",
+            "0x2c640E60C2B388a595Ac805a2283F6B6f2ad7FEc",
+            "0x08a9B4221A84Bb39Faa7D6fE0F7664EFEc9511aC",
+            "0xa94586fBB5B736a3f6AF31f84EEcc7677D2e7F84",
+            "0x9714f78C2f3EAA25f400c7CEe3b354F3fab62D07",
+            "0x5D69C42A3a481d0CCFd88CFA8a2a08e2BF456134",
+            "0x04D1C2bc25288A8F062687404250A423aF15937c"
+          ],
+          [
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd"
+          ],
+          [
+            "375624700000000000000",
+            "355855000000000000000",
+            "197697200000000000000",
+            "79078800000000000000",
+            "1186183400000000000000",
+            "3163155900000000000000",
+            "5535522800000000000000",
+            "395394400000000000000",
+            "81807100000000000000",
+            "5140128300000000000000",
+            "2778397500000000000000",
+            "395394400000000000000",
+            "245144500000000000000",
+            "118618300000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "197697200000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "83032800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79869600000000000000"
+          ],
+          "1734688800",
+          "15724800",
+          "1766224800"
+        ]
+      },
+      "status": "success",
+      "hash": "0xb80e36ded06bba2533c5f9b99f6a93534d3d6b376edaa0f4bf9d69faab444c93"
+    },
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          40,
+          [
+            "0x4b43246728B64a75A4c85A290cd32fE1F2aAef3c",
+            "0x952B869B84d45821F31667771BE7E8C51D7d0316",
+            "0x2D21c492351e8400FeADdcEE68841f4eBB82C566",
+            "0x08F7Fd04e76daC7e4d9e343e0B5510379f5bbA48",
+            "0x42f36d45381e3f5D9443E872b6192aaf0DB55b53",
+            "0xf39fF1e8781c0cC7C714B78d73630f6B9ddddd5f",
+            "0x7aD157E2b175e1a7e3c86a78463E8d5C601DfC32",
+            "0xc8bE8Bc0e266840005D3528e471c998dE93479e3",
+            "0xea3ebd0cc853dDa25c65C13CA2AC1a8eb6B38F09",
+            "0xE945BfDE6344f64062B43B1C2856C5Fa5D58600E",
+            "0x1BBA15127f9FD12a20E0e8C3a1e9C88245452Ef3",
+            "0xA7547FAeabBdfe5D805133622fbe3c7D473c188B",
+            "0x64f8e38e19c1B6992969Dcd5769c149951018Af1",
+            "0x97a1CA841B4792068932D4224681f6F6fa22C549",
+            "0x32cB9fd13AF7635Cc90d0713a80188b366A28205",
+            "0x3C43AA8E525d0CA2fab672CD55F79dE777295e99",
+            "0xcbdcB14D4963a045d6517A89AaB07a097230C9BC",
+            "0x57b977465b9e8E39BFa54e0b4bC0A66d7099684C",
+            "0xc89d2CDbB3bb2381aFFb4d09c137bdb06B62ff7a",
+            "0x6a58EB4b32E34F34E4E2353E4996235a2Ec828F8",
+            "0xDf3e23824C6b35Fc005dB2951396669e48bee106",
+            "0x23384FB02e4D70C357FE977AD742DDa8ab08CD76",
+            "0x9a3b84065FA010d1BdC977d2378e162aA53B64ac",
+            "0x67c37Af23c32cF76a9Cb671c6A865E0f4FC22a77",
+            "0x7aDf30DCa721F792a4308dcaC6607117e697a432",
+            "0x8AE4c29C97A9DFbA7a4440c6336a7D37EbA0e12c",
+            "0xdd9681b0c93AA37C40789579cd8045Ff3FdbB6DF",
+            "0x406c0C92b5bB8E9b890e5bc7a33870a83a950EfB",
+            "0x984061A332F0D28e3Ae8875Ac953e2aB38a4608a",
+            "0xeA3E579dA60CdB97f3870f862Af5DB982C0Ea08c",
+            "0x8fd4f55A3a3f8F3cF461bD4A6a3FfeE937FBF75c",
+            "0x8AAA8E6494B13116AD65168283EC5269479611Ff",
+            "0xa1dAEE22213f64C8bb8CAd5CBaca2f174Af6c144",
+            "0x78B3367B0F547Cd16Bac453F788956AfcE92447B",
+            "0x196066a9031305338f69c5432c927e81a1593fEB",
+            "0xe08753f2CaF86CFA29CE24B1cA765F6f3A25a68D",
+            "0x2764F3102510e51a7d3543A09Fd7F49b1d5e2439",
+            "0x966211E4A01E0E479e86F24F9D3209B8Cc8a7993",
+            "0xAB060E12d6Ee092332A3A947A5714C063A206441",
+            "0xBD7D78d22A3a2a7F679F40C126b297d8b6ed63dd"
+          ],
+          [
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd"
+          ],
+          [
+            "81055800000000000000",
+            "79078800000000000000",
+            "83032800000000000000",
+            "86986700000000000000",
+            "83032800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "197697200000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79474200000000000000",
+            "79276500000000000000",
+            "79078800000000000000",
+            "83032800000000000000",
+            "86986700000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "88963700000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "83032800000000000000",
+            "3953944800000000000000",
+            "94894600000000000000",
+            "79078800000000000000"
+          ],
+          "1734688800",
+          "15724800",
+          "1766224800"
+        ]
+      },
+      "status": "success",
+      "hash": "0x7cbb526c32f1f4e875ea374ed129adc634540dda9875ecf563705a0393b75079"
+    },
+    {
+      "pushPaymentBatchedPayloadViaSdk": {
+        "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+        "functionName": "pushPaymentBatched",
+        "args": [
+          39,
+          [
+            "0x1dF428833f2C9FB1eF098754e5D710432450d706",
+            "0x5Dac9ccC215b9Af65B486066786F79d9aa0043Da",
+            "0x23dB246031fd6F4e81B0814E9C1DC0901a18Da2D",
+            "0x33306dB7d5e2995393BCC894FDAdE12980c516B9",
+            "0x439D6dF49a7ACA63c014bCdBD047ed601C943447",
+            "0x28d11c87073aB09B404FB575bF11F2233Cde345b",
+            "0x3d39271D21F22a0d434e8D6b0756B0840b2361C3",
+            "0x8Da6ccac70C91872ff1d179ceeF4b7b4692eFfda",
+            "0xb1b86cC078870a9c0F998F7c24Dc27AC3dd46Cf1",
+            "0x881FdfC43A5E78C137520abE7C856cb22dff11ad",
+            "0x15e9Af27556A405de918504a83C307d194C71B39",
+            "0xf84C58DC674b8F29F3d5b56f561817E3920F9a63",
+            "0x21005E2cFd76ce154B628A62f120D9B0EA3b4cD2",
+            "0xA18453f015034D42D6c8169c3D88D2A01f52a180",
+            "0x713899c0c0Af5ad5F384754e26cC1ff055E3f730",
+            "0x3860938314A8783d27F5Bf42aDa92D20d2666046",
+            "0x86A43656B482243803925194624Ea1d92692d852",
+            "0x00A66045CCC58a3e79999D6DE0f49809c577Ed3c",
+            "0x00d18ca9782bE1CaEF611017c2Fbc1a39779A57C",
+            "0xf728b1F95bDc795B537B2D7a1386f4F733677839",
+            "0x696Ee4AE0b15feae8ED1AfC865930e0ea65b1f3F",
+            "0xE04885c3f1419C6E8495C33bDCf5F8387cd88846",
+            "0xF8D1d34956cEa24718cf8687588D6FeDbc6d9AA6",
+            "0x25B0ab9c64733a22D90cFFe9284373d7E9664141",
+            "0x38f80f8f76B1C44B2beeFB63bb561F570fb6ddB6",
+            "0x2C8D2e50Ee03f98A2f4CCFbe1A61552b79bDF6fa",
+            "0x7159F373e85d8B5f38972f746f3635d59490b4fF",
+            "0xBEa26DE685Ef828b60cA53b40Ecc9Bab35645fDF",
+            "0x8bB5E5f6799245CB129E430B5E84680933903ed3",
+            "0x083fc10cE7e97CaFBaE0fE332a9c4384c5f54E45",
+            "0xfAb9a3D37999E12252b47468D2FFD4BE15936012",
+            "0x0Eb662de29A9E65A7C89ADB73391f96B478E0793",
+            "0x2dd2036C9Db2ADA2739509AF0047c00C8b9291EF",
+            "0xf632Ce27Ea72deA30d30C1A9700B6b3bCeAA05cF",
+            "0xc191a29203a83eec8e846c26340f828C68835715",
+            "0x37f749Ae2E7A28EFE14beD6ccCA5272527E43112",
+            "0x301605C95acbED7A1fD9C2c0DeEe964e2AFBd0C3",
+            "0xB53b0255895c4F9E3a185E484e5B674bCCfbc076",
+            "0xb749A586080436e616f097f193Ba9CB6A25E7Ea6"
+          ],
+          [
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd",
+            "0xfAFB870F1918827fe57Ca4b891124606EaA7e6bd"
+          ],
+          [
+            "1976972400000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79988300000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "79078800000000000000",
+            "83032800000000000000",
+            "83032800000000000000",
+            "102802500000000000000",
+            "79474200000000000000",
+            "79078800000000000000",
+            "197697200000000000000",
+            "158157700000000000000",
+            "197697200000000000000",
+            "142342000000000000000",
+            "395394400000000000000",
+            "158157700000000000000",
+            "79078800000000000000",
+            "197697200000000000000",
+            "79078800000000000000",
+            "395394400000000000000",
+            "79078800000000000000",
+            "197697200000000000000",
+            "39539448800000000000000",
+            "98848600000000000000",
+            "79078800000000000000",
+            "83032800000000000000",
+            "158157700000000000000",
+            "83032800000000000000",
+            "79474200000000000000",
+            "438887800000000000000",
+            "1976972400000000000000",
+            "118618300000000000000"
+          ],
+          "1734688800",
+          "15724800",
+          "1766224800"
+        ]
+      },
+      "status": "success",
+      "hash": "0xbbea0a3860bc69b96440baae35ba94cf2819a541497046ab3671289023d884bd"
+    }
+  ],
+  "revokeVestingRolePayloadViaSdk": {
+    "revokeVestingRolePayloadViaSdk": {
+      "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+      "functionName": "revokeModuleRole",
+      "args": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0xB4f8D886E9e831B6728D16Ed7F3a6c27974ABAA4"
+      ]
+    },
+    "status": "success",
+    "hash": "0x7df4ab78853aa64e958482fb319572217763134b08d1b653415d30e1500a45dd"
+  },
+  "setBondingCurveAsMinterPayload": {
+    "setBondingCurveAsMinterPayload": {
+      "address": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "functionName": "setMinter",
+      "args": [
+        "0x9d2720d1Bb13F8F5aC51fc32c0a9742A3DD101Be",
+        true
+      ]
+    },
+    "status": "success",
+    "hash": "0xc22e994446e4f842785e963b1b520e262c403a1780d05984bff4b7132cc5dada"
+  },
+  "grantCurveInteractionRightsPayload": {
+    "grantCurveInteractionRightsPayload": {
+      "address": "0x9d2720d1Bb13F8F5aC51fc32c0a9742A3DD101Be",
+      "functionName": "grantModuleRole",
+      "args": [
+        "0x43555256455f5553455200000000000000000000000000000000000000000000",
+        "0xd5c09846fec86d4965bc4b258e8615280aa511e9"
+      ]
+    },
+    "status": "success",
+    "hash": "0x4c34366d76f97c3d7065a463f897a0b4e86e2af2545602529d7cde6e939b4f91"
+  },
+  "grantPaymentPusherRightsPayload": {
+    "grantPaymentPusherRightsPayload": {
+      "address": "0x480f463b0831990b1929fB401f21E55B21E985cD",
+      "functionName": "grantModuleRole",
+      "args": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0xd5c09846fec86d4965bc4b258e8615280aa511e9"
+      ]
+    },
+    "status": "success",
+    "hash": "0x18ed15db8964a3e864b61936e377b29f95f019808ccc0aba612587856ddfa83a"
+  },
+  "grantAdminRolePayload": {
+    "grantAdminRolePayload": {
+      "address": "0x3d9Bf3d62BF31E054b9650BABdE45f85552b224c",
+      "functionName": "grantRole",
+      "args": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e"
+      ]
+    },
+    "status": "success",
+    "hash": "0x6e6f91bf9c87f91c1fcfd4e2edaca1ccc86d26ccd040345d68d2526e87c4411d"
+  }
+}

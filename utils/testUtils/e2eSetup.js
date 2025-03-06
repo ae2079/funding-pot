@@ -16,6 +16,8 @@ import SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { Inverter } from '@inverter-network/sdk';
 
+import { WITH_PROPOSING } from '../../config.js';
+
 import {
   projectConfig,
   allowlist,
@@ -93,23 +95,25 @@ export const deployTestSafe = async () => {
   );
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
-  const apiKit = new SafeApiKit.default({
-    chainId: process.env.CHAIN_ID,
-  });
+  if (WITH_PROPOSING) {
+    const apiKit = new SafeApiKit.default({
+      chainId: process.env.CHAIN_ID,
+    });
 
-  console.info(
-    `> Adding delegate ${delegateAccount.address} to safe ${safeAddress}...`
-  );
+    console.info(
+      `> Adding delegate ${delegateAccount.address} to safe ${safeAddress}...`
+    );
 
-  await apiKit.addSafeDelegate({
-    delegateAddress: delegateAccount.address,
-    delegatorAddress: ownerAccount.address,
-    safeAddress: safeAddress,
-    signer: wallet,
-    label: 'round-proposer',
-  });
+    await apiKit.addSafeDelegate({
+      delegateAddress: delegateAccount.address,
+      delegatorAddress: ownerAccount.address,
+      safeAddress: safeAddress,
+      signer: wallet,
+      label: 'round-proposer',
+    });
 
-  console.info('✅ Delegate added');
+    console.info('✅ Delegate added');
+  }
 
   return safeAddress;
 };
@@ -120,7 +124,7 @@ export const deployWorkflowViaFactory = async (
 ) => {
   const { publicClient, walletClient } = owner;
   const inverterSdk = new Inverter({ publicClient, walletClient });
-  const args = deployArgs(walletClient.account.address, safeAddress);
+  const args = deployArgs(safeAddress, safeAddress);
 
   console.info(
     `> Minting ${parseUnits(
@@ -145,6 +149,8 @@ export const deployWorkflowViaFactory = async (
   await publicClient.waitForTransactionReceipt({ hash });
   console.info('✅ Tokens minted');
 
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
   console.info('> Approving collateral token to factory...');
   const tx1 = await tokenInstance.write.approve([
     restrictedPimFactory,
@@ -156,6 +162,8 @@ export const deployWorkflowViaFactory = async (
   await publicClient.waitForTransactionReceipt({ hash: tx1 });
   console.info('✅ Collateral token approved');
 
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
   console.info('> Adding funding to factory...');
   const factory = getContract({
     abi: abis.restrictedPimFactoryAbi,
@@ -165,7 +173,7 @@ export const deployWorkflowViaFactory = async (
   const tx2 = await factory.write.addFunding([
     walletClient.account.address,
     safeAddress,
-    walletClient.account.address,
+    safeAddress,
     mockCollateralToken,
     parseUnits(
       args.fundingManager.bondingCurveParams.initialCollateralSupply,
@@ -175,13 +183,54 @@ export const deployWorkflowViaFactory = async (
   await publicClient.waitForTransactionReceipt({ hash: tx2 });
   console.info('✅ Funding added');
 
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
   console.info('> Deploying workflow through restricted factory...');
   const { run } = await inverterSdk.getDeploy({
     requestedModules,
     factoryType: 'restricted-pim',
   });
+
   const { orchestratorAddress } = await run(args);
   console.info('✅ Workflow deployed');
+
+  return orchestratorAddress;
+
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  console.info(
+    '> Setting additional admin... (for testing purposes)'
+  );
+  const workflow = await inverterSdk.getWorkflow({
+    orchestratorAddress,
+  });
+  const adminRole = await workflow.authorizer.read.getAdminRole.run();
+  const tx3 = await workflow.authorizer.write.grantRole.run([
+    adminRole,
+    safeAddress,
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash: tx3 });
+  console.info('✅ Safe set as workflow admin');
+
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  console.info(
+    '> Setting safe as token admin (for testing purposes)'
+  );
+  const mintWrapper =
+    await workflow.fundingManager.read.getIssuanceToken.run();
+  const mintWrapperContract = getContract({
+    abi: abis.mintWrapperAbi,
+    address: mintWrapper,
+    client: walletClient,
+  });
+  const tx4 = await mintWrapperContract.write.transferOwnership([
+    safeAddress,
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash: tx4 });
+  console.info('✅ Safe set as mint wrapper admin');
+
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   return orchestratorAddress;
 };
@@ -214,6 +263,7 @@ export const getBatchConfig = async (safe) => {
   batchConfig.LIMITS.INDIVIDUAL_2 = individualLimit2;
   batchConfig.LIMITS.TOTAL = totalLimit;
   batchConfig.PRICE = price;
+  const season = '2';
 
   batchConfig.IS_EARLY_ACCESS = false;
 
@@ -262,7 +312,9 @@ export const getBatchConfig = async (safe) => {
       abi: abis.erc20Abi,
     });
 
-    console.info('> Sending contribution to safe...');
+    console.info(
+      `> Sending contribution ${contributions[i]} to safe...`
+    );
     const tx = await tokenInstance.write.transfer([
       safe,
       contributions[i],
@@ -278,6 +330,8 @@ export const getBatchConfig = async (safe) => {
       '✅ Contribution sent at timestamp: ',
       block.timestamp
     );
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 
   const toBlock = await owner.publicClient.getBlock();
@@ -286,7 +340,7 @@ export const getBatchConfig = async (safe) => {
 
   const batchConfigFilePath = path.join(
     __dirname,
-    '../../data/test/input/batches/3.json'
+    `../../data/test/input/batches/s${season}/3.json`
   );
 
   fs.writeFileSync(
@@ -296,7 +350,7 @@ export const getBatchConfig = async (safe) => {
   );
 
   console.info(
-    '💾 Batch config stored to data/test/input/batches/3.json'
+    `💾 Batch config stored to data/test/input/batches/s${season}/3.json`
   );
 
   return { batchConfig, contributions, contributors };
@@ -457,6 +511,7 @@ export const mintMockTokens = async (
   console.info(`> Minting ${amount} tokens (${token}) to ${to}...`);
   await publicClient.waitForTransactionReceipt({ hash });
   console.info('✅ Tokens minted');
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 };
 
 export const getReport = (projectName, batchNr) => {

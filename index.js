@@ -2,7 +2,7 @@ import './env.js';
 import { main } from './steps/main.js';
 import { getProjectNames } from './utils/helpers.js';
 
-const [, , BATCH, PROJECT_NAME] = process.argv;
+const [, , SEASON, PROJECT_NAME, BATCH] = process.argv;
 const { TYPE } = process.env;
 
 const runScript = async () => {

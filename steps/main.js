@@ -4,15 +4,16 @@ import { instantiateServices } from './03_instantiateServices/03_instantiateServ
 import { defineBatch } from './04_defineBatch/04_defineBatch.js';
 import { proposeBatch } from './05_proposeBatch/05_proposeBatch.js';
 import { storeReport } from './06_storeReport/06_storeReport.js';
-
-export const main = async (projectName, batchNr) => {
+import { WITH_PROPOSING } from '../config.js';
+export const main = async (season, projectName, batchNr) => {
   console.info(
-    `🚀 Starting batch execution for project ${projectName} with batch number ${batchNr}`
+    `🚀 Starting batch execution for season ${season} for project ${projectName} for batch ${batchNr}`
   );
 
   // load configs & batchReports
   console.info(`1️⃣ Loading configs...`);
   const { projectsConfig, batchConfig, batchReports } = loadInputs(
+    season,
     projectName,
     batchNr
   );
@@ -67,8 +68,17 @@ export const main = async (projectName, batchNr) => {
       queryService,
       transactionBuilderService,
       safeService,
-      skipPropose: batchConfig.ONLY_REPORT,
+      skipPropose: batchConfig.ONLY_REPORT || WITH_PROPOSING,
     });
+  }
+
+  let transactionJsons;
+  if (!WITH_PROPOSING) {
+    transactionJsons = transactionBuilderService.getTransactionJsons(
+      `[FUNDING_POT]-[PROJECT-${projectName}]-[BATCH-${batchNr}]`,
+      `Batch ${batchNr} for ${projectName}`
+    );
+    transactionBuilderService.saveTransactionJsons(transactionJsons);
   }
 
   // store comprehensive report in a JSON file
@@ -80,6 +90,7 @@ export const main = async (projectName, batchNr) => {
     queryService,
     projectConfig,
     batchConfig,
+    transactionJsons,
     batchReports,
   });
 
