@@ -169,14 +169,13 @@ When the script has executed a JSON report will be added under `data/production/
 
 - the `data/production/input/projects.json` file is set
 - all environment variables are set that are also required for the funding pot script
-- your `DELEGATE`private key (set in `.env`) is delegate of the project's funding pot multisig
 - the total amount of vesting tokens has been sent to the payment router
 
 ### Necessary steps
 
 1. set the `vestings.json` file under `/utils/scripts/inputs/vestings.json`
 
-NOTE: there is an example file set, which you need to overwrite.
+NOTE: there is an example file set (`vestings.example.json`), which you can use as reference.
 
 The following is an example. Note that all projects share the same vesting details and each key in in `VESTINGS` corresponds to a project name. These need to be the same project names as in the `projects.json` file. Associated with each project is an array of vestings, where the recipient is the address that will receive the vesting and the amount is the amount of tokens that will be vested.
 
