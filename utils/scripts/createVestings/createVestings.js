@@ -1,4 +1,4 @@
-import '../../env.js';
+import '../../../env.js';
 
 import fs from 'fs';
 import path, { dirname } from 'path';
@@ -7,17 +7,16 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-import { loadProjectsConfig } from '../../steps/01_loadInputs/01_loadInputs.js';
-import { Safe } from '../../services/Safe/Safe.js';
-import { Queries } from '../../services/Queries/Queries.js';
-import { TransactionBuilder } from '../../services/TransactionBuilder/TransactionBuilder.js';
+import { loadProjectsConfig } from '../../../steps/01_loadInputs/01_loadInputs.js';
+import { Queries } from '../../../services/Queries/Queries.js';
+import { TransactionBuilder } from '../../../services/TransactionBuilder/TransactionBuilder.js';
 
 const [, , PROJECT_NAME] = process.argv;
 const { CHAIN_ID, INDEXER_URL, BACKEND_URL, RPC_URL } = process.env;
 
 function loadVestingsConfig() {
   const vestingsConfig = JSON.parse(
-    fs.readFileSync(path.join(__dirname, 'inputs/vestings.json'))
+    fs.readFileSync(path.join(__dirname, 'input/vestings.json'))
   );
   return vestingsConfig;
 }
@@ -54,10 +53,14 @@ async function createVestings(projectName, vestingDetails) {
   transactionBuilder.createVestings(
     vestingDetails.VESTINGS[projectName]
   );
-  const txBatches = transactionBuilder.getEncodedTxBatches();
-  const safe = new Safe(CHAIN_ID, projectConfig, RPC_URL);
-  await safe.proposeTxs(txBatches);
-  console.log(`✅ Vesting transactions proposed for ${projectName}`);
+
+  const transactionJsons = transactionBuilder.getTransactionJsons(
+    `[CREATE-VESTINGS]-[PROJECT-${projectName}]`,
+    `Create vestings for ${projectName}`
+  );
+  transactionBuilder.saveTransactionJsons(transactionJsons);
+
+  console.log(`✅ Vesting transactions saved for ${projectName}`);
 }
 
 // requires to have PK of safe owner stored in env
