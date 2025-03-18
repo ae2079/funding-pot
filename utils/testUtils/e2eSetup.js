@@ -1,3 +1,5 @@
+import '../../env.js';
+
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -147,7 +149,7 @@ export const deployWorkflowViaFactory = async (
     ),
   ]);
   await publicClient.waitForTransactionReceipt({ hash });
-  console.info('✅ Tokens minted');
+  console.info(`✅ Tokens minted: ${hash}`);
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -160,7 +162,7 @@ export const deployWorkflowViaFactory = async (
     ),
   ]);
   await publicClient.waitForTransactionReceipt({ hash: tx1 });
-  console.info('✅ Collateral token approved');
+  console.info(`✅ Collateral token approved: ${tx1}`);
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -181,7 +183,7 @@ export const deployWorkflowViaFactory = async (
     ),
   ]);
   await publicClient.waitForTransactionReceipt({ hash: tx2 });
-  console.info('✅ Funding added');
+  console.info(`✅ Funding added: ${tx2}`);
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -192,7 +194,7 @@ export const deployWorkflowViaFactory = async (
   });
 
   const { orchestratorAddress } = await run(args);
-  console.info('✅ Workflow deployed');
+  console.info(`✅ Workflow deployed: ${orchestratorAddress}`);
 
   return orchestratorAddress;
 
@@ -510,7 +512,7 @@ export const mintMockTokens = async (
   });
   console.info(`> Minting ${amount} tokens (${token}) to ${to}...`);
   await publicClient.waitForTransactionReceipt({ hash });
-  console.info('✅ Tokens minted');
+  console.info(`✅ Tokens minted: ${hash}`);
   await new Promise((resolve) => setTimeout(resolve, 5000));
 };
 

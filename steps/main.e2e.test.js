@@ -57,7 +57,7 @@ describe('#main', () => {
       }
     } else {
       const report = await getReport(projectName, batchNr);
-      assert.equal(report.multiSendEncodedTxs.length, 1);
+      assert.equal(report.transactionJsons.length, 1);
     }
   });
 });

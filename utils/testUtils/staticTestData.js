@@ -213,9 +213,9 @@ export const batchReportData = {
 export const nftHolders = [addresses.addr1, addresses.addr2];
 
 export const mockCollateralToken =
-  '0x668f5965c26e5df5e9917f0d7d3367c8d8433682';
+  '0x668f5965c26e5df5e9917f0d7d3367c8d8433682'; // PoS
 
-// '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80'; base sepolia
+// '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80' // base sepolia
 
 export const deployArgs = (admin, safe) => {
   return {
