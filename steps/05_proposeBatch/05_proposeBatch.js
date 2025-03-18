@@ -1,4 +1,5 @@
 import { WITH_PROPOSING } from '../../config.js';
+import { isNativeToken } from '../../utils/helpers.js';
 
 export const proposeBatch = async ({
   queryService,
@@ -14,6 +15,11 @@ export const proposeBatch = async ({
 
   // use sum of total valid contribution and matching funds (if any)
   const collateralAmountIn = batchService.getCollateralAmountIn();
+
+  if (isNativeToken(collateralToken)) {
+    console.log('💰 Wrapping native token');
+    transactionBuilderService.wrapNativeToken(collateralAmountIn);
+  }
 
   // approve token
   transactionBuilderService.approve(

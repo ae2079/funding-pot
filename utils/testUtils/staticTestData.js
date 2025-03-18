@@ -213,7 +213,7 @@ export const batchReportData = {
 export const nftHolders = [addresses.addr1, addresses.addr2];
 
 export const mockCollateralToken =
-  '0x668f5965c26e5df5e9917f0d7d3367c8d8433682'; // PoS
+  '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'; // PoS
 
 // '0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80' // base sepolia
 
@@ -235,8 +235,8 @@ export const deployArgs = (admin, safe) => {
         reserveRatioForSelling: 333_333,
         buyIsOpen: true,
         sellIsOpen: true,
-        initialIssuanceSupply: '200002.999999999999998676',
-        initialCollateralSupply: '296.306333665498798599',
+        initialIssuanceSupply: '20.999999999999998676',
+        initialCollateralSupply: '0.06333665498798599',
       },
       collateralToken: mockCollateralToken,
     },

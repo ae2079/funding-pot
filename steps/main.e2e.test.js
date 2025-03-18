@@ -13,6 +13,7 @@ import {
 import { main } from './main.js';
 import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 import { WITH_PROPOSING } from '../config.js';
+import { mockAllowlist } from '../utils/testUtils/testHelpers.js';
 
 describe('#main', () => {
   const batchNr = '3';
@@ -23,7 +24,7 @@ describe('#main', () => {
 
   before(async () => {
     await setupForE2E();
-
+    mockAllowlist({ type: 'dynamic' });
     console.info(
       '🕒 Waiting for 5 seconds for ANKR API to catch up...'
     );

@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { formatUnits } from 'viem';
+
+import { NATIVE_TOKENS } from '../config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,3 +39,8 @@ export const getProjectNames = () => {
   );
   return Object.keys(projectsConfig);
 };
+
+export const isNativeToken = (token) =>
+  NATIVE_TOKENS.map((t) => t.toLowerCase()).includes(
+    token.toLowerCase()
+  );
