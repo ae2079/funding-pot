@@ -234,7 +234,6 @@ export class Queries {
         }
       }
     }
-    console.log(inflows);
     this.queries.inflows = inflows;
 
     console.timeEnd(timerKey);
