@@ -252,12 +252,23 @@ export class TransactionBuilder {
     );
   }
 
-  addTx(to, abiName, functionSignature, inputValues) {
+  wrapNativeToken(amount) {
+    this.addTx(
+      this.collateralToken,
+      'wethAbi',
+      'deposit()',
+      [],
+      amount
+    );
+  }
+
+  addTx(to, abiName, functionSignature, inputValues, value = '0') {
     this.transactions.push({
       to,
       abiName,
       functionSignature,
       inputValues,
+      value: value.toString(),
     });
   }
 
@@ -266,14 +277,15 @@ export class TransactionBuilder {
   getEncodedTxs() {
     const encodedTxs = [];
     for (const tx of this.transactions) {
-      const { to, abiName, functionSignature, inputValues } = tx;
+      const { to, abiName, functionSignature, inputValues, value } =
+        tx;
       const abi = abis[abiName];
 
       const encoded = encodeSingle({
         type: TransactionType.callContract,
         id: '0',
         to,
-        value: '0',
+        value,
         abi,
         functionSignature,
         inputValues,
@@ -281,7 +293,10 @@ export class TransactionBuilder {
 
       // encodeSingle returns a value of '0x00' for value
       // but the Safe API only accepts '0' => overwrite
-      encodedTxs.push({ ...encoded, value: '0' });
+      encodedTxs.push({
+        ...encoded,
+        value: encoded.value === '0x00' ? '0' : encoded.value,
+      });
     }
     return encodedTxs;
   }
@@ -294,11 +309,12 @@ export class TransactionBuilder {
   getReadableTxBatches() {
     return this.getTxBatches(
       this.transactions.map((tx) => {
-        const { to, functionSignature, inputValues } = tx;
+        const { to, functionSignature, inputValues, value } = tx;
         return {
           to,
           functionSignature,
           inputValues,
+          value,
         };
       })
     );

@@ -9,7 +9,8 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
-import { keysToLowerCase } from '../../utils/helpers.js';
+import { NATIVE_TOKENS } from '../../config.js';
+import { isNativeToken } from '../../utils/helpers.js';
 
 export class Queries {
   indexerUrl;
@@ -158,20 +159,73 @@ export class Queries {
     const timerKey = '  ⏱️ Getting inflows (ANKR API)';
     console.time(timerKey);
 
-    let transactions;
+    let data;
+    let inflows;
 
     let attempts = 0;
     for (let i = 0; i < 10; i++) {
       try {
-        transactions = await this.ankrProvider.getTokenTransfers({
-          address: recipient,
-          fromTimestamp,
-          toTimestamp,
-          blockchain: this.networkIdString,
-          pageSize: 10000,
-        });
+        if (isNativeToken(token)) {
+          const response =
+            await this.ankrProvider.getTransactionsByAddress({
+              address: recipient,
+              fromTimestamp,
+              toTimestamp,
+              blockchain: this.networkIdString,
+              pageSize: 10000,
+            });
+          data = response.transactions;
+          inflows = data
+            .filter(
+              (tx) => tx.to.toLowerCase() === recipient.toLowerCase()
+            )
+            .map((tx) => {
+              return {
+                participant: tx.from.toLowerCase(),
+                contribution: BigInt(tx.value),
+                timestamp: BigInt(tx.timestamp),
+                transactionHash: tx.hash,
+              };
+            });
+        } else {
+          data = await this.ankrProvider.getTokenTransfers({
+            address: recipient,
+            fromTimestamp,
+            toTimestamp,
+            blockchain: this.networkIdString,
+            pageSize: 10000,
+          });
+
+          inflows = data
+            .filter(
+              (tx) =>
+                tx.toAddress.toLowerCase() === recipient.toLowerCase()
+            )
+            .filter(
+              (tx) =>
+                tx.contractAddress.toLowerCase() ===
+                token.toLowerCase()
+            )
+            .map((tx) => {
+              const {
+                fromAddress,
+                value,
+                tokenDecimals,
+                timestamp,
+                transactionHash,
+              } = tx;
+              return {
+                participant: fromAddress.toLowerCase(),
+                contribution: parseUnits(value, tokenDecimals),
+                timestamp,
+                transactionHash,
+              };
+            })
+            .sort((a, b) => a.timestamp - b.timestamp);
+        }
         break;
       } catch (e) {
+        console.log(e);
         if (e.data.includes('context deadline exceeded')) {
           console.error('  ❌ Ankr API error, retrying...');
           attempts++;
@@ -180,32 +234,6 @@ export class Queries {
         }
       }
     }
-
-    const inflows = transactions.transfers
-      .filter(
-        (tx) => tx.toAddress.toLowerCase() === recipient.toLowerCase()
-      )
-      .filter(
-        (tx) =>
-          tx.contractAddress.toLowerCase() === token.toLowerCase()
-      )
-      .map((tx) => {
-        const {
-          fromAddress,
-          value,
-          tokenDecimals,
-          timestamp,
-          transactionHash,
-        } = tx;
-        return {
-          participant: fromAddress.toLowerCase(),
-          contribution: parseUnits(value, tokenDecimals),
-          timestamp,
-          transactionHash,
-        };
-      })
-      .sort((a, b) => a.timestamp - b.timestamp);
-
     this.queries.inflows = inflows;
 
     console.timeEnd(timerKey);

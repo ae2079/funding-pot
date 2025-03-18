@@ -1,3 +1,5 @@
+import '../../env.js';
+
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +11,7 @@ import {
   toHex,
   decodeEventLog,
   parseUnits,
+  formatUnits,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
@@ -126,30 +129,11 @@ export const deployWorkflowViaFactory = async (
   const inverterSdk = new Inverter({ publicClient, walletClient });
   const args = deployArgs(safeAddress, safeAddress);
 
-  console.info(
-    `> Minting ${parseUnits(
-      args.fundingManager.bondingCurveParams.initialCollateralSupply,
-      18
-    )} tokens (${args.fundingManager.collateralToken}) to ${
-      walletClient.account.address
-    }...`
-  );
   const tokenInstance = getContract({
     address: args.fundingManager.collateralToken,
     client: walletClient,
     abi: abis.erc20Abi,
   });
-  const hash = await tokenInstance.write.mint([
-    walletClient.account.address,
-    parseUnits(
-      args.fundingManager.bondingCurveParams.initialCollateralSupply,
-      18
-    ),
-  ]);
-  await publicClient.waitForTransactionReceipt({ hash });
-  console.info('✅ Tokens minted');
-
-  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   console.info('> Approving collateral token to factory...');
   const tx1 = await tokenInstance.write.approve([
@@ -159,8 +143,9 @@ export const deployWorkflowViaFactory = async (
       18
     ),
   ]);
+
   await publicClient.waitForTransactionReceipt({ hash: tx1 });
-  console.info('✅ Collateral token approved');
+  console.info(`✅ Collateral token approved: ${tx1}`);
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -181,7 +166,7 @@ export const deployWorkflowViaFactory = async (
     ),
   ]);
   await publicClient.waitForTransactionReceipt({ hash: tx2 });
-  console.info('✅ Funding added');
+  console.info(`✅ Funding added: ${tx2}`);
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -192,7 +177,7 @@ export const deployWorkflowViaFactory = async (
   });
 
   const { orchestratorAddress } = await run(args);
-  console.info('✅ Workflow deployed');
+  console.info(`✅ Workflow deployed: ${orchestratorAddress}`);
 
   return orchestratorAddress;
 
@@ -235,19 +220,20 @@ export const deployWorkflowViaFactory = async (
   return orchestratorAddress;
 };
 
-export const getBatchConfig = async (safe) => {
+export const getBatchConfig = async (safe, matchingFunds) => {
   const batchConfig = {
     VESTING_DETAILS: {},
     TIMEFRAME: {},
     LIMITS: {},
   };
 
-  const minContribution = 10_000_000_000_000_000;
-  const maxContribution = 10_000_000_000_000_000_000;
+  const minContribution = 1_000_000_000_000_000;
+  const maxContribution = 5_000_000_000_000_000;
   const individualLimit = '5000';
   const individualLimit2 = '500';
   const totalLimit = '300000';
   const price = '0.37';
+  const isMockToken = false;
 
   const { owner, delegate } = clients;
 
@@ -267,14 +253,16 @@ export const getBatchConfig = async (safe) => {
 
   batchConfig.IS_EARLY_ACCESS = false;
 
-  console.info('> Minting matching funds...');
-  await mintMockTokens(
-    mockCollateralToken,
-    parseUnits('420.69', 18),
-    safe,
-    delegate.walletClient,
-    delegate.publicClient
-  );
+  if (matchingFunds > 0 && isMockToken) {
+    console.info('> Minting matching funds...');
+    await mintMockTokens(
+      mockCollateralToken,
+      parseUnits(matchingFunds, 18),
+      safe,
+      delegate.walletClient,
+      delegate.publicClient
+    );
+  }
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
@@ -297,7 +285,21 @@ export const getBatchConfig = async (safe) => {
     );
     contributions.push(contribution);
 
-    // HERE: the error is thrown
+    const hash = await walletClient.sendTransaction({
+      to: safe,
+      value: contribution,
+    });
+
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash,
+    });
+
+    const b = await publicClient.getBlock(receipt.blockNumber);
+
+    console.info('✅ Contribution sent at timestamp: ', b.timestamp);
+
+    continue;
+
     await mintMockTokens(
       mockCollateralToken,
       contribution,
@@ -315,6 +317,7 @@ export const getBatchConfig = async (safe) => {
     console.info(
       `> Sending contribution ${contributions[i]} to safe...`
     );
+
     const tx = await tokenInstance.write.transfer([
       safe,
       contributions[i],
@@ -397,7 +400,7 @@ export const getProjectConfig = async (owner, safe) => {
             SAFE: safeAddress,
             ORCHESTRATOR: orchestratorAddress,
             NFT: projectConfig.NFT,
-            MATCHING_FUNDS: '420.69',
+            MATCHING_FUNDS: '0',
           },
         },
         null,
@@ -417,9 +420,8 @@ export const getProjectConfig = async (owner, safe) => {
 
 export const setupForE2E = async () => {
   const { owner, delegate } = clients;
-  const { SAFE } = await getProjectConfig(owner);
-  await getBatchConfig(SAFE);
-  mockAllowlist({ type: 'dynamic' });
+  const { SAFE, MATCHING_FUNDS } = await getProjectConfig(owner);
+  await getBatchConfig(SAFE, MATCHING_FUNDS);
 };
 
 export const signAndExecutePendingTxs = async (safeAddress) => {
@@ -510,7 +512,7 @@ export const mintMockTokens = async (
   });
   console.info(`> Minting ${amount} tokens (${token}) to ${to}...`);
   await publicClient.waitForTransactionReceipt({ hash });
-  console.info('✅ Tokens minted');
+  console.info(`✅ Tokens minted: ${hash}`);
   await new Promise((resolve) => setTimeout(resolve, 5000));
 };
 

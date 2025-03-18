@@ -48,13 +48,16 @@ Copy `.env.example` to `.env.test` and fill in the values. In order to run all t
 
 ### End-to-end test
 
+**Prerequisites**:
+
+- hold a small amount of wrapped native tokens in the wallet associated with the PK of the .env
+
 The `main.e2e.test.js` file is an end-to-end test that tests the whole flow from safe creation to vesting creation. Specifically it does the following steps:
 
 - deploy a safe (via Safe's Protocol and API Kits)
-- add the delegate to the safe (via the [Safe Transaction API](https://docs.safe.global/core-api/transaction-service-overview))
 - deploy the workflow (via the [Inverter SDK](https://github.com/InverterNetwork/sdk))
 - make all inverter-related workflow configurations
-- send some contributions to the safe from the owner and delegate accounts (using [this](https://sepolia.basescan.org/address/0xC4d4598AE5843ed851D81F4E35E97cCCC4E25D80) collateral token)
+- send some contributions to the safe from the owner and delegate accounts (using the native token)
 - generate & save a project & batch config
 - execute the funding pot script
 
