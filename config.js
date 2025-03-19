@@ -4,3 +4,6 @@ export const WITH_PROPOSING = false;
 export const NATIVE_TOKENS = [
   '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
 ];
+export const AXELAR_RELAYS = [
+  '0xE743a49F04F2f77eB2D3b753aE3AD599dE8CEA84',
+];
