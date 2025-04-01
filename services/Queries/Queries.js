@@ -10,7 +10,7 @@ import { AnkrProvider } from '@ankr.com/ankr.js';
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
 import { NATIVE_TOKENS } from '../../config.js';
-import { isNativeToken } from '../../utils/helpers.js';
+import { isNativeToken, isAxelarRelay } from '../../utils/helpers.js';
 
 export class Queries {
   indexerUrl;
@@ -187,10 +187,6 @@ export class Queries {
                 transactionHash: tx.hash,
               };
             });
-
-          for (const tx of inflows) {
-            console.log(tx);
-          }
         } else {
           data = await this.ankrProvider.getTokenTransfers({
             address: recipient,
@@ -238,6 +234,15 @@ export class Queries {
         }
       }
     }
+
+    for (const inflow of inflows) {
+      if (isAxelarRelay(inflow.participant)) {
+        inflow.participant = await this.lookupTransaction(
+          inflow.transactionHash
+        );
+      }
+    }
+
     this.queries.inflows = inflows;
 
     console.timeEnd(timerKey);
