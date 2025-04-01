@@ -230,17 +230,14 @@ export const getBatchConfig = async (safe, matchingFunds) => {
   const price = '0.37';
   const isMockToken = false;
 
+  const batchConfigFilePath = path.join(
+    __dirname,
+    `../../data/test/input/batches/s${season}/3.json`
+  );
+
   let batchConfig;
   try {
-    batchConfig = JSON.parse(
-      fs.readFileSync(
-        path.join(
-          __dirname,
-          `../../data/test/input/batches/s${season}/3.json`
-        )
-      )
-    );
-    console.log('batchConfig', batchConfig);
+    batchConfig = JSON.parse(fs.readFileSync(batchConfigFilePath));
     if (batchConfig) {
       console.info('🥳 Batch config already exists');
       return batchConfig;
