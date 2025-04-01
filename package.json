@@ -23,6 +23,7 @@
     "@safe-global/api-kit": "^2.4.4",
     "@safe-global/protocol-kit": "^4.0.4",
     "@safe-global/safe-core-sdk-types": "^5.0.3",
+    "axios": "^1.8.3",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",
     "ethers-multisend": "^3.1.0",

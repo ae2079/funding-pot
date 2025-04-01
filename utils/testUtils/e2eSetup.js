@@ -221,12 +221,7 @@ export const deployWorkflowViaFactory = async (
 };
 
 export const getBatchConfig = async (safe, matchingFunds) => {
-  const batchConfig = {
-    VESTING_DETAILS: {},
-    TIMEFRAME: {},
-    LIMITS: {},
-  };
-
+  const season = '2';
   const minContribution = 1_000_000_000_000_000;
   const maxContribution = 5_000_000_000_000_000;
   const individualLimit = '5000';
@@ -234,6 +229,31 @@ export const getBatchConfig = async (safe, matchingFunds) => {
   const totalLimit = '300000';
   const price = '0.37';
   const isMockToken = false;
+
+  const batchConfigFilePath = path.join(
+    __dirname,
+    `../../data/test/input/batches/s${season}/3.json`
+  );
+
+  let batchConfig;
+  try {
+    batchConfig = JSON.parse(fs.readFileSync(batchConfigFilePath));
+    if (batchConfig) {
+      console.info('🥳 Batch config already exists');
+      return batchConfig;
+    }
+  } catch (e) {
+    console.log(e);
+    console.info(
+      '❗ No batch config found, setting up new e2e environment...'
+    );
+  }
+
+  batchConfig = {
+    VESTING_DETAILS: {},
+    TIMEFRAME: {},
+    LIMITS: {},
+  };
 
   const { owner, delegate } = clients;
 
@@ -249,7 +269,6 @@ export const getBatchConfig = async (safe, matchingFunds) => {
   batchConfig.LIMITS.INDIVIDUAL_2 = individualLimit2;
   batchConfig.LIMITS.TOTAL = totalLimit;
   batchConfig.PRICE = price;
-  const season = '2';
 
   batchConfig.IS_EARLY_ACCESS = false;
 
@@ -340,11 +359,6 @@ export const getBatchConfig = async (safe, matchingFunds) => {
   const toBlock = await owner.publicClient.getBlock();
   const toTimestamp = toBlock.timestamp + 60n;
   batchConfig.TIMEFRAME.TO_TIMESTAMP = toTimestamp.toString();
-
-  const batchConfigFilePath = path.join(
-    __dirname,
-    `../../data/test/input/batches/s${season}/3.json`
-  );
 
   fs.writeFileSync(
     batchConfigFilePath,

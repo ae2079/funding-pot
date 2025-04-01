@@ -6,11 +6,12 @@ import {
   getAddress,
 } from 'viem';
 import { AnkrProvider } from '@ankr.com/ankr.js';
+import axios from 'axios';
 
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
 import { NATIVE_TOKENS } from '../../config.js';
-import { isNativeToken } from '../../utils/helpers.js';
+import { isNativeToken, isAxelarRelay } from '../../utils/helpers.js';
 
 export class Queries {
   indexerUrl;
@@ -234,6 +235,15 @@ export class Queries {
         }
       }
     }
+
+    for (const inflow of inflows) {
+      if (isAxelarRelay(inflow.participant)) {
+        inflow.participant = await this.lookupTransaction(
+          inflow.transactionHash
+        );
+      }
+    }
+
     this.queries.inflows = inflows;
 
     console.timeEnd(timerKey);
@@ -381,6 +391,60 @@ export class Queries {
       abi: abis.bondingCurveAbi,
     });
     return await fundingManager.read.projectCollateralFeeCollected();
+  }
+
+  async lookupTransaction(txHash) {
+    if (!txHash?.startsWith('0x')) {
+      throw new Error('Transaction hash must start with 0x');
+    }
+
+    // Move to config/constants
+    const AXELAR_API = 'https://api.axelarscan.io/gmp/searchGMP';
+    const SQUID_API = 'https://apiplus.squidrouter.com/v2/rfq/order';
+
+    // Try Axelar
+    try {
+      const axelarResponse = await axios.post(
+        AXELAR_API,
+        { size: 1, txHash },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      const from =
+        axelarResponse.data?.data?.[0]?.call?.receipt?.from;
+      if (from) {
+        console.log(`Transaction found in Axelar: ${from}`);
+        return from;
+      }
+    } catch (error) {
+      console.error(`Axelar API error for ${txHash}:`, error.message);
+    }
+
+    // Try Squid
+    try {
+      const squidResponse = await axios.post(
+        SQUID_API,
+        { hash: txHash },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-integrator-id': CONFIG.integratorId,
+          },
+        }
+      );
+
+      const from = squidResponse.data?.fromAddress;
+      if (from) {
+        console.log(`Transaction found in Squid: ${from}`);
+        return from;
+      }
+    } catch (error) {
+      console.error(`Squid API error for ${txHash}:`, error.message);
+    }
+
+    throw new Error(
+      `Could not resolve transaction ${txHash} from any source`
+    );
   }
 
   /* 
