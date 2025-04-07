@@ -3,6 +3,7 @@ export const BATCH_SIZE = 35;
 export const WITH_PROPOSING = false;
 export const NATIVE_TOKENS = [
   '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
+  '0x806B448d6C5b507727AD715425B744f038E475bc',
 ];
 export const AXELAR_RELAYS = [
   '0xd36aac0c9676e984d72823fb662ce94d3ab5e551',

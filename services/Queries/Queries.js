@@ -10,7 +10,6 @@ import axios from 'axios';
 
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
-import { NATIVE_TOKENS } from '../../config.js';
 import { isNativeToken, isAxelarRelay } from '../../utils/helpers.js';
 
 export class Queries {
