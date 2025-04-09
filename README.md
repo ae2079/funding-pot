@@ -222,7 +222,7 @@ npm run vesting:project <project_name>
 
 ```
 
-This will propose a transaction to the project safe. The command needs to be repeated for each project.
+This will create and store a transaction json. The command needs to be repeated for each project.
 
 ## Setting up Roles (claiming tributes)
 
