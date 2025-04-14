@@ -220,7 +220,11 @@ export const deployWorkflowViaFactory = async (
   return orchestratorAddress;
 };
 
-export const getBatchConfig = async (safe, matchingFunds) => {
+export const getBatchConfig = async (
+  safe,
+  matchingFunds,
+  projectConfig
+) => {
   const season = '2';
   const minContribution = 1_000_000_000_000_000;
   const maxContribution = 5_000_000_000_000_000;
@@ -230,17 +234,14 @@ export const getBatchConfig = async (safe, matchingFunds) => {
   const price = '0.37';
   const isMockToken = false;
 
-  const batchConfigFilePath = path.join(
-    __dirname,
-    `../../data/test/input/batches/s${season}/3.json`
-  );
-
   let batchConfig;
   try {
-    batchConfig = JSON.parse(fs.readFileSync(batchConfigFilePath));
-    if (batchConfig) {
+    if (
+      projectConfig.BATCH_CONFIGS &&
+      projectConfig.BATCH_CONFIGS[3]
+    ) {
       console.info('🥳 Batch config already exists');
-      return batchConfig;
+      return projectConfig.BATCH_CONFIGS[3];
     }
   } catch (e) {
     console.log(e);
@@ -360,9 +361,19 @@ export const getBatchConfig = async (safe, matchingFunds) => {
   const toTimestamp = toBlock.timestamp + 60n;
   batchConfig.TIMEFRAME.TO_TIMESTAMP = toTimestamp.toString();
 
+  projectConfig.BATCH_CONFIGS = { 3: batchConfig };
+  const filePath = path.join(
+    __dirname,
+    '../../data/test/input/projects.json'
+  );
+
   fs.writeFileSync(
-    batchConfigFilePath,
-    JSON.stringify(batchConfig, null, 2),
+    filePath,
+    JSON.stringify(
+      { GENERATED_TEST_PROJECT: projectConfig },
+      null,
+      2
+    ),
     'utf8'
   );
 
@@ -433,9 +444,10 @@ export const getProjectConfig = async (owner, safe) => {
 };
 
 export const setupForE2E = async () => {
-  const { owner, delegate } = clients;
-  const { SAFE, MATCHING_FUNDS } = await getProjectConfig(owner);
-  await getBatchConfig(SAFE, MATCHING_FUNDS);
+  const { owner } = clients;
+  const projectConfig = await getProjectConfig(owner);
+  const { SAFE, MATCHING_FUNDS } = projectConfig;
+  await getBatchConfig(SAFE, MATCHING_FUNDS, projectConfig);
 };
 
 export const signAndExecutePendingTxs = async (safeAddress) => {
