@@ -98,6 +98,8 @@ There are three types of inputs that the script executor can take. They can all 
 
 1. `projects.json`: Contains on object where each key is a project name and each value is an object containing the safe address and the orchestrator address of the project, the NFT contract address associated with the early access round, and the amount of collateral tokens to be used as matching funds. This file should be updated whenever a new project is added or an existing one is updated. There is an example file under `/data/test/input/projects.json`. If you run the tests for the first time, an additional project ("GENERATED_TEST_PROJECT") will be added to `/data/test/input/projects.json`.
 
+Nested under the key `BATCH_CONFIGS` you need - surprise - to put the batch config. The key corresponds to the batch number.
+
 **Example:**
 
 ```json
@@ -105,40 +107,44 @@ There are three types of inputs that the script executor can take. They can all 
   "SOME_PROJECT": {
     "SAFE": "0x0000000000000000000000000000000000000000",
     "ORCHESTRATOR": "0x0000000000000000000000000000000000000001",
-    "NFT": "0x0000000000000000000000000000000000000002"
+    "NFT": "0x0000000000000000000000000000000000000002",
+    "BATCH_CONFIGS:" {
+      "3": {
+        "VESTING_DETAILS": {
+          "START": "1726861746", // vesting start in unix time
+          "CLIFF": "60", // seconds until cliff from start
+          "END": "1726861806" // vesting end in unix time
+        },
+        "TIMEFRAME": {
+          "FROM_TIMESTAMP": "1726861686", // start timestamp
+          "TO_TIMESTAMP": "1726861818" // end timestamp => between these timestamps users can contribute
+        },
+        "LIMITS": {
+          "INDIVIDUAL": "2000", // individual contribution limit in dollar; for the EA and QACC round this corresponds to the cap for zkID users
+          "INDIVIDUAL_2": "250", // ONLY REQUIRED FOR QACC ROUND: individual contribution limit in dollar for GTCPass users
+          "TOTAL": "1500" // batch limit in dollar
+        },
+        "IS_EARLY_ACCESS": false, // if its an early access round (true) or a qacc round (false),
+        "PRICE": "0.1", // assumed dollar price per collateral token for that batch,
+        "MATCHING_FUNDS": "420.69" // ONLY REQUIRED FOR QACC ROUND: amount of collateral tokens to be used as matching funds; e.g. 420.69 POL coming from the matching pool
+      }
+    }
   },
   "ANOTHER_PROJECT": {
     "SAFE": "0x0000000000000000000000000000000000000003",
     "ORCHESTRATOR": "0x0000000000000000000000000000000000000004",
     "NFT": "0x0000000000000000000000000000000000000005",
-    "MATCHING_FUNDS": "420.69"
+    "MATCHING_FUNDS": "420.69",
+    "BATCH_CONFIGS:" {
+      "1": {
+        ...
+      },
+      "2": {
+        ...
+      }
+    }
+  },
   }
-}
-```
-
-2. `batches/<season>/<batchNr>.json`: For each batch, a JSON file needs to be added to the `batches` directory under the corresponding season. The file contains the vesting timelines (start, cliff, end) for that batch, the timeframe (fromTimestamp, toTimestamp) expressed in unix time (seconds, not miliseconds) during which contributions will be considered, the limits that apply to the contributions, as well as a flag if it's an early access round or not, the assumed price for that round and whether only a report should be generated (for reviewing purposes). If you run the e2e test for the first time, an example file for a fictional 3rd batch is generated in `/data/test/input/batches/s2/3.json`.
-
-**Example:**
-
-```json
-{
-  "VESTING_DETAILS": {
-    "START": "1726861746", // vesting start in unix time
-    "CLIFF": "60", // seconds until cliff from start
-    "END": "1726861806" // vesting end in unix time
-  },
-  "TIMEFRAME": {
-    "FROM_TIMESTAMP": "1726861686", // start timestamp
-    "TO_TIMESTAMP": "1726861818" // end timestamp => between these timestamps users can contribute
-  },
-  "LIMITS": {
-    "INDIVIDUAL": "2000", // individual contribution limit in dollar; for the EA and QACC round this corresponds to the cap for zkID users
-    "INDIVIDUAL_2": "250", // ONLY REQUIRED FOR QACC ROUND: individual contribution limit in dollar for GTCPass users
-    "TOTAL": "1500" // batch limit in dollar
-  },
-  "IS_EARLY_ACCESS": false, // if its an early access round (true) or a qacc round (false),
-  "PRICE": "0.1", // assumed dollar price per collateral token for that batch,
-  "MATCHING_FUNDS": "420.69" // ONLY REQUIRED FOR QACC ROUND: amount of collateral tokens to be used as matching funds; e.g. 420.69 POL coming from the matching pool
 }
 ```
 

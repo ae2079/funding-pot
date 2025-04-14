@@ -11,8 +11,7 @@
   "LIMITS": {
     "INDIVIDUAL": "10000",
     "INDIVIDUAL_2": "0",
-    "TOTAL": "200000",
-    "TOTAL_2": "0"
+    "TOTAL": "200000"
   },
   "PRICE": "0.37",
   "IS_EARLY_ACCESS": true
