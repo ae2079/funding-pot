@@ -13,11 +13,11 @@ const runScript = async () => {
   );
 
   if (TYPE === 'project') {
-    await main(PROJECT_NAME, BATCH);
+    await main(SEASON, PROJECT_NAME, BATCH);
   } else if (TYPE === 'all') {
     const projectNames = getProjectNames();
     for (const projectName of projectNames) {
-      await main(projectName, BATCH);
+      await main(SEASON, projectName, BATCH);
     }
   }
 };
