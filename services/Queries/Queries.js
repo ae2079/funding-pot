@@ -11,6 +11,7 @@ import axios from 'axios';
 import { queryBuilder } from './queryBuilder.js';
 import abis from '../../data/abis.js';
 import { isNativeToken, isAxelarRelay } from '../../utils/helpers.js';
+import { SQUID_MULTICALL } from '../../config.js';
 
 export class Queries {
   indexerUrl;
@@ -166,27 +167,21 @@ export class Queries {
     for (let i = 0; i < 10; i++) {
       try {
         if (isNativeToken(token)) {
-          const response =
-            await this.ankrProvider.getTransactionsByAddress({
-              address: recipient,
+          inflows = await this.getDirectNativeTransfers(
+            recipient,
+            fromTimestamp,
+            toTimestamp
+          );
+
+          inflows = [
+            ...inflows,
+            ...(await this.getSquidTransfers(
+              recipient,
               fromTimestamp,
               toTimestamp,
-              blockchain: this.networkIdString,
-              pageSize: 10000,
-            });
-          data = response.transactions;
-          inflows = data
-            .filter(
-              (tx) => tx.to.toLowerCase() === recipient.toLowerCase()
-            )
-            .map((tx) => {
-              return {
-                participant: tx.from.toLowerCase(),
-                contribution: BigInt(tx.value),
-                timestamp: BigInt(tx.timestamp),
-                transactionHash: tx.hash,
-              };
-            });
+              inflows.map((i) => i.transactionHash)
+            )),
+          ];
         } else {
           data = await this.ankrProvider.getTokenTransfers({
             address: recipient,
@@ -225,21 +220,7 @@ export class Queries {
         }
         break;
       } catch (e) {
-        console.log(e);
-        if (e.data.includes('context deadline exceeded')) {
-          console.error('  ❌ Ankr API error, retrying...');
-          attempts++;
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    for (const inflow of inflows) {
-      if (isAxelarRelay(inflow.participant)) {
-        inflow.participant = await this.lookupTransaction(
-          inflow.transactionHash
-        );
+        console.error(e);
       }
     }
 
@@ -265,6 +246,100 @@ export class Queries {
       await this.bondingCurve.read.getStaticPriceForBuying();
     console.timeEnd(timerKey);
     return this.queries.spotPrice;
+  }
+
+  async getDirectNativeTransfers(
+    recipient,
+    fromTimestamp,
+    toTimestamp
+  ) {
+    for (let i = 0; i < 10; i++) {
+      try {
+        const response =
+          await this.ankrProvider.getTransactionsByAddress({
+            address: recipient,
+            fromTimestamp,
+            toTimestamp,
+            blockchain: this.networkIdString,
+            pageSize: 10000,
+          });
+        const data = response.transactions;
+        const inflows = data
+          .filter(
+            (tx) => tx.to.toLowerCase() === recipient.toLowerCase()
+          )
+          .map((tx) => {
+            return {
+              participant: tx.from.toLowerCase(),
+              contribution: BigInt(tx.value),
+              timestamp: BigInt(tx.timestamp),
+              transactionHash: tx.hash,
+            };
+          });
+
+        return inflows;
+      } catch (e) {
+        if (e.data.includes('context deadline exceeded')) {
+          console.error('  ❌ Ankr API error, retrying...');
+        } else {
+          throw e;
+        }
+      }
+    }
+  }
+
+  async getSquidTransfers(
+    recipient,
+    fromTimestamp,
+    toTimestamp,
+    excludeHashes
+  ) {
+    for (let i = 0; i < 10; i++) {
+      try {
+        const { logs } = await this.ankrProvider.getLogs({
+          address: recipient,
+          fromTimestamp,
+          toTimestamp,
+          blockchain: this.networkIdString,
+          pageSize: 100,
+          decodeLogs: true,
+          topics: [
+            '0x3d0ce9bfc3ed7d6862dbb28b2dea94561fe714a1b4d019aa8af39730d1ad7c3d',
+          ],
+        });
+
+        const filteredLogs = logs.filter(
+          (l) => !excludeHashes.includes(l.transactionHash)
+        );
+
+        const inflows = [];
+        for (const log of filteredLogs) {
+          const [sender] = log.event.inputs;
+          if (
+            sender.valueDecoded.toLowerCase() ===
+            SQUID_MULTICALL.toLowerCase()
+          ) {
+            const actualSender = await this.lookupTransaction(
+              log.transactionHash
+            );
+            inflows.push({
+              participant: actualSender,
+              contribution: BigInt(log.event.inputs[1].valueDecoded),
+              timestamp: BigInt(log.timestamp),
+              transactionHash: log.transactionHash,
+            });
+          }
+        }
+
+        return inflows;
+      } catch (e) {
+        if (e.data.includes('context deadline exceeded')) {
+          console.error('  ❌ Ankr API error, retrying...');
+        } else {
+          throw e;
+        }
+      }
+    }
   }
 
   async getNftHolders(token) {
@@ -427,7 +502,7 @@ export class Queries {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-integrator-id': CONFIG.integratorId,
+            'x-integrator-id': process.env.SQUID_INTEGRATOR_ID,
           },
         }
       );
@@ -439,6 +514,27 @@ export class Queries {
       }
     } catch (error) {
       console.error(`Squid API error for ${txHash}:`, error.message);
+    }
+
+    for (let i = 0; i < 10; i++) {
+      try {
+        const { transactions } =
+          await this.ankrProvider.getTransactionsByHash({
+            transactionHash: txHash,
+            blockchain: this.networkIdString,
+          });
+        console.log(
+          `Transaction found in Ankr: ${transactions[0].from}`
+        );
+        return transactions[0].from;
+      } catch (error) {
+        if (error.data.includes('context deadline exceeded')) {
+          console.error('  ❌ Ankr API error, retrying...');
+        } else {
+          console.error(error);
+          break;
+        }
+      }
     }
 
     throw new Error(

@@ -14,8 +14,6 @@ export const loadInputs = (season, projectName, batch) => {
 
 const loadConfigs = (batch, projectName) => {
   const projectsConfig = loadProjectsConfig();
-  console.log(projectsConfig);
-  console.log(projectName);
   return {
     projectsConfig,
     batchConfig: projectsConfig[projectName].BATCH_CONFIGS[batch],
