@@ -43,6 +43,7 @@ export class Queries {
       this.getAdvancedApiEndpoint(advancedApiKey)
     );
     this.queries = { addresses: {} };
+    this.errors = [];
   }
 
   async setup(orchestratorAddress) {
@@ -294,9 +295,10 @@ export class Queries {
     toTimestamp,
     excludeHashes
   ) {
+    let logs;
     for (let i = 0; i < 10; i++) {
       try {
-        const { logs } = await this.ankrProvider.getLogs({
+        ({ logs } = await this.ankrProvider.getLogs({
           address: recipient,
           fromTimestamp,
           toTimestamp,
@@ -306,32 +308,7 @@ export class Queries {
           topics: [
             '0x3d0ce9bfc3ed7d6862dbb28b2dea94561fe714a1b4d019aa8af39730d1ad7c3d',
           ],
-        });
-
-        const filteredLogs = logs.filter(
-          (l) => !excludeHashes.includes(l.transactionHash)
-        );
-
-        const inflows = [];
-        for (const log of filteredLogs) {
-          const [sender] = log.event.inputs;
-          if (
-            sender.valueDecoded.toLowerCase() ===
-            SQUID_MULTICALL.toLowerCase()
-          ) {
-            const actualSender = await this.lookupTransaction(
-              log.transactionHash
-            );
-            inflows.push({
-              participant: actualSender,
-              contribution: BigInt(log.event.inputs[1].valueDecoded),
-              timestamp: BigInt(log.timestamp),
-              transactionHash: log.transactionHash,
-            });
-          }
-        }
-
-        return inflows;
+        }));
       } catch (e) {
         if (e.data.includes('context deadline exceeded')) {
           console.error('  ❌ Ankr API error, retrying...');
@@ -340,6 +317,31 @@ export class Queries {
         }
       }
     }
+
+    const filteredLogs = logs.filter(
+      (l) => !excludeHashes.includes(l.transactionHash)
+    );
+
+    const inflows = [];
+    for (const log of filteredLogs) {
+      const [sender] = log.event.inputs;
+      if (
+        sender.valueDecoded.toLowerCase() ===
+        SQUID_MULTICALL.toLowerCase()
+      ) {
+        const actualSender = await this.lookupTransaction(
+          log.transactionHash
+        );
+        inflows.push({
+          participant: actualSender,
+          contribution: BigInt(log.event.inputs[1].valueDecoded),
+          timestamp: BigInt(log.timestamp),
+          transactionHash: log.transactionHash,
+        });
+      }
+    }
+
+    return inflows;
   }
 
   async getNftHolders(token) {
@@ -468,6 +470,8 @@ export class Queries {
   }
 
   async lookupTransaction(txHash) {
+    let error = `API Error looking up transaction ${txHash}`;
+
     if (!txHash?.startsWith('0x')) {
       throw new Error('Transaction hash must start with 0x');
     }
@@ -536,6 +540,8 @@ export class Queries {
         }
       }
     }
+
+    this.errors.push(error);
 
     throw new Error(
       `Could not resolve transaction ${txHash} from any source`

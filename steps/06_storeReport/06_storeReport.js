@@ -33,6 +33,7 @@ export const storeReport = async (
       encoded: transactionBuilderService.getEncodedTxBatches(),
     },
     queries: queryService.queries,
+    errors: queryService.errors,
     inputs: {
       projectConfig,
       batchConfig,
