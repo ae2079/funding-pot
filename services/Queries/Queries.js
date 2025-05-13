@@ -310,7 +310,17 @@ export class Queries {
           ],
         }));
       } catch (e) {
-        if (e.data.includes('context deadline exceeded')) {
+        this.errors.push({
+          type: 'ankr',
+          method: 'getLogs',
+          message: e.message,
+          recipientAddress: recipient,
+        });
+        if (
+          e &&
+          e.data &&
+          e.data.includes('context deadline exceeded')
+        ) {
           console.error('  ❌ Ankr API error, retrying...');
         } else {
           throw e;
@@ -470,7 +480,7 @@ export class Queries {
   }
 
   async lookupTransaction(txHash) {
-    let error = `API Error looking up transaction ${txHash}`;
+    const customError = { txHash };
 
     if (!txHash?.startsWith('0x')) {
       throw new Error('Transaction hash must start with 0x');
@@ -495,6 +505,9 @@ export class Queries {
         return from;
       }
     } catch (error) {
+      customError.type = 'axelar';
+      customError.message = error.message;
+      this.errors.push(customError);
       console.error(`Axelar API error for ${txHash}:`, error.message);
     }
 
@@ -517,6 +530,9 @@ export class Queries {
         return from;
       }
     } catch (error) {
+      customError.type = 'squid';
+      customError.message = error.message;
+      this.errors.push(customError);
       console.error(`Squid API error for ${txHash}:`, error.message);
     }
 
@@ -532,7 +548,15 @@ export class Queries {
         );
         return transactions[0].from;
       } catch (error) {
-        if (error.data.includes('context deadline exceeded')) {
+        customError.type = 'ankr';
+        customError.message = error.message;
+        customError.method = 'getTransactionsByHash';
+        this.errors.push(customError);
+        if (
+          error &&
+          error.data &&
+          error.data.includes('context deadline exceeded')
+        ) {
           console.error('  ❌ Ankr API error, retrying...');
         } else {
           console.error(error);
@@ -540,8 +564,6 @@ export class Queries {
         }
       }
     }
-
-    this.errors.push(error);
 
     throw new Error(
       `Could not resolve transaction ${txHash} from any source`
