@@ -296,36 +296,26 @@ export class Queries {
     excludeHashes
   ) {
     let logs;
-    for (let i = 0; i < 10; i++) {
-      try {
-        ({ logs } = await this.ankrProvider.getLogs({
-          address: recipient,
-          fromTimestamp,
-          toTimestamp,
-          blockchain: this.networkIdString,
-          pageSize: 100,
-          decodeLogs: true,
-          topics: [
-            '0x3d0ce9bfc3ed7d6862dbb28b2dea94561fe714a1b4d019aa8af39730d1ad7c3d',
-          ],
-        }));
-      } catch (e) {
-        this.errors.push({
-          type: 'ankr',
-          method: 'getLogs',
-          message: e.message,
-          recipientAddress: recipient,
-        });
-        if (
-          e &&
-          e.data &&
-          e.data.includes('context deadline exceeded')
-        ) {
-          console.error('  ❌ Ankr API error, retrying...');
-        } else {
-          throw e;
-        }
-      }
+
+    try {
+      ({ logs } = await this.ankrProvider.getLogs({
+        address: recipient,
+        fromTimestamp,
+        toTimestamp,
+        blockchain: this.networkIdString,
+        pageSize: 10000,
+        decodeLogs: true,
+        topics: [
+          '0x3d0ce9bfc3ed7d6862dbb28b2dea94561fe714a1b4d019aa8af39730d1ad7c3d',
+        ],
+      }));
+    } catch (e) {
+      this.errors.push({
+        type: 'ankr',
+        method: 'getLogs',
+        message: e.message,
+        recipientAddress: recipient,
+      });
     }
 
     const filteredLogs = logs.filter(
