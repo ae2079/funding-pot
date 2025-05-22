@@ -260,6 +260,100 @@ The following is an example. Note that all projects share the same vesting detai
 
 This will save a transaction JSON to transactions folder. The json needs to be dropped in the Safe UI and confirmed by the workflow admin multisig.
 
+## Distribute Protocol Fees Script
+
+This script facilitates the distribution of accumulated ERC20 tokens and the native blockchain token from a central fee collector multisig to a predefined list of recipients based on specified shares.
+
+### Purpose
+
+The script performs the following actions:
+
+1.  Connects to the specified blockchain via an RPC URL.
+2.  Optionally, fetches current balances of configured ERC20 tokens and the native token held by the `feeCollectorMs`.
+3.  Calculates the amount of each token to be distributed to each recipient according to their defined share.
+4.  Generates Gnosis Safe compatible transaction JSON files for these transfers. These files can then be uploaded to the Gnosis Safe UI to execute the distributions.
+5.  Handles batching of transactions if the total number of transfers exceeds the configured `batchSize`.
+
+### Configuration
+
+The script's behavior is controlled by the `utils/scripts/distributeProtocolFees/config.js` file. Key configuration options include:
+
+- `feeCollectorMs`: (String) The address of the Gnosis Safe multisig wallet that holds the fees to be distributed.
+- `tokens`: (Array of Strings) A list of ERC20 token contract addresses that the script should attempt to distribute.
+- `recipients`: (Array of Objects) Defines who receives the fees and their respective shares. Each object should have:
+  - `name`: (String) A descriptive name for the recipient.
+  - `address`: (String) The recipient's blockchain address.
+  - `share`: (Number) The proportion of fees this recipient should receive (e.g., `0.6` for 60%). The sum of shares for all recipients should ideally be 1.0 for full distribution.
+- `rpcUrl`: (String) The URL of the RPC provider for the blockchain network (e.g., `https://1rpc.io/matic`).
+- `chainId`: (String) The chain ID of the network (e.g., `"137"` for Polygon Mainnet).
+- `batchSize`: (Number) The maximum number of individual transfer transactions to include in a single Gnosis Safe JSON file. Default is `100`.
+- `distributeNativeToken`: (Boolean) Set to `true` to enable distribution of the native blockchain token (e.g., ETH, MATIC), or `false` to disable it.
+- `nativeTokenSymbol`: (String) The symbol of the native token (e.g., `"MATIC"`). Used for logging.
+- `transactionMeta`: (Object) Contains metadata for the generated transaction files:
+  - `namePrefix`: (String) A prefix used in the output JSON `meta.name` field and filename (e.g., `"Fee Distribution"`).
+  - `description`: (String) A description for the transaction batch.
+
+**Example `config.js` snippet:**
+
+```javascript
+// utils/scripts/distributeProtocolFees/config.js
+export const config = {
+  feeCollectorMs: '0x7022CE36B265cAcD497b2d3AC70fB7020d3892a6',
+  tokens: [
+    '0x6fc91fbe42f72941486c98d11724b14fb8d18b36', // Example Token 1
+    // ... more token addresses
+  ],
+  recipients: [
+    { name: 'QACC', address: '0x...', share: 0.6 },
+    { name: 'Inverter', address: '0x...', share: 0.3 },
+    // ... more recipients
+  ],
+  rpcUrl: 'https://1rpc.io/matic',
+  chainId: '137',
+  batchSize: 100,
+  distributeNativeToken: true,
+  nativeTokenSymbol: 'MATIC',
+  transactionMeta: {
+    namePrefix: 'Fee Distribution',
+    description: 'Distribute protocol fees from the main multisig.',
+  },
+};
+```
+
+### Running the Script
+
+To execute the script, navigate to the project's root directory and run:
+
+```bash
+npm run distribute-fees
+```
+
+This command will run the script with `NODE_ENV` set to `production` by default, causing output files to be saved in `data/production/transactions/`.
+
+If you need to run the script for a different environment (e.g., to output files to `data/development/transactions/`), you can still override the `NODE_ENV` variable when invoking the script:
+
+```bash
+NODE_ENV=development npm run distribute-fees
+```
+
+### Output
+
+The script generates one or more Gnosis Safe transaction JSON files in the `data/{NODE_ENV}/transactions/` directory.
+The naming convention for these files is:
+
+- `[FEE_DISTRIBUTION]-{timestamp}.json` (if only one file is generated)
+- `[FEE_DISTRIBUTION]-{timestamp}-{index}.json` (e.g., `[FEE_DISTRIBUTION]-1678886400000-1.json`, `[FEE_DISTRIBUTION]-1678886400000-2.json`) if multiple files are generated due to `batchSize`.
+
+The `{timestamp}` is a Unix millisecond timestamp from the time the script was run. The `{index}` is a 1-based counter for multiple files from the same run.
+
+These JSON files can be uploaded to the Gnosis Safe interface to propose and execute the fee distribution transactions.
+
+### Important Notes
+
+- **Environment Configuration**: The script relies on the `NODE_ENV` environment variable to determine the output directory for transaction files (e.g., `data/production/transactions/` or `data/development/transactions/`). Ensure this is set appropriately before running.
+- **RPC URL and Chain ID**: For the script to fetch live on-chain data (like token balances and decimals), the `rpcUrl` and `chainId` in `config.js` must be correctly set to valid values. If placeholder values are used (e.g., `'YOUR_RPC_PROVIDER_URL_PLACEHOLDER'`), the script will skip blockchain interactions and assume zero balances for all tokens, though it will still generate transaction JSONs based on this assumption.
+- **Token Decimals**: The script attempts to fetch ERC20 token decimals on-chain. If this fails or if blockchain interactions are skipped, it defaults to 18 decimals. Native token distributions always assume 18 decimals.
+
 ## Technical Specification
 
 In summary this project does three things:

@@ -12,7 +12,8 @@
     "test:unit": "NODE_ENV=test node utils/testUtils/unitTestRunner.js",
     "test:e2e": "NODE_ENV=test node steps/main.e2e.test.js",
     "test:e2e:roles": "NODE_ENV=test node utils/scripts/setupRoles/setupRoles.e2e.test.js",
-    "clean": "NODE_ENV=test node utils/scripts/resetTestFiles.js"
+    "clean": "NODE_ENV=test node utils/scripts/resetTestFiles.js",
+    "distribute-fees": "NODE_ENV=production node utils/scripts/distributeProtocolFees/index.js"
   },
   "author": "",
   "license": "ISC",
