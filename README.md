@@ -232,32 +232,9 @@ This will create and store a transaction json. The command needs to be repeated 
 
 ## Setting up Roles (claiming tributes)
 
-### E2E test
-
-**Prerequisites**:
-
-- you need to run the regular e2e test before running this e2e test (in order to generate claimable fees): `npm run test:e2e`
-- potentially you need to remove the data/test/output/GENERATED_TEST_PROJECT/3.json file to be able to re-run the regular e2e test
-
-Run the e2e test with roles: `npm run test:e2e:roles`.
-
-This will do the following:
-
-1. runs the roles script for the GENERATED_TEST_PROJECT
-
-NOTE:
-
-- uses the delegate PK as the feeClaimer
-- uses the owner PK as the feeRecipient
-
-2. confirms the transaction on the safe (NOTE: for simplicity this test is re-using the funding pot multisig as the workflow admin multisig)
-3. as fee claimer, claims the fees (aka tributes) to the feeRecipient
-
 ### Running the script
 
 **Prerequisites**:
-
-- the address associated to your delegate PK (set in `.env`) has been set as delegate on the workflow admin multisig
 
 1. Set up the roles config in utils/scripts/inputs/roles.json
 
@@ -281,7 +258,7 @@ The following is an example. Note that all projects share the same vesting detai
 
 2. **Per project** run the script with `npm run roles:project <PROJECT_NAME>`
 
-This will propose a transaction to the workflow admin safe. The transaction needs to be confirmed by the workflow admin multisig.
+This will save a transaction JSON to transactions folder. The json needs to be dropped in the Safe UI and confirmed by the workflow admin multisig.
 
 ## Technical Specification
 

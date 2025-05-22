@@ -8,7 +8,7 @@
     "vesting:project": "NODE_ENV=test TYPE=project node utils/scripts/createVestings.js",
     "migrate:project": "TYPE=project node utils/scripts/migrateWorkflows/index.js",
     "close:project": "NODE_ENV=production TYPE=project node utils/scripts/closeWorkflows/index.js",
-    "roles:project": "NODE_ENV=test node utils/scripts/setupRoles/index.js",
+    "roles:project": "NODE_ENV=production node utils/scripts/setupRoles/index.js",
     "test:unit": "NODE_ENV=test node utils/testUtils/unitTestRunner.js",
     "test:e2e": "NODE_ENV=test node steps/main.e2e.test.js",
     "test:e2e:roles": "NODE_ENV=test node utils/scripts/setupRoles/setupRoles.e2e.test.js",

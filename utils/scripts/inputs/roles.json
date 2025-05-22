@@ -1,0 +1,13 @@
+{
+  "workflowAdmin": "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e",
+  "projects": {
+    "GENERATED_TEST_PROJECT": {
+      "feeClaimer": "0x...",
+      "feeRecipient": "0x..."
+    },
+    "<PROJECT_NAME_2>": {
+      "feeClaimer": "0x...",
+      "feeRecipient": "0x..."
+    }
+  }
+}
