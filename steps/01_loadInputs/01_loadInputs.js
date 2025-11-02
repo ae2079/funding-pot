@@ -7,16 +7,30 @@ const __dirname = dirname(__filename);
 
 export const loadInputs = (season, projectName, batch) => {
   return {
-    ...loadConfigs(batch, projectName),
+    ...loadConfigs(season, batch),
     ...loadbatchReports(projectName, batch),
   };
 };
 
-const loadConfigs = (batch, projectName) => {
+const loadConfigs = (season, batch) => {
+  const basePath = getBasePath('input');
+
+  // load project config (= project-specific constants)
   const projectsConfig = loadProjectsConfig();
+
+  // load batch config (batch-specific constants such as allowlist, start & end block, vesting schedule)
+  const batchConfig = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        __dirname,
+        `${basePath}/batches/s${season}/${batch}.json`
+      )
+    )
+  );
+
   return {
     projectsConfig,
-    batchConfig: projectsConfig[projectName].BATCH_CONFIGS[batch],
+    batchConfig,
   };
 };
 

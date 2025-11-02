@@ -50,7 +50,6 @@ const runScript = async () => {
   }
 
   await setupRoles(
-    projectName, // Pass PROJECT_NAME as the new first argument
     workflowAdmin,
     projectConfig.ORCHESTRATOR,
     feeClaimer,

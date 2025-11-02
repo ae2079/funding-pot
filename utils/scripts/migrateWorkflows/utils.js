@@ -113,7 +113,8 @@ export const getTokenSnapshot = async (token) => {
       }
     }
   }
-  return holders ? holders : [];
+
+  return holders;
 };
 
 export async function getState(projectConfig) {

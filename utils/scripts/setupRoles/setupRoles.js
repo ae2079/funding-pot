@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import { loadProjectsConfig } from '../../../steps/01_loadInputs/01_loadInputs.js';
-// import { Safe } from '../../../services/Safe/Safe.js'; // No longer needed for direct proposal
+import { Safe } from '../../../services/Safe/Safe.js';
 import { TransactionBuilder } from '../../../services/TransactionBuilder/TransactionBuilder.js';
 import { keccak256, toHex } from 'viem';
 import { Queries } from '../../../services/Queries/Queries.js';
@@ -21,7 +21,6 @@ const ROLE_KEY =
   '0x000000000000000000000000000000000000000000000000000000000000000f';
 
 export async function setupRoles(
-  projectName, // Added projectName for descriptive JSON output
   admin,
   orchestrator,
   feeClaimer,
@@ -39,7 +38,7 @@ export async function setupRoles(
     projectConfig: { SAFE: admin },
     workflowAddresses: queries.queries.addresses,
   });
-  // const safe = new Safe(CHAIN_ID, { SAFE: admin }, RPC_URL); // No longer needed
+  const safe = new Safe(CHAIN_ID, { SAFE: admin }, RPC_URL);
 
   // Deploy Roles
   const rolesModule = transactionBuilder.deployZodiacRoles(
@@ -56,19 +55,10 @@ export async function setupRoles(
   // // Assign role to fee claimer
   transactionBuilder.assignRole(ROLE_KEY, rolesModule, feeClaimer);
 
-  // Generate and save transaction JSONs instead of proposing directly
-  const transactionName = `[SETUP-ROLES]-[PROJECT-${projectName}]-[ADMIN-${admin}]`;
-  const transactionDescription = `Setup Zodiac Roles for project ${projectName}, admin Safe ${admin} (Fee Claimer: ${feeClaimer}, Fee Recipient: ${feeRecipient})`;
+  // Propose transactions
+  const txBatches = transactionBuilder.getEncodedTxBatches();
 
-  const transactionJsons = transactionBuilder.getTransactionJsons(
-    transactionName,
-    transactionDescription
-  );
-  transactionBuilder.saveTransactionJsons(transactionJsons);
-
-  console.log(
-    `✅ Roles setup transaction JSON saved for project ${projectName}, admin ${admin}`
-  );
+  await safe.proposeTxs(txBatches);
 
   return rolesModule;
 }

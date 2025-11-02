@@ -69,8 +69,6 @@ export async function closeWorkflow(projectName, projectsConfig) {
   transactionBuilder.renounceOwnership(addresses.mintWrapper);
   transactionBuilder.closeCurve();
 
-  transactionBuilder.assignVestingAdmin(firstAdmin);
-
   const collateralInFundingManager = await queriesService.balanceOf(
     addresses.collateralToken,
     addresses.bondingCurve
@@ -88,6 +86,7 @@ export async function closeWorkflow(projectName, projectsConfig) {
   );
 
   transactionBuilder.claimStream();
+  transactionBuilder.revokeCurveInteractionRole(projectConfig.SAFE);
   transactionBuilder.revokeVestingAdmin(projectConfig.SAFE);
 
   // Propose transactions

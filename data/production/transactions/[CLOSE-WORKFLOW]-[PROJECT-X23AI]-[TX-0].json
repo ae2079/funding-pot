@@ -1,0 +1,138 @@
+{
+    "version": "1.0",
+    "chainId": "137",
+    "createdAt": 1741259505190,
+    "meta": {
+        "name": "[GRASEFUL-EXIT]-[PROJECT-X23AI]-[TX-0]",
+        "description": "Graceful exit for X23AI",
+        "txBuilderVersion": "",
+        "createdFromSafeAddress": "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e",
+        "createdFromOwnerAddress": "",
+        "checksum": ""
+    },
+    "transactions": [{
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0xcf456ae70000000000000000000000009298fD550E2c02AdeBf781e08214E4131CDeC44e0000000000000000000000000000000000000000000000000000000000000001",
+            "contractMethod": "setMinter(address,bool)",
+            "contractInputsValues": [
+                "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e",
+                "true"
+            ]
+        },
+        {
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0x9dc29fac0000000000000000000000007022ce36b265cacd497b2d3ac70fb7020d3892a600000000000000000000000000000000000000000000030f5ef661a37768d38a",
+            "contractMethod": "burn(address,uint256)",
+            "contractInputsValues": [
+                "0x7022ce36b265cacd497b2d3ac70fb7020d3892a6",
+                "14450643373753125884810"
+            ]
+        },
+        {
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0x9dc29fac0000000000000000000000006B5d37c206D56B16F44b0C1b89002fd9B138e9Be00000000000000000000000000000000000000000005c29cfaf07df65a5fbbca",
+            "contractMethod": "burn(address,uint256)",
+            "contractInputsValues": [
+                "0x6B5d37c206D56B16F44b0C1b89002fd9B138e9Be",
+                "6963663969916356659231690"
+            ]
+        },
+        {
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0x9dc29fac000000000000000000000000e077bc743b10833cc938cd5700f92316d5da11bf000000000000000000000000000000000000000000002e32de3af927d57c1fd9",
+            "contractMethod": "burn(address,uint256)",
+            "contractInputsValues": [
+                "0xe077bc743b10833cc938cd5700f92316d5da11bf",
+                "218167208801063707353049"
+            ]
+        },
+        {
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0xcf456ae70000000000000000000000009298fD550E2c02AdeBf781e08214E4131CDeC44e0000000000000000000000000000000000000000000000000000000000000000",
+            "contractMethod": "setMinter(address,bool)",
+            "contractInputsValues": [
+                "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e",
+                "false"
+            ]
+        },
+        {
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0xcf456ae70000000000000000000000004b2502ad254855AC83990998695c6fD16c2CeeD90000000000000000000000000000000000000000000000000000000000000000",
+            "contractMethod": "setMinter(address,bool)",
+            "contractInputsValues": [
+                "0x4b2502ad254855AC83990998695c6fD16c2CeeD9",
+                "false"
+            ]
+        },
+        {
+            "to": "0x594a6257a477C6fd15f0dF56d1d319985197c1b0",
+            "value": "0",
+            "data": "0x715018a6",
+            "contractMethod": "renounceOwnership()",
+            "contractInputsValues": []
+        },
+        {
+            "to": "0x4b2502ad254855AC83990998695c6fD16c2CeeD9",
+            "value": "0",
+            "data": "0xc6ab5cdc",
+            "contractMethod": "closeBuy()",
+            "contractInputsValues": []
+        },
+        {
+            "to": "0x4b2502ad254855AC83990998695c6fD16c2CeeD9",
+            "value": "0",
+            "data": "0xba83c970",
+            "contractMethod": "closeSell()",
+            "contractInputsValues": []
+        },
+        {
+            "to": "0x6B5d37c206D56B16F44b0C1b89002fd9B138e9Be",
+            "value": "0",
+            "data": "0x8028b82f0000000000000000000000009298fD550E2c02AdeBf781e08214E4131CDeC44e0000000000000000000000000d500B1d8E8eF31E21C99d1Db9A6444d3ADf12700000000000000000000000000000000000000000000052516a57029c6719ca0e000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a",
+            "contractMethod": "pushPayment(address,address,uint256,uint256,uint256,uint256)",
+            "contractInputsValues": [
+                "0x9298fD550E2c02AdeBf781e08214E4131CDeC44e",
+                "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+                "388735900461443143289358",
+                "10",
+                "0",
+                "10"
+            ]
+        },
+        {
+            "to": "0x972063532dc2bd7210328044ed68Fb2530b3dEED",
+            "value": "0",
+            "data": "0x77329f350000000000000000000000006B5d37c206D56B16F44b0C1b89002fd9B138e9Be",
+            "contractMethod": "claimAll(address)",
+            "contractInputsValues": [
+                "0x6B5d37c206D56B16F44b0C1b89002fd9B138e9Be"
+            ]
+        },
+        {
+            "to": "0x4b2502ad254855AC83990998695c6fD16c2CeeD9",
+            "value": "0",
+            "data": "0xbcb6192043555256455f5553455200000000000000000000000000000000000000000000000000000000000000000000e077bc743b10833cc938cd5700f92316d5da11bf",
+            "contractMethod": "revokeModuleRole(bytes32,address)",
+            "contractInputsValues": [
+                "0x43555256455f5553455200000000000000000000000000000000000000000000",
+                "0xe077bc743b10833cc938cd5700f92316d5da11bf"
+            ]
+        },
+        {
+            "to": "0x6B5d37c206D56B16F44b0C1b89002fd9B138e9Be",
+            "value": "0",
+            "data": "0xbcb619205041594d454e545f505553484552000000000000000000000000000000000000000000000000000000000000e077bc743b10833cc938cd5700f92316d5da11bf",
+            "contractMethod": "revokeModuleRole(bytes32,address)",
+            "contractInputsValues": [
+                "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+                "0xe077bc743b10833cc938cd5700f92316d5da11bf"
+            ]
+        }
+    ]
+}

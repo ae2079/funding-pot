@@ -1,5 +1,3 @@
-import '../../env.js';
-
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -11,7 +9,6 @@ import {
   toHex,
   decodeEventLog,
   parseUnits,
-  formatUnits,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import ProtocolKit, { SafeFactory } from '@safe-global/protocol-kit';
@@ -129,11 +126,30 @@ export const deployWorkflowViaFactory = async (
   const inverterSdk = new Inverter({ publicClient, walletClient });
   const args = deployArgs(safeAddress, safeAddress);
 
+  console.info(
+    `> Minting ${parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    )} tokens (${args.fundingManager.collateralToken}) to ${
+      walletClient.account.address
+    }...`
+  );
   const tokenInstance = getContract({
     address: args.fundingManager.collateralToken,
     client: walletClient,
     abi: abis.erc20Abi,
   });
+  const hash = await tokenInstance.write.mint([
+    walletClient.account.address,
+    parseUnits(
+      args.fundingManager.bondingCurveParams.initialCollateralSupply,
+      18
+    ),
+  ]);
+  await publicClient.waitForTransactionReceipt({ hash });
+  console.info('✅ Tokens minted');
+
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   console.info('> Approving collateral token to factory...');
   const tx1 = await tokenInstance.write.approve([
@@ -143,9 +159,8 @@ export const deployWorkflowViaFactory = async (
       18
     ),
   ]);
-
   await publicClient.waitForTransactionReceipt({ hash: tx1 });
-  console.info(`✅ Collateral token approved: ${tx1}`);
+  console.info('✅ Collateral token approved');
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -166,7 +181,7 @@ export const deployWorkflowViaFactory = async (
     ),
   ]);
   await publicClient.waitForTransactionReceipt({ hash: tx2 });
-  console.info(`✅ Funding added: ${tx2}`);
+  console.info('✅ Funding added');
 
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -177,7 +192,7 @@ export const deployWorkflowViaFactory = async (
   });
 
   const { orchestratorAddress } = await run(args);
-  console.info(`✅ Workflow deployed: ${orchestratorAddress}`);
+  console.info('✅ Workflow deployed');
 
   return orchestratorAddress;
 
@@ -220,41 +235,19 @@ export const deployWorkflowViaFactory = async (
   return orchestratorAddress;
 };
 
-export const getBatchConfig = async (
-  safe,
-  matchingFunds,
-  projectConfig
-) => {
-  const season = '2';
-  const minContribution = 1_000_000_000_000_000;
-  const maxContribution = 5_000_000_000_000_000;
-  const individualLimit = '5000';
-  const individualLimit2 = '500';
-  const totalLimit = '300000';
-  const price = '0.37';
-  const isMockToken = false;
-
-  let batchConfig;
-  try {
-    if (
-      projectConfig.BATCH_CONFIGS &&
-      projectConfig.BATCH_CONFIGS[3]
-    ) {
-      console.info('🥳 Batch config already exists');
-      return projectConfig.BATCH_CONFIGS[3];
-    }
-  } catch (e) {
-    console.log(e);
-    console.info(
-      '❗ No batch config found, setting up new e2e environment...'
-    );
-  }
-
-  batchConfig = {
+export const getBatchConfig = async (safe) => {
+  const batchConfig = {
     VESTING_DETAILS: {},
     TIMEFRAME: {},
     LIMITS: {},
   };
+
+  const minContribution = 10_000_000_000_000_000;
+  const maxContribution = 10_000_000_000_000_000_000;
+  const individualLimit = '5000';
+  const individualLimit2 = '500';
+  const totalLimit = '300000';
+  const price = '0.37';
 
   const { owner, delegate } = clients;
 
@@ -270,19 +263,18 @@ export const getBatchConfig = async (
   batchConfig.LIMITS.INDIVIDUAL_2 = individualLimit2;
   batchConfig.LIMITS.TOTAL = totalLimit;
   batchConfig.PRICE = price;
+  const season = '2';
 
   batchConfig.IS_EARLY_ACCESS = false;
 
-  if (matchingFunds > 0 && isMockToken) {
-    console.info('> Minting matching funds...');
-    await mintMockTokens(
-      mockCollateralToken,
-      parseUnits(matchingFunds, 18),
-      safe,
-      delegate.walletClient,
-      delegate.publicClient
-    );
-  }
+  console.info('> Minting matching funds...');
+  await mintMockTokens(
+    mockCollateralToken,
+    parseUnits('420.69', 18),
+    safe,
+    delegate.walletClient,
+    delegate.publicClient
+  );
 
   console.info(
     '> Minting collateral tokens to contributors (so that they can contribute)...'
@@ -305,21 +297,7 @@ export const getBatchConfig = async (
     );
     contributions.push(contribution);
 
-    const hash = await walletClient.sendTransaction({
-      to: safe,
-      value: contribution,
-    });
-
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash,
-    });
-
-    const b = await publicClient.getBlock(receipt.blockNumber);
-
-    console.info('✅ Contribution sent at timestamp: ', b.timestamp);
-
-    continue;
-
+    // HERE: the error is thrown
     await mintMockTokens(
       mockCollateralToken,
       contribution,
@@ -337,7 +315,6 @@ export const getBatchConfig = async (
     console.info(
       `> Sending contribution ${contributions[i]} to safe...`
     );
-
     const tx = await tokenInstance.write.transfer([
       safe,
       contributions[i],
@@ -361,19 +338,14 @@ export const getBatchConfig = async (
   const toTimestamp = toBlock.timestamp + 60n;
   batchConfig.TIMEFRAME.TO_TIMESTAMP = toTimestamp.toString();
 
-  projectConfig.BATCH_CONFIGS = { 3: batchConfig };
-  const filePath = path.join(
+  const batchConfigFilePath = path.join(
     __dirname,
-    '../../data/test/input/projects.json'
+    `../../data/test/input/batches/s${season}/3.json`
   );
 
   fs.writeFileSync(
-    filePath,
-    JSON.stringify(
-      { GENERATED_TEST_PROJECT: projectConfig },
-      null,
-      2
-    ),
+    batchConfigFilePath,
+    JSON.stringify(batchConfig, null, 2),
     'utf8'
   );
 
@@ -425,7 +397,7 @@ export const getProjectConfig = async (owner, safe) => {
             SAFE: safeAddress,
             ORCHESTRATOR: orchestratorAddress,
             NFT: projectConfig.NFT,
-            MATCHING_FUNDS: '0',
+            MATCHING_FUNDS: '420.69',
           },
         },
         null,
@@ -444,10 +416,10 @@ export const getProjectConfig = async (owner, safe) => {
 };
 
 export const setupForE2E = async () => {
-  const { owner } = clients;
-  const projectConfig = await getProjectConfig(owner);
-  const { SAFE, MATCHING_FUNDS } = projectConfig;
-  await getBatchConfig(SAFE, MATCHING_FUNDS, projectConfig);
+  const { owner, delegate } = clients;
+  const { SAFE } = await getProjectConfig(owner);
+  await getBatchConfig(SAFE);
+  mockAllowlist({ type: 'dynamic' });
 };
 
 export const signAndExecutePendingTxs = async (safeAddress) => {
@@ -538,7 +510,7 @@ export const mintMockTokens = async (
   });
   console.info(`> Minting ${amount} tokens (${token}) to ${to}...`);
   await publicClient.waitForTransactionReceipt({ hash });
-  console.info(`✅ Tokens minted: ${hash}`);
+  console.info('✅ Tokens minted');
   await new Promise((resolve) => setTimeout(resolve, 5000));
 };
 

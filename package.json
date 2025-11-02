@@ -8,12 +8,11 @@
     "vesting:project": "NODE_ENV=test TYPE=project node utils/scripts/createVestings.js",
     "migrate:project": "TYPE=project node utils/scripts/migrateWorkflows/index.js",
     "close:project": "NODE_ENV=production TYPE=project node utils/scripts/closeWorkflows/index.js",
-    "roles:project": "NODE_ENV=production node utils/scripts/setupRoles/index.js",
+    "roles:project": "NODE_ENV=test node utils/scripts/setupRoles/index.js",
     "test:unit": "NODE_ENV=test node utils/testUtils/unitTestRunner.js",
     "test:e2e": "NODE_ENV=test node steps/main.e2e.test.js",
     "test:e2e:roles": "NODE_ENV=test node utils/scripts/setupRoles/setupRoles.e2e.test.js",
-    "clean": "NODE_ENV=test node utils/scripts/resetTestFiles.js",
-    "distribute-fees": "NODE_ENV=production node utils/scripts/distributeProtocolFees/index.js"
+    "clean": "NODE_ENV=test node utils/scripts/resetTestFiles.js"
   },
   "author": "",
   "license": "ISC",
@@ -24,7 +23,6 @@
     "@safe-global/api-kit": "^2.4.4",
     "@safe-global/protocol-kit": "^4.0.4",
     "@safe-global/safe-core-sdk-types": "^5.0.3",
-    "axios": "^1.8.3",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",
     "ethers-multisend": "^3.1.0",

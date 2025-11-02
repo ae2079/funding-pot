@@ -1,0 +1,175 @@
+{
+    "projectName": "AKARUN",
+    "batchNr": "2",
+    "batch": {
+        "data": {
+            "aggregatedPreviousContributions": {},
+            "totalContribution": {
+                "inCollateral": "0",
+                "inDollar": 0
+            },
+            "totalValidContribution": {
+                "inCollateral": "0",
+                "inDollar": 0
+            },
+            "totalInvalidContribution": {
+                "inCollateral": "0",
+                "inDollar": 0
+            },
+            "participants": {}
+        },
+        "config": {
+            "limits": {
+                "totalLimit": {
+                    "inCollateral": "728332119446467600000000",
+                    "inDollar": 300000
+                },
+                "individualLimit": {
+                    "inDollar": 15000,
+                    "inCollateral": "36416605972323380000000"
+                }
+            },
+            "price": "0.4119",
+            "isEarlyAccess": true
+        }
+    },
+    "safe": {
+        "proposedTransactions": []
+    },
+    "transactions": {
+        "readable": [],
+        "encoded": []
+    },
+    "queries": {
+        "addresses": {
+            "orchestrator": "0xac0b9b9648bfc2cb8cd5f0f7d42df9ec78a62a4a",
+            "bondingCurve": "0xF3ef1dDC511587BF16351af9Ba9947203F014f72",
+            "collateralToken": "0x22B21BedDef74FE62F031D2c5c8F7a9F8a4b304D",
+            "mintWrapper": "0x6941344942418FE8B58C98d24C8212DebE599935",
+            "issuanceToken": "0xA3dd6163B5742B0D8Cb7d79CB5DFE3F81F8F8fC4",
+            "paymentRouter": "0x513E116779a0E4645d262c3d78190B4cC6bB47Dd"
+        },
+        "timeframe": {
+            "fromTimestamp": 1731327000,
+            "toTimestamp": 1731759000
+        },
+        "inflows": [],
+        "nftHolders": []
+    },
+    "inputs": {
+        "projectConfig": {
+            "SAFE": "0x473c36457e2c134837937f7c20aa0abaf78210c3",
+            "ORCHESTRATOR": "0xac0b9b9648bfc2cb8cd5f0f7d42df9ec78a62a4a",
+            "NFT": "0x2985ac1e1cd37d3145379ce92dff0864d0d33c51"
+        },
+        "batchConfig": {
+            "TIMEFRAME": {
+                "FROM_TIMESTAMP": 1731327000,
+                "TO_TIMESTAMP": 1731759000
+            },
+            "VESTING_DETAILS": {
+                "START": 1730196000,
+                "CLIFF": 31536000,
+                "END": 1793268000
+            },
+            "LIMITS": {
+                "INDIVIDUAL": "15000",
+                "INDIVIDUAL_2": "0",
+                "TOTAL": "300000",
+                "TOTAL_2": "0"
+            },
+            "IS_EARLY_ACCESS": true,
+            "PRICE": "0.4119",
+            "ONLY_REPORT": false
+        }
+    },
+    "batchReports": {
+        "1": {
+            "projectName": "AKARUN",
+            "batchNr": "1",
+            "batch": {
+                "data": {
+                    "aggregatedPreviousContributions": {},
+                    "totalContribution": {
+                        "inCollateral": "0",
+                        "inDollar": 0
+                    },
+                    "totalValidContribution": {
+                        "inCollateral": "0",
+                        "inDollar": 0
+                    },
+                    "totalInvalidContribution": {
+                        "inCollateral": "0",
+                        "inDollar": 0
+                    },
+                    "participants": {}
+                },
+                "config": {
+                    "limits": {
+                        "totalLimit": {
+                            "inCollateral": "305064063453325250000000",
+                            "inDollar": 100000.00000000001
+                        },
+                        "individualLimit": {
+                            "inDollar": 5000,
+                            "inCollateral": "15253203172666260000000"
+                        }
+                    },
+                    "price": "0.3278",
+                    "isEarlyAccess": true
+                }
+            },
+            "safe": {
+                "proposedTransactions": []
+            },
+            "transactions": {
+                "readable": [],
+                "encoded": []
+            },
+            "queries": {
+                "addresses": {
+                    "orchestrator": "0xac0b9b9648bfc2cb8cd5f0f7d42df9ec78a62a4a",
+                    "bondingCurve": "0xF3ef1dDC511587BF16351af9Ba9947203F014f72",
+                    "collateralToken": "0x22B21BedDef74FE62F031D2c5c8F7a9F8a4b304D",
+                    "mintWrapper": "0x6941344942418FE8B58C98d24C8212DebE599935",
+                    "issuanceToken": "0xA3dd6163B5742B0D8Cb7d79CB5DFE3F81F8F8fC4",
+                    "paymentRouter": "0x513E116779a0E4645d262c3d78190B4cC6bB47Dd"
+                },
+                "timeframe": {
+                    "fromTimestamp": 1730894400,
+                    "toTimestamp": 1731327000
+                },
+                "inflows": [],
+                "nftHolders": []
+            },
+            "inputs": {
+                "projectConfig": {
+                    "SAFE": "0x473c36457e2c134837937f7c20aa0abaf78210c3",
+                    "ORCHESTRATOR": "0xac0b9b9648bfc2cb8cd5f0f7d42df9ec78a62a4a",
+                    "NFT": "0x2985ac1e1cd37d3145379ce92dff0864d0d33c51"
+                },
+                "batchConfig": {
+                    "TIMEFRAME": {
+                        "FROM_TIMESTAMP": 1730894400,
+                        "TO_TIMESTAMP": 1731327000
+                    },
+                    "VESTING_DETAILS": {
+                        "START": 1730196000,
+                        "CLIFF": 31536000,
+                        "END": 1793268000
+                    },
+                    "LIMITS": {
+                        "INDIVIDUAL": "5000",
+                        "INDIVIDUAL_2": "0",
+                        "TOTAL": "100000",
+                        "TOTAL_2": "0"
+                    },
+                    "IS_EARLY_ACCESS": true,
+                    "PRICE": "0.3278",
+                    "ONLY_REPORT": false
+                }
+            },
+            "batchReports": {}
+        }
+    }
+}

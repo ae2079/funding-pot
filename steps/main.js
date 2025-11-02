@@ -12,14 +12,11 @@ export const main = async (season, projectName, batchNr) => {
 
   // load configs & batchReports
   console.info(`1️⃣ Loading configs...`);
-  const { projectsConfig, batchReports } = loadInputs(
+  const { projectsConfig, batchConfig, batchReports } = loadInputs(
     season,
     projectName,
     batchNr
   );
-
-  const projectConfig = projectsConfig[projectName];
-  const batchConfig = projectConfig.BATCH_CONFIGS[batchNr];
 
   // checks if all required inputs are set in configs
   console.info(`2️⃣ Validating inputs...`);
@@ -37,6 +34,9 @@ export const main = async (season, projectName, batchNr) => {
     );
     return;
   }
+
+  // deconstruct project config
+  const projectConfig = projectsConfig[projectName];
 
   // instantiate services
   console.info(`3️⃣ Instantiating services...`);

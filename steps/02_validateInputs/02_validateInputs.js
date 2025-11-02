@@ -102,6 +102,12 @@ const validateConfigs = ({
         batchConfig,
       });
     }
+    if (!MATCHING_FUNDS) {
+      throwConfigError('MATCHING_FUNDS missing or empty', {
+        projectName,
+        batchConfig,
+      });
+    }
   }
 };
 

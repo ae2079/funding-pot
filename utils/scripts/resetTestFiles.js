@@ -8,10 +8,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 async function main() {
+  // remove allowlist
+  try {
+    fs.unlinkSync(
+      path.join(__dirname, '../../data/test/input/allowlist.json')
+    );
+  } catch (e) {}
+
   // remove batch config 3.json
   try {
     fs.unlinkSync(
-      path.join(__dirname, '../../data/test/input/batches/s2/3.json')
+      path.join(__dirname, '../../data/test/input/batches/3.json')
     );
   } catch (e) {}
 

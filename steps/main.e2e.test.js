@@ -13,7 +13,6 @@ import {
 import { main } from './main.js';
 import { loadInputs } from './01_loadInputs/01_loadInputs.js';
 import { WITH_PROPOSING } from '../config.js';
-import { mockAllowlist } from '../utils/testUtils/testHelpers.js';
 
 describe('#main', () => {
   const batchNr = '3';
@@ -24,7 +23,7 @@ describe('#main', () => {
 
   before(async () => {
     await setupForE2E();
-    mockAllowlist({ type: 'dynamic' });
+
     console.info(
       '🕒 Waiting for 5 seconds for ANKR API to catch up...'
     );
@@ -58,7 +57,7 @@ describe('#main', () => {
       }
     } else {
       const report = await getReport(projectName, batchNr);
-      assert.equal(report.transactionJsons.length, 1);
+      assert.equal(report.multiSendEncodedTxs.length, 1);
     }
   });
 });

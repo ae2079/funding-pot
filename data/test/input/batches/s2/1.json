@@ -1,0 +1,19 @@
+{
+  "VESTING_DETAILS": {
+    "START": "1729124916",
+    "CLIFF": "60",
+    "END": "1729124976"
+  },
+  "TIMEFRAME": {
+    "FROM_TIMESTAMP": "1729124856",
+    "TO_TIMESTAMP": "1729124994"
+  },
+  "LIMITS": {
+    "INDIVIDUAL": "5000",
+    "INDIVIDUAL_2": "0",
+    "TOTAL": "100000",
+    "TOTAL_2": "0"
+  },
+  "PRICE": "0.37",
+  "IS_EARLY_ACCESS": true
+}

@@ -1,0 +1,139 @@
+{
+  "version": "1.0",
+  "chainId": "1101",
+  "createdAt": 1741259484016,
+  "meta": {
+    "name": "[CLOSE-WORKFLOW]-[PROJECT-THE_GRAND_TIMELINE]-[TX-0]",
+    "description": "Close workflow for THE_GRAND_TIMELINE",
+    "txBuilderVersion": "",
+    "createdFromSafeAddress": "0x44a0eBe19A93C801AD97F308672fdc7B110B2128",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0xcf456ae700000000000000000000000044a0ebe19a93c801ad97f308672fdc7b110b21280000000000000000000000000000000000000000000000000000000000000001",
+      "contractMethod": "setMinter(address,bool)",
+      "contractInputsValues": [
+        "0x44a0eBe19A93C801AD97F308672fdc7B110B2128",
+        "true"
+      ]
+    },
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0x9dc29fac0000000000000000000000007022ce36b265cacd497b2d3ac70fb7020d3892a600000000000000000000000000000000000000000000010d5be03de83ae7a427",
+      "contractMethod": "burn(address,uint256)",
+      "contractInputsValues": [
+        "0x7022ce36b265cacd497b2d3ac70fb7020d3892a6",
+        "4968794515347733980199"
+      ]
+    },
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0x9dc29fac00000000000000000000000073f3cbe77253ea4e30266e3219f06674651c8a320000000000000000000000000000000000000000000568e5e73f31fb2b688d00",
+      "contractMethod": "burn(address,uint256)",
+      "contractInputsValues": [
+        "0x73f3cbe77253ea4e30266e3219f06674651c8a32",
+        "6539996179776569592024320"
+      ]
+    },
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0x9dc29fac000000000000000000000000d5c09846fec86d4965bc4b258e8615280aa511e90000000000000000000000000000000000000000000019bdc926f7ff88c62ad1",
+      "contractMethod": "burn(address,uint256)",
+      "contractInputsValues": [
+        "0xd5c09846fec86d4965bc4b258e8615280aa511e9",
+        "121560091246799857527505"
+      ]
+    },
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0xcf456ae700000000000000000000000044a0ebe19a93c801ad97f308672fdc7b110b21280000000000000000000000000000000000000000000000000000000000000000",
+      "contractMethod": "setMinter(address,bool)",
+      "contractInputsValues": [
+        "0x44a0eBe19A93C801AD97F308672fdc7B110B2128",
+        "false"
+      ]
+    },
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0xcf456ae7000000000000000000000000ac518d2e95fb45480f11801737be147a036c25470000000000000000000000000000000000000000000000000000000000000000",
+      "contractMethod": "setMinter(address,bool)",
+      "contractInputsValues": [
+        "0xaC518d2E95Fb45480F11801737Be147a036C2547",
+        "false"
+      ]
+    },
+    {
+      "to": "0x793Aa2517656F1dFd528F41000EFE9d4175C917E",
+      "value": "0",
+      "data": "0x715018a6",
+      "contractMethod": "renounceOwnership()",
+      "contractInputsValues": []
+    },
+    {
+      "to": "0xaC518d2E95Fb45480F11801737Be147a036C2547",
+      "value": "0",
+      "data": "0xc6ab5cdc",
+      "contractMethod": "closeBuy()",
+      "contractInputsValues": []
+    },
+    {
+      "to": "0xaC518d2E95Fb45480F11801737Be147a036C2547",
+      "value": "0",
+      "data": "0xba83c970",
+      "contractMethod": "closeSell()",
+      "contractInputsValues": []
+    },
+    {
+      "to": "0x73f3CBe77253eA4E30266E3219F06674651c8A32",
+      "value": "0",
+      "data": "0x8028b82f00000000000000000000000044a0ebe19a93c801ad97f308672fdc7b110b212800000000000000000000000022b21beddef74fe62f031d2c5c8f7a9f8a4b304d000000000000000000000000000000000000000000002ca6838d996e4f411670000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a",
+      "contractMethod": "pushPayment(address,address,uint256,uint256,uint256,uint256)",
+      "contractInputsValues": [
+        "0x44a0eBe19A93C801AD97F308672fdc7B110B2128",
+        "0x22B21BedDef74FE62F031D2c5c8F7a9F8a4b304D",
+        "210855764163989914850928",
+        "10",
+        "0",
+        "10"
+      ]
+    },
+    {
+      "to": "0x89a4cA46374C6Ade490dC11024A5EE266BfF9ebE",
+      "value": "0",
+      "data": "0x77329f3500000000000000000000000073f3cbe77253ea4e30266e3219f06674651c8a32",
+      "contractMethod": "claimAll(address)",
+      "contractInputsValues": [
+        "0x73f3CBe77253eA4E30266E3219F06674651c8A32"
+      ]
+    },
+    {
+      "to": "0xaC518d2E95Fb45480F11801737Be147a036C2547",
+      "value": "0",
+      "data": "0xbcb6192043555256455f5553455200000000000000000000000000000000000000000000000000000000000000000000d5c09846fec86d4965bc4b258e8615280aa511e9",
+      "contractMethod": "revokeModuleRole(bytes32,address)",
+      "contractInputsValues": [
+        "0x43555256455f5553455200000000000000000000000000000000000000000000",
+        "0xd5c09846fec86d4965bc4b258e8615280aa511e9"
+      ]
+    },
+    {
+      "to": "0x73f3CBe77253eA4E30266E3219F06674651c8A32",
+      "value": "0",
+      "data": "0xbcb619205041594d454e545f505553484552000000000000000000000000000000000000000000000000000000000000d5c09846fec86d4965bc4b258e8615280aa511e9",
+      "contractMethod": "revokeModuleRole(bytes32,address)",
+      "contractInputsValues": [
+        "0x5041594d454e545f505553484552000000000000000000000000000000000000",
+        "0xd5c09846fec86d4965bc4b258e8615280aa511e9"
+      ]
+    }
+  ]
+}

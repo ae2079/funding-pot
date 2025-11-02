@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
-
-import { NATIVE_TOKENS, AXELAR_RELAYS } from '../config.js';
+import { formatUnits } from 'viem';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,13 +38,3 @@ export const getProjectNames = () => {
   );
   return Object.keys(projectsConfig);
 };
-
-export const isNativeToken = (token) =>
-  NATIVE_TOKENS.map((t) => t.toLowerCase()).includes(
-    token.toLowerCase()
-  );
-
-export const isAxelarRelay = (from) =>
-  AXELAR_RELAYS.map((t) => t.toLowerCase()).includes(
-    from.toLowerCase()
-  );

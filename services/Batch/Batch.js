@@ -36,7 +36,7 @@ export class Batch {
       price: batchConfig.PRICE,
       isEarlyAccess,
       matchingFunds: parseUnits(
-        batchConfig.MATCHING_FUNDS || '0',
+        projectConfig.MATCHING_FUNDS || '0',
         18
       ),
     };
